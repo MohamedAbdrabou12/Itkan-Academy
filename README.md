@@ -1,6 +1,7 @@
 # Itkan Academy Backend
 
 # Project Structure (start point)
+```bash
 
 itkan-backend/
 ├─ .venv/                              # Virtual environment folder
@@ -105,7 +106,7 @@ itkan-backend/
 │      └─ test_example.py              # Example test file
 │
 └─ README.md                           # Project documentation file
-
+```
 
 
 ## Project Setup
@@ -140,7 +141,7 @@ POSTGRES_DB=<your_db_name>
 POSTGRES_HOST=<your_db_host>
 POSTGRES_PORT=<your_db_port>
 DATABASE_URL=postgresql://<user>:<password>@<host>:<port>/<db>
-````
+
 5.Run Alembic migrations
 $: alembic upgrade head
 
@@ -151,7 +152,7 @@ $: uvicorn app.main:app --reload
 Open Swagger UI
 Navigate to http://127.0.0.1:8000/docs
  to explore and test the API.
-
+```
 Additional Notes
 
 Make sure PostgreSQL server is running and accessible from your .env configuration.
@@ -161,6 +162,7 @@ All modules are structured to allow easy addition of new endpoints and business 
 Background tasks (Celery) require Redis to be running for asynchronous processing.
 
 Unit tests can be run using:
-$: pytest app/tests
-
+```bash
+ pytest app/tests
+```
 >> Note: Always activate the virtual environment before running commands to ensure dependencies are used from .venv.
