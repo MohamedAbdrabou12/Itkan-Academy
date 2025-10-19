@@ -105,35 +105,28 @@ itkan-backend/
 │      └─ test_example.py              # Example test file
 │
 └─ README.md                           # Project documentation file
-```
 
 
-## Project Setup
+Project Setup
 
-Follow these steps after cloning the repository:
-
-1. Clone the repository
-```bash
+# 1. Clone the repository
 git clone <repo_url>
 cd <repo_folder>
 
+# 2. Create and activate a virtual environment
 
-2.Create and activate a virtual environment
+# Linux/macOS
+python3 -m venv .venv
+source .venv/bin/activate
 
-Linux/macOS: 
-$: python3 -m venv .venv
-$: source .venv/bin/activate
+# Windows
+python -m venv .venv
+.venv\Scripts\activate
 
-Windows:
-$:python -m venv .venv
-$: .venv\Scripts\activate
+# 3. Install dependencies
+pip install -r requirements.txt
 
-3.Install dependencies
-$: pip install -r requirements.txt
-
-4.Create a .env file
-Add your database configuration:
-
+# 4. Create a .env file and add your database configuration
 POSTGRES_USER=<your_db_user>
 POSTGRES_PASSWORD=<your_db_password>
 POSTGRES_DB=<your_db_name>
@@ -141,40 +134,36 @@ POSTGRES_HOST=<your_db_host>
 POSTGRES_PORT=<your_db_port>
 DATABASE_URL=postgresql://<user>:<password>@<host>:<port>/<db>
 
-5.Run Alembic migrations
-$: alembic upgrade head
+# 5. Run Alembic migrations
+alembic upgrade head
 
-6.Start the FastAPI server
-$: uvicorn app.main:app --reload
+# 6. Start the FastAPI server
+uvicorn app.main:app --reload
 
-7. Run the project using:
-$: python run.py
+# 7. Run the project using the shortcut
+python run.py
 
->> Notes 
-
-Windows users: This automatically uses --loop asyncio since uvloop is not supported on Windows.
-
-Linux/macOS users: Runs with the default (faster) uvloop event loop.
-
-You no longer need to manually type uvicorn app.main:app --reload.
-
-Make sure your virtual environment (.venv) is activated before running.
-
+# Notes:
+# - Windows users: automatically uses '--loop asyncio' since uvloop isn't supported.
+# - Linux/macOS users: uses the default (faster) uvloop loop.
+# - Make sure your virtual environment (.venv) is activated before running.
 
 
 Open Swagger UI
+
+# Access the interactive API documentation at:
 Navigate to http://127.0.0.1:8000/docs
  to explore and test the API.
 
 Additional Notes
 
-Make sure PostgreSQL server is running and accessible from your .env configuration.
+# - Ensure PostgreSQL server is running and accessible from your .env configuration.
+# - All modules are structured for easy extension and new endpoint additions.
+# - Celery background tasks require Redis to be running.
+# - Run tests with:
+pytest app/tests
 
-All modules are structured to allow easy addition of new endpoints and business logic.
+# Note: Always activate the virtual environment before running commands
+# to ensure dependencies are used from .venv.
 
-Background tasks (Celery) require Redis to be running for asynchronous processing.
-
-Unit tests can be run using:
-$: pytest app/tests
-````
 >> Note: Always activate the virtual environment before running commands to ensure dependencies are used from .venv.
