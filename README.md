@@ -93,12 +93,12 @@ itkan-backend/
 │  │  └─ test_example.py               # Example test file
 │
 └─ README.md                           # Project documentation file
-```
+
 
 
 ⚙️ Project Setup
 
-```bash
+
 # 1. Clone the repository
 git clone <repo_url>
 cd <repo_folder>
@@ -136,7 +136,7 @@ python run.py
 # 7. Open Swagger UI
 # Visit:
 http://127.0.0.1:8000/docs
-```
+
 
 🧾 Notes
 
@@ -152,6 +152,6 @@ Celery background tasks require Redis to be active.
 
 Run tests with:
 
-```bash
+
 pytest app/tests
 ```
