@@ -105,3 +105,62 @@ itkan-backend/
 │      └─ test_example.py              # Example test file
 │
 └─ README.md                           # Project documentation file
+
+
+
+## Project Setup
+
+Follow these steps after cloning the repository:
+
+1. Clone the repository
+```bash
+git clone <repo_url>
+cd <repo_folder>
+
+
+2.Create and activate a virtual environment
+
+Linux/macOS: 
+$: python3 -m venv .venv
+$: source .venv/bin/activate
+
+Windows:
+$:python -m venv .venv
+$: .venv\Scripts\activate
+
+3.Install dependencies
+$: pip install -r requirements.txt
+
+4.Create a .env file
+Add your database configuration:
+
+```POSTGRES_USER=<your_db_user>
+POSTGRES_PASSWORD=<your_db_password>
+POSTGRES_DB=<your_db_name>
+POSTGRES_HOST=<your_db_host>
+POSTGRES_PORT=<your_db_port>
+DATABASE_URL=postgresql://<user>:<password>@<host>:<port>/<db>
+````
+5.Run Alembic migrations
+$: alembic upgrade head
+
+6.Start the FastAPI server
+$: uvicorn app.main:app --reload
+
+
+Open Swagger UI
+Navigate to http://127.0.0.1:8000/docs
+ to explore and test the API.
+
+Additional Notes
+
+Make sure PostgreSQL server is running and accessible from your .env configuration.
+
+All modules are structured to allow easy addition of new endpoints and business logic.
+
+Background tasks (Celery) require Redis to be running for asynchronous processing.
+
+Unit tests can be run using:
+$: pytest app/tests
+
+>> Note: Always activate the virtual environment before running commands to ensure dependencies are used from .venv.
