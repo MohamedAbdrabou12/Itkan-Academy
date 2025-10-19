@@ -1,7 +1,7 @@
 # Itkan Academy Backend
 
 # Project Structure (start point)
-
+```bash
 itkan-backend/
 ├─ .venv/                              # Virtual environment folder
 ├─ .env                                # Environment variables file
@@ -105,7 +105,7 @@ itkan-backend/
 │      └─ test_example.py              # Example test file
 │
 └─ README.md                           # Project documentation file
-
+```
 
 
 ## Project Setup
@@ -134,18 +134,32 @@ $: pip install -r requirements.txt
 4.Create a .env file
 Add your database configuration:
 
-```POSTGRES_USER=<your_db_user>
+POSTGRES_USER=<your_db_user>
 POSTGRES_PASSWORD=<your_db_password>
 POSTGRES_DB=<your_db_name>
 POSTGRES_HOST=<your_db_host>
 POSTGRES_PORT=<your_db_port>
 DATABASE_URL=postgresql://<user>:<password>@<host>:<port>/<db>
-````
+
 5.Run Alembic migrations
 $: alembic upgrade head
 
 6.Start the FastAPI server
 $: uvicorn app.main:app --reload
+
+7. Run the project using:
+$: python run.py
+
+>> Notes 
+
+Windows users: This automatically uses --loop asyncio since uvloop is not supported on Windows.
+
+Linux/macOS users: Runs with the default (faster) uvloop event loop.
+
+You no longer need to manually type uvicorn app.main:app --reload.
+
+Make sure your virtual environment (.venv) is activated before running.
+
 
 
 Open Swagger UI
@@ -162,5 +176,5 @@ Background tasks (Celery) require Redis to be running for asynchronous processin
 
 Unit tests can be run using:
 $: pytest app/tests
-
+````
 >> Note: Always activate the virtual environment before running commands to ensure dependencies are used from .venv.
