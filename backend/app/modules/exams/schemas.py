@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 
 
@@ -7,13 +7,14 @@ class ExamCreate(BaseModel):
     description: str | None = None
     created_by: int
 
+    model_config = ConfigDict(extra="ignore")
+
 
 class ExamOut(BaseModel):
     id: int
     title: str
-    description: str | None
-    created_at: datetime | None
+    description: str | None = None
+    created_at: datetime | None = None
     created_by: int
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)

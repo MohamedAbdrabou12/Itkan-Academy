@@ -1,9 +1,10 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
 from datetime import datetime
 from app.modules.exams import models, schemas
 
 
-def create_exam(db: Session, exam_in: schemas.ExamCreate):
+async def create_exam(db: AsyncSession, exam_in: schemas.ExamCreate):
     exam = models.Exam(
         title=exam_in.title,
         description=exam_in.description,
@@ -11,10 +12,11 @@ def create_exam(db: Session, exam_in: schemas.ExamCreate):
         created_at=datetime.utcnow(),
     )
     db.add(exam)
-    db.commit()
-    db.refresh(exam)
+    await db.commit()
+    await db.refresh(exam)
     return exam
 
 
-def get_exams(db: Session):
-    return db.query(models.Exam).all()
+async def get_exams(db: AsyncSession):
+    result = await db.execute(select(models.Exam))
+    return result.scalars().all()

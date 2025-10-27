@@ -13,5 +13,6 @@ class BranchOut(BaseModel):
     address: str | None = None
     phone: str | None = None
 
-    class Config:
-        orm_mode = True
+    model_config = {
+        "from_attributes": True  # enable ORM mode in Pydantic v2
+    }

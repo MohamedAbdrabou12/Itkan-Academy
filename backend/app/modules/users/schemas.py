@@ -1,5 +1,5 @@
 # app/modules/users/schemas.py
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, ConfigDict
 
 
 class UserCreate(BaseModel):
@@ -14,5 +14,5 @@ class UserOut(BaseModel):
     full_name: str
     is_active: bool
 
-    class Config:
-        orm_mode = True
+    # Pydantic V2: use 'from_attributes' instead of 'orm_mode'
+    model_config = ConfigDict(from_attributes=True)

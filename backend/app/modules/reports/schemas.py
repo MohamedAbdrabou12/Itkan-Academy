@@ -1,5 +1,8 @@
 from pydantic import BaseModel
+from typing import Literal
 
 
 class ReportRequest(BaseModel):
-    type: str  # 'attendance', 'performance', 'financial'
+    type: Literal[
+        "attendance", "performance", "financial"
+    ]  # restrict to specific report types

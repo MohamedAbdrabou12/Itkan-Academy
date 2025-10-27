@@ -1,6 +1,21 @@
-import platform, os
+import platform
+import subprocess
+import sys
 
+# Base uvicorn command
+cmd = [
+    sys.executable,
+    "-m",
+    "uvicorn",
+    "app.main:app",
+    "--reload",
+    "--reload-dir",
+    "app",
+]
+
+# Add asyncio loop option for Windows
 if platform.system() == "Windows":
-    os.system("uvicorn app.main:app --reload --loop asyncio")
-else:
-    os.system("uvicorn app.main:app --reload")
+    cmd += ["--loop", "asyncio"]
+
+# Run the command
+subprocess.run(cmd)
