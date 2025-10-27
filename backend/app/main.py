@@ -34,3 +34,9 @@ async def shutdown_event():
 @app.get("/test", tags=["test"])
 async def test():
     return {"status": "ok"}
+
+
+# Root endpoint
+@app.get("/")
+async def root():
+    return {"message": "Welcome to Itkan Academy!"}
