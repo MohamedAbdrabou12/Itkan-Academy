@@ -1,15 +1,17 @@
 from logging.config import fileConfig
 from sqlalchemy import pool
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncEngine
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncEngine  # noqa: F401
 from alembic import context
 import asyncio
 
 from app.core.config import settings
 from app.db.base import Base
-from app.modules.users import models as user_models
-from app.modules.branches import models as branch_models
-from app.modules.exams import models as exam_models
-from app.modules.financial import models as financial_models
+from app.modules.users import models as user_models  # noqa: F401
+from app.modules.branches import models as branch_models  # noqa: F401
+from app.modules.exams import models as exam_models  # noqa: F401
+from app.modules.financial import models as financial_models  # noqa: F401
+from app.modules.reports import models as report_models  # noqa: F401
+
 
 # Alembic config
 config = context.config
