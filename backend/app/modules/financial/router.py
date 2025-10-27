@@ -1,18 +1,21 @@
-from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
-from app.api.v1.deps import get_db
-from app.modules.financial import crud, schemas
+from typing import AsyncGenerator
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.ext.asyncio import AsyncSession
+from app.db.session import async_session
+from app.modules.users import crud, schemas
 
 router = APIRouter()
 
 
-@router.post("/", response_model=schemas.TransactionOut)
-def create_transaction(
-    txn_in: schemas.TransactionCreate, db: Session = Depends(get_db)
-):
-    return crud.create_transaction(db, txn_in)
+# Async generator with correct type annotation
+async def get_db() -> AsyncGenerator[AsyncSession, None]:
+    async with async_session() as session:
+        yield session
 
 
-@router.get("/", response_model=list[schemas.TransactionOut])
-def list_transactions(db: Session = Depends(get_db)):
-    return crud.get_transactions(db)
+@router.post("/", response_model=schemas.UserOut)
+async def create_user(user_in: schemas.UserCreate, db: AsyncSession = Depends(get_db)):
+    existing = await crud.get_user_by_email(db, user_in.email)
+    if existing:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    return await crud.create_user(db, user_in)

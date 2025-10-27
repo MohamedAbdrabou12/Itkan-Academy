@@ -1,13 +1,12 @@
-# app/modules/users/models.py
-from sqlalchemy import String, Boolean, Column
+from sqlalchemy import String, Boolean, Column, Integer
 from app.db.base import Base
-from sqlalchemy import Integer
 
 
 class User(Base):
     __tablename__ = "users"
-    id = Column(Integer, primary_key=True, index=True)
-    email = Column(String(255), unique=True, nullable=False, index=True)
-    full_name = Column(String(255))
-    is_active = Column(Boolean, default=True)
-    hashed_password = Column(String(512), nullable=False)
+
+    id: int = Column(Integer, primary_key=True, index=True)
+    email: str = Column(String(255), unique=True, nullable=False, index=True)
+    full_name: str | None = Column(String(255), nullable=True)
+    is_active: bool = Column(Boolean, default=True)
+    hashed_password: str = Column(String(512), nullable=False)

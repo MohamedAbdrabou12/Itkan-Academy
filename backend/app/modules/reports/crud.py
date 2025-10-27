@@ -1,7 +1,8 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
-def generate_report(db: Session, report_type: str):
+async def generate_report(db: AsyncSession, report_type: str):
+    # Placeholder logic; replace with real async DB queries if needed
     if report_type == "financial":
         return {"report": "Financial report generated."}
     elif report_type == "attendance":

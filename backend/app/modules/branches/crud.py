@@ -1,14 +1,16 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
 from app.modules.branches import models, schemas
 
 
-def create_branch(db: Session, branch_in: schemas.BranchCreate):
+async def create_branch(db: AsyncSession, branch_in: schemas.BranchCreate):
     branch = models.Branch(**branch_in.dict())
     db.add(branch)
-    db.commit()
-    db.refresh(branch)
+    await db.commit()
+    await db.refresh(branch)
     return branch
 
 
-def get_branches(db: Session):
-    return db.query(models.Branch).all()
+async def get_branches(db: AsyncSession):
+    result = await db.execute(select(models.Branch))
+    return result.scalars().all()

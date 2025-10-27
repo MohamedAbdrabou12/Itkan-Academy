@@ -1,11 +1,20 @@
 from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
-from app.api.v1.deps import get_db
+from sqlalchemy.ext.asyncio import AsyncSession
+from typing import AsyncGenerator
+from app.db.session import async_session
 from app.modules.reports import crud, schemas
 
 router = APIRouter()
 
 
+# Correctly typed async generator for FastAPI
+async def get_db() -> AsyncGenerator[AsyncSession, None]:
+    async with async_session() as session:
+        yield session
+
+
 @router.post("/")
-def generate_report(request: schemas.ReportRequest, db: Session = Depends(get_db)):
-    return crud.generate_report(db, request.type)
+async def generate_report(
+    request: schemas.ReportRequest, db: AsyncSession = Depends(get_db)
+):
+    return await crud.generate_report(db, request.type)
