@@ -8,11 +8,11 @@ class Settings(BaseSettings):
     ENV: str = Field(default="development")
 
     # Database
-    POSTGRES_USER: str = Field(..., env="POSTGRES_USER")
-    POSTGRES_PASSWORD: str = Field(..., env="POSTGRES_PASSWORD")
-    POSTGRES_DB: str = Field(..., env="POSTGRES_DB")
-    POSTGRES_HOST: str = Field(..., env="POSTGRES_HOST")
-    POSTGRES_PORT: int = Field(..., env="POSTGRES_PORT")
+    POSTGRES_USER: str = Field(default=..., validation_alias="POSTGRES_USER")
+    POSTGRES_PASSWORD: str = Field(default=..., validation_alias="POSTGRES_PASSWORD")
+    POSTGRES_DB: str = Field(default=..., validation_alias="POSTGRES_DB")
+    POSTGRES_HOST: str = Field(default=..., validation_alias="POSTGRES_HOST")
+    POSTGRES_PORT: int = Field(default=..., validation_alias="POSTGRES_PORT")
 
     # Security
     SECRET_KEY: str | None = None
