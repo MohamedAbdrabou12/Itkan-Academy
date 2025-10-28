@@ -9,12 +9,26 @@ from app.core.config import settings
 from app.db.base import Base
 
 # Import models so Alembic can detect them
+from app.modules.roles import models as role_models  # noqa: F401
+from app.modules.permissions.models import permission as permission_models  # noqa: F401
+from app.modules.permissions.models import permission_role as permission_role_models  # noqa: F401
+from app.modules.classes import models as class_models  # noqa: F401
+from app.modules.students import models as student_models  # noqa: F401
+from app.modules.audits.models import audit_log as audit_models  # noqa: F401
+from app.modules.attendance import models as attendance_models  # noqa: F401
+from app.modules.notifications import models as notification_models  # noqa: F401
+from app.modules.question_bank.models import QuestionBank as question_bank_models  # noqa: F401
+from app.modules.evaluations.models import daily_evaluation as daily_evaluation_models  # noqa: F401
 from app.modules.users import models as user_models  # noqa: F401
 from app.modules.branches import models as branch_models  # noqa: F401
-from app.modules.exams import models as exam_models  # noqa: F401
-from app.modules.financial import models as financial_models  # noqa: F401
-from app.modules.reports import models as report_models  # noqa: F401
-
+from app.modules.exams.models import exam as exam_models  # noqa: F401
+from app.modules.exams.models import exam_answer as exam_answer_models  # noqa: F401
+from app.modules.financial.models import payment as payment_models  # noqa: F401
+from app.modules.reports.models import reports_job as reports_job_models  # noqa: F401
+from app.modules.financial.models import invoice as invoice_models  # noqa: F401
+from app.modules.exams.models import exam_question as exam_question_models  # noqa: F401
+from app.modules.exams.models import exam_attempt as exam_attempt_models  # noqa: F401
+from app.modules.staff.models import Staff as staff_models  # noqa: F401
 
 # Load Alembic configuration
 config = context.config
