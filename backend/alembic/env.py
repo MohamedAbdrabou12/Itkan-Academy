@@ -1,8 +1,8 @@
 # alembic/env.py
 import asyncio
 from logging.config import fileConfig
-import sys
-import os
+import sys  # noqa: F401
+import os  # noqa: F401
 from alembic import context
 from app.core.config import settings
 from app.db.base import Base
