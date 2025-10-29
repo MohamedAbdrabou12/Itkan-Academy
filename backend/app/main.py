@@ -1,44 +1,51 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
 from app.core.config import settings
-
-# Import routers from modules
-# from app.modules.users.router import router as users_router
-# from app.modules.branches.router import router as branches_router
-# from app.modules.exams.router import router as exams_router
-# from app.modules.financial.router import router as financial_router
-# from backend.app.modules.reports.router.reports_job import router as reports_router
+from app.api.v1 import api_router
 
 
-# Create FastAPI app
-app = FastAPI(title=settings.APP_NAME)
+# Create FastAPI app instance
+app = FastAPI(
+    title=settings.APP_NAME,
+    version="2.0",
+    description="Itkan Academy API — powered by Mohamed Abdrabou",
+)
 
-# Include routers
-# app.include_router(users_router, prefix="/api/v1/users", tags=["users"])
-# app.include_router(branches_router, prefix="/api/v1/branches", tags=["branches"])
-# app.include_router(exams_router, prefix="/api/v1/exams", tags=["exams"])
-# app.include_router(financial_router, prefix="/api/v1/financial", tags=["financial"])
-# app.include_router(reports_router, prefix="/api/v1/reports", tags=["reports"])
+# Add CORS middleware (if frontend will call this API)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "*"
+    ],  # you can add specific origins in production as  ["http://localhost:5173"]
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Include API v2 router
+app.include_router(api_router, prefix="/api/v1")
 
 
 # Startup event
 @app.on_event("startup")
-async def startup_event():
-    print("🚀 Mohamed Abdrabou — Hello from Itkan Academy.")
+async def on_startup():
+    print("🚀 Mohamed Abdrabou — Itkan Academy API started successfully.")
 
 
 # Shutdown event
 @app.on_event("shutdown")
-async def shutdown_event():
-    print("🛑 Mohamed Abdrabou — Goodbye from Itkan Academy.")
+async def on_shutdown():
+    print("🛑 Mohamed Abdrabou — Itkan Academy API stopped.")
 
 
-# Test endpoint
-@app.get("/test", tags=["test"])
-async def test():
-    return {"status": "ok"}
+# Health check endpoint
+@app.get("/health", tags=["System"])
+async def health_check():
+    return {"status": "ok", "app": settings.APP_NAME}
 
 
 # Root endpoint
-@app.get("/")
+@app.get("/", tags=["Root"])
 async def root():
-    return {"message": "Welcome to Itkan Academy!"}
+    return {"message": "Welcome to Itkan Academy API 👋"}

@@ -1,5 +1,5 @@
 # app/db/session.py
-from contextlib import asynccontextmanager
+from typing import AsyncGenerator
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, AsyncEngine
 from sqlalchemy.orm import sessionmaker
 from app.core.config import settings
@@ -8,11 +8,11 @@ from app.core.config import settings
 engine: AsyncEngine = create_async_engine(
     settings.DATABASE_URL,
     echo=True,  # Show SQL logs in console (optional)
-    future=True,  # Enable 2.0 style usage
+    future=True,  # Enable SQLAlchemy 2.0 style
 )
 
 # Create Async Session Factory
-async_session = sessionmaker(
+async_session_factory = sessionmaker(
     bind=engine,
     class_=AsyncSession,
     autoflush=False,
@@ -20,18 +20,12 @@ async_session = sessionmaker(
 )
 
 
-# Dependency for FastAPI Routes
-@asynccontextmanager
-async def get_db_session():
-    async with async_session() as session:
+# Dependency for FastAPI routes
+async def get_db() -> AsyncGenerator[AsyncSession, None]:
+    async with async_session_factory() as session:
         yield session
 
 
-# Helper for Alembic Async Migrations
+# Helper for Alembic or manual DB access
 def get_engine() -> AsyncEngine:
     return engine
-
-
-# # Helper to get a new session
-# def get_session() -> AsyncSession:    #we can use this in services
-#     return async_session()
