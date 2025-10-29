@@ -1,25 +1,79 @@
-# app/modules/users/crud.py
+from typing import List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
-from app.modules.users import models, schemas
-from passlib.context import CryptContext
+from sqlalchemy.future import select
+from sqlalchemy.orm import selectinload
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+from app.modules.users.models import User
+from app.modules.users.schemas import UserCreate, UserUpdate
 
-
-async def get_user_by_email(db: AsyncSession, email: str):
-    result = await db.execute(select(models.User).where(models.User.email == email))
-    return result.scalars().first()
+from app.core.security import get_password_hash
 
 
-async def create_user(db: AsyncSession, user_in: schemas.UserCreate):
-    hashed_password = pwd_context.hash(user_in.password)
-    db_user = models.User(
-        email=user_in.email,
-        full_name=user_in.full_name,
-        hashed_password=hashed_password,
-    )
-    db.add(db_user)
-    await db.commit()
-    await db.refresh(db_user)
-    return db_user
+class UserCRUD:
+    async def get_all(self, db: AsyncSession) -> List[User]:
+        result = await db.execute(
+            select(User).options(
+                selectinload(User.role),
+                selectinload(User.branch),
+            )
+        )
+        return result.scalars().all()
+
+    async def get_by_id(self, db: AsyncSession, user_id: int) -> Optional[User]:
+        result = await db.execute(
+            select(User)
+            .where(User.id == user_id)
+            .options(
+                selectinload(User.role),
+                selectinload(User.branch),
+            )
+        )
+        return result.scalars().first()
+
+    async def get_by_email(self, db: AsyncSession, email: str) -> Optional[User]:
+        result = await db.execute(
+            select(User)
+            .where(User.email == email)
+            .options(
+                selectinload(User.role),
+                selectinload(User.branch),
+            )
+        )
+        return result.scalars().first()
+
+    async def create(self, db: AsyncSession, obj_in: UserCreate) -> User:
+        hashed_password = get_password_hash(obj_in.password)
+        db_obj = User(
+            full_name=obj_in.full_name,
+            email=obj_in.email,
+            phone=obj_in.phone,
+            password_hash=hashed_password,
+            role_id=obj_in.role_id,
+            branch_id=obj_in.branch_id,
+            is_active=obj_in.is_active,
+            mfa_enabled=obj_in.mfa_enabled,
+        )
+        db.add(db_obj)
+        await db.commit()
+        await db.refresh(db_obj)
+        return db_obj
+
+    async def update(self, db: AsyncSession, db_obj: User, obj_in: UserUpdate) -> User:
+        data = obj_in.dict(exclude_unset=True)
+        if "password" in data:
+            data["password_hash"] = get_password_hash(data.pop("password"))
+        for field, value in data.items():
+            setattr(db_obj, field, value)
+        db.add(db_obj)
+        await db.commit()
+        await db.refresh(db_obj)
+        return db_obj
+
+    async def delete(self, db: AsyncSession, user_id: int) -> None:
+        user = await self.get_by_id(db, user_id)
+        if user:
+            await db.delete(user)
+            await db.commit()
+
+
+user_crud = UserCRUD()
