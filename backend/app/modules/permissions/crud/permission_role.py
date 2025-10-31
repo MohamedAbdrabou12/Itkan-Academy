@@ -1,4 +1,5 @@
-from typing import List
+# app/modules/permissions/crud/permission_role.py
+from typing import List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
@@ -19,17 +20,16 @@ class RolePermissionCRUD:
 
     async def create(
         self, db: AsyncSession, obj_in: RolePermissionCreate
-    ) -> RolePermission:
+    ) -> Optional[RolePermission]:
         db_obj = RolePermission(
-            role_id=obj_in.role_id,
-            permission_id=obj_in.permission_id,
+            role_id=obj_in.role_id, permission_id=obj_in.permission_id
         )
         db.add(db_obj)
         await db.commit()
         await db.refresh(db_obj)
         return db_obj
 
-    async def delete(self, db: AsyncSession, role_id: int, permission_id: int) -> None:
+    async def delete(self, db: AsyncSession, role_id: int, permission_id: int) -> bool:
         result = await db.execute(
             select(RolePermission)
             .where(RolePermission.role_id == role_id)
@@ -39,6 +39,8 @@ class RolePermissionCRUD:
         if obj:
             await db.delete(obj)
             await db.commit()
+            return True
+        return False
 
 
 role_permission_crud = RolePermissionCRUD()

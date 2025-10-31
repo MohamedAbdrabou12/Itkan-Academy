@@ -1,12 +1,13 @@
+# backend/app/modules/users/crud.py
 from typing import List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
 
-from app.modules.users.models import User
+from app.modules.users.models import User, UserStatus
 from app.modules.users.schemas import UserCreate, UserUpdate
 
-from app.core.security import get_password_hash
+from app.core.security import get_password_hash as hash_password
 
 
 class UserCRUD:
@@ -42,7 +43,7 @@ class UserCRUD:
         return result.scalars().first()
 
     async def create(self, db: AsyncSession, obj_in: UserCreate) -> User:
-        hashed_password = get_password_hash(obj_in.password)
+        hashed_password = hash_password(obj_in.password)
         db_obj = User(
             full_name=obj_in.full_name,
             email=obj_in.email,
@@ -52,8 +53,10 @@ class UserCRUD:
             branch_id=obj_in.branch_id,
             is_active=obj_in.is_active,
             mfa_enabled=obj_in.mfa_enabled,
+            status=obj_in.status or UserStatus.pending,
         )
         db.add(db_obj)
+        await db.flush()
         await db.commit()
         await db.refresh(db_obj)
         return db_obj
@@ -61,7 +64,7 @@ class UserCRUD:
     async def update(self, db: AsyncSession, db_obj: User, obj_in: UserUpdate) -> User:
         data = obj_in.dict(exclude_unset=True)
         if "password" in data:
-            data["password_hash"] = get_password_hash(data.pop("password"))
+            data["password_hash"] = hash_password(data.pop("password"))
         for field, value in data.items():
             setattr(db_obj, field, value)
         db.add(db_obj)

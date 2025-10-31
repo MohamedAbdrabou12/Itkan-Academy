@@ -1,3 +1,4 @@
+# app/modules/permissions/crud/permission.py
 from typing import List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -44,11 +45,13 @@ class PermissionCRUD:
         await db.refresh(db_obj)
         return db_obj
 
-    async def delete(self, db: AsyncSession, permission_id: int) -> None:
+    async def delete(self, db: AsyncSession, permission_id: int) -> bool:
         permission = await self.get_by_id(db, permission_id)
         if permission:
             await db.delete(permission)
             await db.commit()
+            return True
+        return False
 
 
 permission_crud = PermissionCRUD()

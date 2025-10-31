@@ -27,13 +27,13 @@ app.add_middleware(
 app.include_router(api_router, prefix="/api/v1")
 
 
-# Startup event
+# Main application entry point
 @app.on_event("startup")
 async def on_startup():
     print("🚀 Mohamed Abdrabou — Itkan Academy API started successfully.")
 
 
-# Shutdown event
+# Application shutdown event
 @app.on_event("shutdown")
 async def on_shutdown():
     print("🛑 Mohamed Abdrabou — Itkan Academy API stopped.")
