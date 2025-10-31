@@ -10,7 +10,7 @@ from app.core.authorization import require_permission
 from app.modules.users.schemas import UserCreate, UserRead, UserUpdate, UserStatus
 from app.modules.users.crud import user_crud
 
-router = APIRouter(prefix="/users", tags=["Admin Users"])
+router = APIRouter(prefix="/users")
 
 
 @router.get(

@@ -32,11 +32,11 @@ from app.modules.exams.router.exam_attempt import router as exam_attempt_router
 api_router = APIRouter()
 
 # Include sub-routers with tags for Swagger grouping
-api_router.include_router(user_router, tags=["Users"])
+api_router.include_router(user_router, tags=["Admin Users"])
 api_router.include_router(role_router, tags=["Roles"])
 api_router.include_router(permission_router, tags=["Permissions"])
 api_router.include_router(role_permission_router, tags=["Role Permissions"])
-api_router.include_router(auth_router, tags=["Authentication"])
+api_router.include_router(auth_router, tags=["Public Auth"])
 api_router.include_router(branch_router, tags=["Branches"])
 api_router.include_router(class_router, tags=["Classes"])
 api_router.include_router(staff_router, tags=["Staff"])

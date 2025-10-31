@@ -19,7 +19,7 @@ from app.api.v1.auth.schemas import (
     ActivateUserRequest,
 )
 
-router = APIRouter(prefix="/auth", tags=["Public Auth"])
+router = APIRouter(prefix="/auth")
 
 
 # Login
