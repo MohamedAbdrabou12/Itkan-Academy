@@ -1,4 +1,3 @@
-# app/modules/branches/models.py
 from __future__ import annotations
 from datetime import datetime
 from typing import Optional, List, TYPE_CHECKING
@@ -10,7 +9,6 @@ from app.db.base import Base
 
 # Avoid circular imports
 if TYPE_CHECKING:
-    from app.modules.users.models import User
     from app.modules.classes.models import Class
 
 
@@ -32,9 +30,6 @@ class Branch(Base):
     )
 
     # Relationships
-    users: Mapped[List[User]] = relationship(
-        back_populates="branch", lazy="selectin", cascade="all, delete-orphan"
-    )
     classes: Mapped[List[Class]] = relationship(
         back_populates="branch", lazy="selectin", cascade="all, delete-orphan"
     )

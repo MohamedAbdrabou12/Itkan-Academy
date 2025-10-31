@@ -1,0 +1,50 @@
+[
+  {
+    "id": 1,
+    "name": "الفرع الرئيسي - بني سويف",
+    "address": "شارع الجامعة، أمام جامعة بني سويف، بني سويف 62511",
+    "phone": "+20 082 2345678",
+    "email": "main@qurankindergarten.com",
+    "active": true
+  },
+  {
+    "id": 2,
+    "name": "فرع حي غرب",
+    "address": "حي غرب، شارع التسعين، بجوار مستشفى بني سويف التعليمي، بني سويف 62512",
+    "phone": "+20 082 2345679",
+    "email": "west@qurankindergarten.com",
+    "active": true
+  },
+  {
+    "id": 3,
+    "name": "فرع حي شرق",
+    "address": "حي شرق، شارع النصر، أمام حديقة الطفل، بني سويف 62513",
+    "phone": "+20 082 2345680",
+    "email": "east@qurankindergarten.com",
+    "active": true
+  },
+  {
+    "id": 4,
+    "name": "فرع مدينة ناصر",
+    "address": "مدينة ناصر، شارع الصناعات، بجوار مركز الشباب، بني سويف 62514",
+    "phone": "+20 082 2345681",
+    "email": "naser@qurankindergarten.com",
+    "active": true
+  },
+  {
+    "id": 5,
+    "name": "فرع حي الأربعين",
+    "address": "حي الأربعين، شارع المدارس، بجوار مدرسة الأربعين الابتدائية، بني سويف 62515",
+    "phone": "+20 082 2345682",
+    "email": "arbaeen@qurankindergarten.com",
+    "active": true
+  },
+  {
+    "id": 6,
+    "name": "فرع بني سويف الجديدة",
+    "address": "مدينة بني سويف الجديدة، الحي السكني الأول، قطعة ٥، بني سويف 62516",
+    "phone": "+20 082 2345683",
+    "email": "newcity@qurankindergarten.com",
+    "active": true
+  }
+]

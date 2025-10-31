@@ -1,11 +1,10 @@
-# # app/modules/roles/crud.py
 from typing import List, Optional
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
-from sqlalchemy.orm import selectinload
 
 from app.modules.roles.models import Role
 from app.modules.roles.schemas import RoleCreate, RoleUpdate
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
+from sqlalchemy.orm import selectinload
 
 
 class RoleCRUD:

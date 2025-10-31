@@ -12,10 +12,10 @@ from app.modules.financial.schemas.payment import (
 )
 from app.modules.financial.crud.payment import payment_crud
 
-router = APIRouter(prefix="/payments", tags=["Payments"])
+payment_router = APIRouter(prefix="/payments", tags=["Payments"])
 
 
-@router.get(
+@payment_router.get(
     "/",
     response_model=List[PaymentRead],
     dependencies=[
@@ -27,7 +27,7 @@ async def list_payments(db: AsyncSession = Depends(get_db)):
     return await payment_crud.get_all(db)
 
 
-@router.get(
+@payment_router.get(
     "/{payment_id}",
     response_model=PaymentRead,
     dependencies=[
@@ -42,7 +42,7 @@ async def get_payment(payment_id: int, db: AsyncSession = Depends(get_db)):
     return payment
 
 
-@router.get(
+@payment_router.get(
     "/invoice/{invoice_id}",
     response_model=List[PaymentRead],
     dependencies=[
@@ -54,7 +54,7 @@ async def get_payments_by_invoice(invoice_id: int, db: AsyncSession = Depends(ge
     return await payment_crud.get_by_invoice(db, invoice_id)
 
 
-@router.post(
+@payment_router.post(
     "/",
     response_model=PaymentRead,
     status_code=status.HTTP_201_CREATED,
@@ -67,7 +67,7 @@ async def create_payment(payment_in: PaymentCreate, db: AsyncSession = Depends(g
     return await payment_crud.create(db, payment_in)
 
 
-@router.put(
+@payment_router.put(
     "/{payment_id}",
     response_model=PaymentRead,
     dependencies=[
@@ -84,7 +84,7 @@ async def update_payment(
     return await payment_crud.update(db, payment, payment_in)
 
 
-@router.put(
+@payment_router.put(
     "/{payment_id}/mark-paid",
     response_model=PaymentRead,
     dependencies=[
@@ -99,7 +99,7 @@ async def mark_payment_as_paid(payment_id: int, db: AsyncSession = Depends(get_d
     return payment
 
 
-@router.delete(
+@payment_router.delete(
     "/{payment_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     dependencies=[

@@ -13,10 +13,10 @@ from app.modules.exams.schemas.exam_attempt import (
 )
 from app.modules.exams.crud.exam_attempt import exam_attempt_crud
 
-router = APIRouter(prefix="/exam-attempts", tags=["Exam Attempts"])
+exam_attempt_router = APIRouter(prefix="/exam-attempts", tags=["Exam Attempts"])
 
 
-@router.get(
+@exam_attempt_router.get(
     "/",
     response_model=List[ExamAttemptRead],
     dependencies=[Depends(get_current_user), Depends(require_permission("exam:view"))],
@@ -25,7 +25,7 @@ async def list_exam_attempts(db: AsyncSession = Depends(get_db)):
     return await exam_attempt_crud.get_all(db)
 
 
-@router.get(
+@exam_attempt_router.get(
     "/{attempt_id}",
     response_model=ExamAttemptRead,
     dependencies=[Depends(get_current_user), Depends(require_permission("exam:view"))],
@@ -37,7 +37,7 @@ async def get_exam_attempt(attempt_id: int, db: AsyncSession = Depends(get_db)):
     return attempt
 
 
-@router.post(
+@exam_attempt_router.post(
     "/",
     response_model=ExamAttemptRead,
     status_code=status.HTTP_201_CREATED,
@@ -52,7 +52,7 @@ async def create_exam_attempt(
     return await exam_attempt_crud.create(db, obj_in)
 
 
-@router.put(
+@exam_attempt_router.put(
     "/{attempt_id}",
     response_model=ExamAttemptRead,
     dependencies=[
@@ -71,7 +71,7 @@ async def update_exam_attempt(
     return await exam_attempt_crud.update(db, attempt, obj_in)
 
 
-@router.delete(
+@exam_attempt_router.delete(
     "/{attempt_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     dependencies=[

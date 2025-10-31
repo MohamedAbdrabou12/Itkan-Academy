@@ -12,10 +12,10 @@ from app.modules.financial.schemas.invoice import (
 )
 from app.modules.financial.crud.invoice import invoice_crud
 
-router = APIRouter(prefix="/invoices", tags=["Invoices"])
+invoice_router = APIRouter(prefix="/invoices", tags=["Invoices"])
 
 
-@router.get(
+@invoice_router.get(
     "/",
     response_model=List[InvoiceRead],
     dependencies=[
@@ -27,7 +27,7 @@ async def list_invoices(db: AsyncSession = Depends(get_db)):
     return await invoice_crud.get_all(db)
 
 
-@router.get(
+@invoice_router.get(
     "/{invoice_id}",
     response_model=InvoiceRead,
     dependencies=[
@@ -42,7 +42,7 @@ async def get_invoice(invoice_id: int, db: AsyncSession = Depends(get_db)):
     return invoice
 
 
-@router.get(
+@invoice_router.get(
     "/student/{student_id}",
     response_model=List[InvoiceRead],
     dependencies=[
@@ -54,7 +54,7 @@ async def get_invoices_by_student(student_id: int, db: AsyncSession = Depends(ge
     return await invoice_crud.get_by_student(db, student_id)
 
 
-@router.post(
+@invoice_router.post(
     "/",
     response_model=InvoiceRead,
     status_code=status.HTTP_201_CREATED,
@@ -67,7 +67,7 @@ async def create_invoice(invoice_in: InvoiceCreate, db: AsyncSession = Depends(g
     return await invoice_crud.create(db, invoice_in)
 
 
-@router.put(
+@invoice_router.put(
     "/{invoice_id}",
     response_model=InvoiceRead,
     dependencies=[
@@ -84,7 +84,7 @@ async def update_invoice(
     return await invoice_crud.update(db, invoice, invoice_in)
 
 
-@router.delete(
+@invoice_router.delete(
     "/{invoice_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     dependencies=[

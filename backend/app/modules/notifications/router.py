@@ -13,11 +13,11 @@ from app.modules.notifications.schemas import (
 )
 from app.modules.notifications.crud import notification_crud
 
-router = APIRouter(prefix="/notifications", tags=["Notifications"])
+notification_router = APIRouter(prefix="/notifications", tags=["Notifications"])
 
 
 # List all notifications (admin or hr)
-@router.get(
+@notification_router.get(
     "/",
     response_model=List[NotificationRead],
     dependencies=[
@@ -30,7 +30,7 @@ async def list_notifications(db: AsyncSession = Depends(get_db)):
 
 
 # List user notifications (self)
-@router.get("/my", response_model=List[NotificationRead])
+@notification_router.get("/my", response_model=List[NotificationRead])
 async def list_my_notifications(
     current_user=Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
@@ -38,7 +38,7 @@ async def list_my_notifications(
 
 
 # Get single notification
-@router.get(
+@notification_router.get(
     "/{notif_id}",
     response_model=NotificationRead,
     dependencies=[
@@ -54,7 +54,7 @@ async def get_notification(notif_id: int, db: AsyncSession = Depends(get_db)):
 
 
 # Create / push new notification
-@router.post(
+@notification_router.post(
     "/",
     response_model=NotificationRead,
     status_code=status.HTTP_201_CREATED,
@@ -72,7 +72,7 @@ async def create_notification(
 
 
 # Update (mark as read/sent, etc.)
-@router.put(
+@notification_router.put(
     "/{notif_id}",
     response_model=NotificationRead,
     dependencies=[
@@ -90,7 +90,7 @@ async def update_notification(
 
 
 # Mark as sent (optional helper endpoint)
-@router.put(
+@notification_router.put(
     "/{notif_id}/mark-sent",
     response_model=NotificationRead,
     dependencies=[
@@ -106,7 +106,7 @@ async def mark_notification_sent(notif_id: int, db: AsyncSession = Depends(get_d
 
 
 # Delete notification
-@router.delete(
+@notification_router.delete(
     "/{notif_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     dependencies=[

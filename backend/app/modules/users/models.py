@@ -1,24 +1,23 @@
-# app/modules/users/models.py
 from __future__ import annotations
-from datetime import datetime
-from typing import Optional, TYPE_CHECKING
-from enum import Enum
 
-from sqlalchemy import String, Boolean, DateTime, Text, ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from datetime import datetime
+from enum import Enum
+from typing import TYPE_CHECKING, Optional
 
 from app.db.base import Base
+from sqlalchemy import DateTime, ForeignKey, String, Text
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 if TYPE_CHECKING:
-    from app.modules.roles.models import Role
-    from app.modules.branches.models import Branch
     from app.modules.notifications.models import Notification
+    from app.modules.roles.models import Role
 
 
 class UserStatus(str, Enum):
     pending = "pending"
     active = "active"
     rejected = "rejected"
+    deleted = "deleted"
 
 
 class User(Base):
@@ -28,11 +27,7 @@ class User(Base):
     role_id: Mapped[Optional[int]] = mapped_column(
         ForeignKey("roles.id", ondelete="SET NULL")
     )
-    branch_id: Mapped[Optional[int]] = mapped_column(
-        ForeignKey("branches.id", ondelete="SET NULL")
-    )
-
-    full_name: Mapped[str] = mapped_column(String(120), nullable=False)
+    name: Mapped[str] = mapped_column(String(120), nullable=False)
     email: Mapped[str] = mapped_column(
         String(120), unique=True, nullable=False, index=True
     )
@@ -42,10 +37,6 @@ class User(Base):
     status: Mapped[UserStatus] = mapped_column(
         String(20), default=UserStatus.pending, nullable=False
     )
-
-    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
-    # Two-factor authentication enabled
-    mfa_enabled: Mapped[bool] = mapped_column(Boolean, default=False)
     last_login: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=datetime.utcnow
@@ -54,12 +45,7 @@ class User(Base):
         DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow
     )
 
-    role: Mapped[Optional[Role]] = relationship(
-        "Role", back_populates="users", lazy="joined"
-    )
-    branch: Mapped[Optional[Branch]] = relationship(
-        "Branch", back_populates="users", lazy="joined"
-    )
+    role: Mapped[Role] = relationship("Role", back_populates="users", lazy="joined")
     notifications: Mapped[list[Notification]] = relationship(
         "Notification",
         back_populates="user",

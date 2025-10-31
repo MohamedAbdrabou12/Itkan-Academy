@@ -1,4 +1,3 @@
-# app/modules/staff/models.py
 from __future__ import annotations
 from datetime import datetime
 from typing import Optional, Dict, TYPE_CHECKING
@@ -21,8 +20,8 @@ class Staff(Base):
     user_id: Mapped[int] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
-    branch_id: Mapped[int] = mapped_column(
-        ForeignKey("branches.id", ondelete="CASCADE"), nullable=False
+    branch_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("branches.id", ondelete="SET NULL")
     )
     position: Mapped[Optional[str]] = mapped_column(String(100))
     salary_meta: Mapped[Optional[Dict]] = mapped_column(JSON)

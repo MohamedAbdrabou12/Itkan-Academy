@@ -1,19 +1,18 @@
-# # backend/app/modules/users/router.py
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List
 
-from app.db.session import get_db
 from app.core.auth import get_current_user
 from app.core.authorization import require_permission
-
-from app.modules.users.schemas import UserCreate, UserRead, UserUpdate, UserStatus
+from app.db.session import get_db
 from app.modules.users.crud import user_crud
+from app.modules.users.models import UserStatus
+from app.modules.users.schemas import UserCreate, UserRead, UserUpdate
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
 
-router = APIRouter(prefix="/users")
+user_router = APIRouter(prefix="/users")
 
 
-@router.get(
+@user_router.get(
     "/",
     response_model=List[UserRead],
     dependencies=[
@@ -25,7 +24,7 @@ async def list_users(db: AsyncSession = Depends(get_db)):
     return await user_crud.get_all(db)
 
 
-@router.get(
+@user_router.get(
     "/{user_id}",
     response_model=UserRead,
     dependencies=[
@@ -40,7 +39,7 @@ async def get_user(user_id: int, db: AsyncSession = Depends(get_db)):
     return user
 
 
-@router.post(
+@user_router.post(
     "/",
     response_model=UserRead,
     status_code=status.HTTP_201_CREATED,
@@ -56,7 +55,7 @@ async def create_user(user_in: UserCreate, db: AsyncSession = Depends(get_db)):
     return await user_crud.create(db, user_in)
 
 
-@router.post(
+@user_router.post(
     "/register",
     response_model=UserRead,
     status_code=status.HTTP_201_CREATED,
@@ -78,7 +77,7 @@ async def register_user_admin(user_in: UserCreate, db: AsyncSession = Depends(ge
     return await user_crud.create(db, user_in)
 
 
-@router.put(
+@user_router.put(
     "/{user_id}",
     response_model=UserRead,
     dependencies=[
@@ -97,7 +96,7 @@ async def update_user(
     return await user_crud.update(db, user, user_in)
 
 
-@router.delete(
+@user_router.delete(
     "/{user_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     dependencies=[
@@ -110,7 +109,7 @@ async def delete_user(user_id: int, db: AsyncSession = Depends(get_db)):
     return None
 
 
-@router.put(
+@user_router.put(
     "/{user_id}/approve",
     response_model=UserRead,
     dependencies=[

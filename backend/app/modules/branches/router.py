@@ -8,17 +8,17 @@ from app.core.authorization import require_permission
 from app.modules.branches.schemas import BranchCreate, BranchRead, BranchUpdate
 from app.modules.branches.crud import branch_crud
 
-router = APIRouter(prefix="/branches", tags=["Branches"])
+branch_router = APIRouter(prefix="/branches", tags=["Branches"])
 
 
-@router.get("/", response_model=List[BranchRead])
+@branch_router.get("/", response_model=List[BranchRead])
 async def list_branches(
     db: AsyncSession = Depends(get_db), current_user=Depends(get_current_user)
 ):
     return await branch_crud.get_all(db)
 
 
-@router.get("/{branch_id}", response_model=BranchRead)
+@branch_router.get("/{branch_id}", response_model=BranchRead)
 async def get_branch(
     branch_id: int,
     db: AsyncSession = Depends(get_db),
@@ -30,7 +30,7 @@ async def get_branch(
     return branch
 
 
-@router.post(
+@branch_router.post(
     "/",
     response_model=BranchRead,
     status_code=status.HTTP_201_CREATED,
@@ -43,7 +43,7 @@ async def create_branch(branch_in: BranchCreate, db: AsyncSession = Depends(get_
     return await branch_crud.create(db, branch_in)
 
 
-@router.put(
+@branch_router.put(
     "/{branch_id}",
     response_model=BranchRead,
     dependencies=[
@@ -60,7 +60,7 @@ async def update_branch(
     return await branch_crud.update(db, branch, branch_in)
 
 
-@router.delete(
+@branch_router.delete(
     "/{branch_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     dependencies=[

@@ -13,10 +13,10 @@ from app.modules.exams.schemas.exam_answer import (
 )
 from app.modules.exams.crud.exam_answer import exam_answer_crud
 
-router = APIRouter(prefix="/exam-answers", tags=["Exam Answers"])
+exam_answer_router = APIRouter(prefix="/exam-answers", tags=["Exam Answers"])
 
 
-@router.get(
+@exam_answer_router.get(
     "/",
     response_model=List[ExamAnswerRead],
     dependencies=[Depends(get_current_user), Depends(require_permission("exam:view"))],
@@ -25,7 +25,7 @@ async def list_exam_answers(db: AsyncSession = Depends(get_db)):
     return await exam_answer_crud.get_all(db)
 
 
-@router.get(
+@exam_answer_router.get(
     "/{answer_id}",
     response_model=ExamAnswerRead,
     dependencies=[Depends(get_current_user), Depends(require_permission("exam:view"))],
@@ -37,7 +37,7 @@ async def get_exam_answer(answer_id: int, db: AsyncSession = Depends(get_db)):
     return answer
 
 
-@router.post(
+@exam_answer_router.post(
     "/",
     response_model=ExamAnswerRead,
     status_code=status.HTTP_201_CREATED,
@@ -52,7 +52,7 @@ async def create_exam_answer(
     return await exam_answer_crud.create(db, obj_in)
 
 
-@router.put(
+@exam_answer_router.put(
     "/{answer_id}",
     response_model=ExamAnswerRead,
     dependencies=[
@@ -71,7 +71,7 @@ async def update_exam_answer(
     return await exam_answer_crud.update(db, answer, obj_in)
 
 
-@router.delete(
+@exam_answer_router.delete(
     "/{answer_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     dependencies=[

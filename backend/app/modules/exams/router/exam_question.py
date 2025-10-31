@@ -13,10 +13,10 @@ from app.modules.exams.schemas.exam_question import (
 )
 from app.modules.exams.crud.exam_question import exam_question_crud
 
-router = APIRouter(prefix="/exam-questions", tags=["Exam Questions"])
+exam_question_router = APIRouter(prefix="/exam-questions", tags=["Exam Questions"])
 
 
-@router.get(
+@exam_question_router.get(
     "/",
     response_model=List[ExamQuestionRead],
     dependencies=[Depends(get_current_user), Depends(require_permission("exam:view"))],
@@ -25,7 +25,7 @@ async def list_exam_questions(db: AsyncSession = Depends(get_db)):
     return await exam_question_crud.get_all(db)
 
 
-@router.get(
+@exam_question_router.get(
     "/{exam_id}/{question_id}",
     response_model=ExamQuestionRead,
     dependencies=[Depends(get_current_user), Depends(require_permission("exam:view"))],
@@ -39,7 +39,7 @@ async def get_exam_question(
     return exam_question
 
 
-@router.post(
+@exam_question_router.post(
     "/",
     response_model=ExamQuestionRead,
     status_code=status.HTTP_201_CREATED,
@@ -54,7 +54,7 @@ async def create_exam_question(
     return await exam_question_crud.create(db, obj_in)
 
 
-@router.put(
+@exam_question_router.put(
     "/{exam_id}/{question_id}",
     response_model=ExamQuestionRead,
     dependencies=[
@@ -74,7 +74,7 @@ async def update_exam_question(
     return await exam_question_crud.update(db, exam_question, obj_in)
 
 
-@router.delete(
+@exam_question_router.delete(
     "/{exam_id}/{question_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     dependencies=[

@@ -12,17 +12,17 @@ from app.modules.attendance.schemas import (
 )
 from app.modules.attendance.crud import attendance_crud
 
-router = APIRouter(prefix="/attendance", tags=["Attendance"])
+attendance_router = APIRouter(prefix="/attendance", tags=["Attendance"])
 
 
-@router.get("/", response_model=List[AttendanceRead])
+@attendance_router.get("/", response_model=List[AttendanceRead])
 async def list_attendance(
     db: AsyncSession = Depends(get_db), current_user=Depends(get_current_user)
 ):
     return await attendance_crud.get_all(db)
 
 
-@router.get("/{attendance_id}", response_model=AttendanceRead)
+@attendance_router.get("/{attendance_id}", response_model=AttendanceRead)
 async def get_attendance(
     attendance_id: int,
     db: AsyncSession = Depends(get_db),
@@ -34,7 +34,7 @@ async def get_attendance(
     return attendance
 
 
-@router.post(
+@attendance_router.post(
     "/",
     response_model=AttendanceRead,
     status_code=status.HTTP_201_CREATED,
@@ -49,7 +49,7 @@ async def create_attendance(
     return await attendance_crud.create(db, attendance_in)
 
 
-@router.put(
+@attendance_router.put(
     "/{attendance_id}",
     response_model=AttendanceRead,
     dependencies=[
@@ -68,7 +68,7 @@ async def update_attendance(
     return await attendance_crud.update(db, attendance, attendance_in)
 
 
-@router.delete(
+@attendance_router.delete(
     "/{attendance_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     dependencies=[
