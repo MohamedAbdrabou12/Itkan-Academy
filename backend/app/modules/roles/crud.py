@@ -1,3 +1,4 @@
+# # app/modules/roles/crud.py
 from typing import List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -9,20 +10,30 @@ from app.modules.roles.schemas import RoleCreate, RoleUpdate
 
 class RoleCRUD:
     async def get_all(self, db: AsyncSession) -> List[Role]:
-        result = await db.execute(select(Role).options(selectinload(Role.permissions)))
+        result = await db.execute(
+            select(Role).options(
+                selectinload(Role.permissions),
+            )
+        )
         return result.scalars().all()
 
     async def get_by_id(self, db: AsyncSession, role_id: int) -> Optional[Role]:
         result = await db.execute(
             select(Role)
             .where(Role.id == role_id)
-            .options(selectinload(Role.permissions))
+            .options(
+                selectinload(Role.permissions),
+            )
         )
         return result.scalars().first()
 
     async def create(self, db: AsyncSession, obj_in: RoleCreate) -> Role:
-        db_obj = Role(name=obj_in.name, description=obj_in.description)
+        db_obj = Role(
+            name=obj_in.name,
+            description=obj_in.description,
+        )
         db.add(db_obj)
+        await db.flush()
         await db.commit()
         await db.refresh(db_obj)
         return db_obj

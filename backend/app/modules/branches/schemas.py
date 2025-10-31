@@ -1,18 +1,32 @@
+from datetime import datetime
+from typing import Optional, List  # noqa F401
 from pydantic import BaseModel
 
 
-class BranchCreate(BaseModel):
+class BranchBase(BaseModel):
     name: str
-    address: str | None = None
-    phone: str | None = None
+    address: Optional[str] = None
+    phone: Optional[str] = None
+    email: Optional[str] = None
+    active: Optional[bool] = True
 
 
-class BranchOut(BaseModel):
+class BranchCreate(BranchBase):
+    pass
+
+
+class BranchUpdate(BaseModel):
+    name: Optional[str] = None
+    address: Optional[str] = None
+    phone: Optional[str] = None
+    email: Optional[str] = None
+    active: Optional[bool] = None
+
+
+class BranchRead(BranchBase):
     id: int
-    name: str
-    address: str | None = None
-    phone: str | None = None
+    created_at: datetime
+    updated_at: datetime
 
-    model_config = {
-        "from_attributes": True  # enable ORM mode in Pydantic v2
-    }
+    class Config:
+        from_attributes = True

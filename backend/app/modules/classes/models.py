@@ -1,3 +1,4 @@
+# app/modules/classes/models.py
 from __future__ import annotations
 from datetime import datetime
 from typing import List, Optional, Dict, TYPE_CHECKING

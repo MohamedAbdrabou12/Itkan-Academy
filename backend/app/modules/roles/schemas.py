@@ -1,4 +1,4 @@
-# app/modules/roles/schemas/role.py
+# # app/modules/roles/schemas/role.py
 from datetime import datetime
 from typing import Optional, List
 from pydantic import BaseModel
@@ -23,7 +23,7 @@ class RoleRead(RoleBase):
     id: int
     created_at: datetime
     updated_at: datetime
-    permissions: List[PermissionRead] = []  # Nested permission objects
+    permissions: List[PermissionRead] = []
 
     class Config:
         from_attributes = True

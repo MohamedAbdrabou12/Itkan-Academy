@@ -4,15 +4,14 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, AsyncEngin
 from sqlalchemy.orm import sessionmaker
 from app.core.config import settings
 
-# Create Async SQLAlchemy Engine
+# Create async SQLAlchemy engine
 engine: AsyncEngine = create_async_engine(
     settings.DATABASE_URL,
-    echo=True,  # Show SQL logs in console (optional)
-    future=True,  # Enable SQLAlchemy 2.0 style
+    echo=(settings.ENV == "development"),  # Show SQL logs only in development
 )
 
-# Create Async Session Factory
-async_session_factory = sessionmaker(
+# Create async session factory
+AsyncSessionLocal = sessionmaker(
     bind=engine,
     class_=AsyncSession,
     autoflush=False,
@@ -20,9 +19,9 @@ async_session_factory = sessionmaker(
 )
 
 
-# Dependency for FastAPI routes
+# Provide a database session for FastAPI routes
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
-    async with async_session_factory() as session:
+    async with AsyncSessionLocal() as session:
         yield session
 
 

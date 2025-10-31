@@ -1,7 +1,14 @@
-# app/modules/users/schemas/user.py
+# backend/app/modules/users/schemas.py
 from datetime import datetime
 from typing import Optional
+from enum import Enum
 from pydantic import BaseModel, EmailStr
+
+
+class UserStatus(str, Enum):
+    pending = "pending"
+    active = "active"
+    rejected = "rejected"
 
 
 class UserBase(BaseModel):
@@ -10,6 +17,7 @@ class UserBase(BaseModel):
     phone: Optional[str] = None
     is_active: bool = True
     mfa_enabled: bool = False
+    status: UserStatus = UserStatus.pending
 
 
 class UserCreate(UserBase):
@@ -27,14 +35,15 @@ class UserUpdate(BaseModel):
     branch_id: Optional[int] = None
     is_active: Optional[bool] = None
     mfa_enabled: Optional[bool] = None
+    status: Optional[UserStatus] = None
 
 
 class UserRead(UserBase):
     id: int
     role_id: Optional[int]
-    role_name: Optional[str] = None  # Added for readability
+    role_name: Optional[str] = None
     branch_id: Optional[int]
-    branch_name: Optional[str] = None  # Added for readability
+    branch_name: Optional[str] = None
     last_login: Optional[datetime]
     created_at: datetime
     updated_at: datetime
