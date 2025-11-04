@@ -1,11 +1,16 @@
-from typing import List
+from typing import Optional
 
 from app.core.auth import get_current_user
 from app.core.authorization import require_permission
 from app.db.session import get_db
 from app.modules.roles.crud import role_crud
-from app.modules.roles.schemas import RoleCreate, RoleRead, RoleUpdate
-from fastapi import APIRouter, Depends, HTTPException, status
+from app.modules.roles.schemas import (
+    PaginatedResponse,
+    RoleCreate,
+    RoleRead,
+    RoleUpdate,
+)
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 role_router = APIRouter(prefix="/roles", tags=["Roles"])
@@ -13,11 +18,28 @@ role_router = APIRouter(prefix="/roles", tags=["Roles"])
 
 @role_router.get(
     "/",
-    response_model=List[RoleRead],
-    dependencies=[Depends(get_current_user), Depends(require_permission("role:view"))],
+    response_model=PaginatedResponse[RoleRead],
+    # dependencies=[Depends(get_current_user), Depends(require_permission("role:view"))],
 )
-async def list_roles(db: AsyncSession = Depends(get_db)):
-    return await role_crud.get_all(db)
+async def list_roles(
+    # Pagination
+    page: int = Query(1, ge=1, description="Page number"),
+    page_size: int = Query(10, ge=1, le=100, description="Items per page"),
+    # Search
+    search: Optional[str] = Query(None, description="Search in name"),
+    # Sorting
+    sort_by: Optional[str] = Query("id", description="Field to sort by"),
+    sort_order: Optional[str] = Query("asc", description="Sort order: asc or desc"),
+    db: AsyncSession = Depends(get_db),
+):
+    return await role_crud.get_all(
+        db=db,
+        page=page,
+        page_size=page_size,
+        search=search,
+        sort_by=sort_by,
+        sort_order=sort_order,
+    )
 
 
 @role_router.get(
