@@ -6,6 +6,9 @@ from app.core.config import settings
 router = APIRouter()
 
 
+notification_router = APIRouter(prefix="/notifications", tags=["Notifications"])
+
+
 @router.post("/notifications/", status_code=status.HTTP_202_ACCEPTED)
 async def queue_notification(request: NotificationRequest):
     send_notification_task.delay(  # type: ignore

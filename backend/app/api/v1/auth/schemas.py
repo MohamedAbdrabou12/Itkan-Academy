@@ -1,7 +1,27 @@
-# backend/app/api/v1/auth/schemas.py
-from typing import Optional
 from pydantic import BaseModel, EmailStr
 from app.modules.users.models import UserStatus
+
+
+# Registration
+class RegisterRequest(BaseModel):
+    name: str
+    parent_name: str
+    email: EmailStr
+    password: str
+    phone: str
+    branch_id: int
+
+
+# User representation
+class UserRead(BaseModel):
+    id: int
+    name: str
+    email: str
+    role_name: str
+    status: UserStatus
+
+    class Config:
+        from_attributes = True
 
 
 # Login request and token response
@@ -12,28 +32,7 @@ class LoginRequest(BaseModel):
 
 class TokenResponse(BaseModel):
     access_token: str
-    token_type: str = "bearer"
-    expires_in: Optional[int] = None
-
-
-# Registration
-class RegisterRequest(BaseModel):
-    full_name: str
-    email: EmailStr
-    password: str
-    role_id: Optional[int] = None
-
-
-# User representation
-class UserRead(BaseModel):
-    id: int
-    full_name: str
-    email: str
-    role_name: Optional[str] = None
-    status: UserStatus
-
-    class Config:
-        from_attributes = True
+    user: UserRead
 
 
 # Password management

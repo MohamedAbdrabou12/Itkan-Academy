@@ -1,46 +1,39 @@
-# backend/app/api/v1/__init__.py
+from app.api.v1.auth.auth import auth_router
+from app.modules.attendance.router import attendance_router
+from app.modules.audits.router import audit_log_router
+from app.modules.branches.router import branch_router
+from app.modules.classes.router import class_router
+from app.modules.evaluations.router import daily_evaluation_router
+from app.modules.exams.router.exam import exam_router
+from app.modules.exams.router.exam_answer import exam_answer_router
+from app.modules.exams.router.exam_attempt import exam_attempt_router
+from app.modules.exams.router.exam_question import exam_question_router
+from app.modules.financial.router.invoice import invoice_router
+from app.modules.financial.router.payment import payment_router
+from app.modules.notifications.router import notification_router
+from app.modules.permissions.router import permissions_router
+from app.modules.question_bank.router import question_bank_router
+from app.modules.reports.router import report_job_router
+from app.modules.role_permissions.router import role_permissions_router
+from app.modules.roles.router import role_router
+from app.modules.staff.router import staff_router
+from app.modules.students.router import students_router
+from app.modules.users.router import user_router
 from fastapi import APIRouter
-
-# Import routers from modules
-from app.modules.users.router import router as user_router
-from app.modules.roles.router import router as role_router
-from app.modules.permissions.router.permission import router as permission_router
-from app.modules.permissions.router.permission_role import (
-    router as role_permission_router,
-)
-from app.api.v1.auth.auth import router as auth_router
-from app.modules.branches.router import router as branch_router
-from app.modules.classes.router import router as class_router
-from app.modules.staff.router import router as staff_router
-from app.modules.students.router import router as student_router
-from app.modules.attendance.router import router as attendance_router
-from app.modules.evaluations.router.daily_evaluation import (
-    router as daily_evaluation_router,
-)
-from app.modules.audits.router.audit_log import router as audit_log_router
-from app.modules.question_bank.router import router as question_bank_router
-from app.modules.notifications.router import router as notification_router
-from app.modules.financial.router.invoice import router as invoice_router
-from app.modules.financial.router.payment import router as payment_router
-from app.modules.reports.router.report_job import router as report_job_router
-from app.modules.exams.router.exam import router as exam_router
-from app.modules.exams.router.exam_question import router as exam_question_router
-from app.modules.exams.router.exam_answer import router as exam_answer_router
-from app.modules.exams.router.exam_attempt import router as exam_attempt_router
 
 # Initialize API Router
 api_router = APIRouter()
 
 # Include sub-routers with tags for Swagger grouping
+api_router.include_router(auth_router, tags=["Public Auth"])
 api_router.include_router(user_router, tags=["Admin Users"])
 api_router.include_router(role_router, tags=["Roles"])
-api_router.include_router(permission_router, tags=["Permissions"])
-api_router.include_router(role_permission_router, tags=["Role Permissions"])
-api_router.include_router(auth_router, tags=["Public Auth"])
+api_router.include_router(permissions_router, tags=["Permissions"])
+api_router.include_router(role_permissions_router, tags=["Role Permissions"])
 api_router.include_router(branch_router, tags=["Branches"])
 api_router.include_router(class_router, tags=["Classes"])
 api_router.include_router(staff_router, tags=["Staff"])
-api_router.include_router(student_router, tags=["Students"])
+api_router.include_router(students_router, tags=["Students"])
 api_router.include_router(attendance_router, tags=["Attendance"])
 api_router.include_router(daily_evaluation_router, tags=["Daily Evaluations"])
 api_router.include_router(audit_log_router, tags=["Audit Logs"])

@@ -1,13 +1,11 @@
-# backend/app/modules/users/crud.py
 from typing import List, Optional
+
+from app.core.security import get_password_hash as hash_password
+from app.modules.users.models import User, UserStatus
+from app.modules.users.schemas import UserCreate, UserUpdate
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
-
-from app.modules.users.models import User, UserStatus
-from app.modules.users.schemas import UserCreate, UserUpdate
-
-from app.core.security import get_password_hash as hash_password
 
 
 class UserCRUD:
@@ -15,7 +13,6 @@ class UserCRUD:
         result = await db.execute(
             select(User).options(
                 selectinload(User.role),
-                selectinload(User.branch),
             )
         )
         return result.scalars().all()
@@ -26,7 +23,6 @@ class UserCRUD:
             .where(User.id == user_id)
             .options(
                 selectinload(User.role),
-                selectinload(User.branch),
             )
         )
         return result.scalars().first()
@@ -37,7 +33,6 @@ class UserCRUD:
             .where(User.email == email)
             .options(
                 selectinload(User.role),
-                selectinload(User.branch),
             )
         )
         return result.scalars().first()
