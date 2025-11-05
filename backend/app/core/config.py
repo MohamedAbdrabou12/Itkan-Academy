@@ -8,6 +8,17 @@ class Settings(BaseSettings):
 
     # Database
     POSTGRES_USER: str | None = os.getenv("POSTGRES_USER")
+    # Email Configuration
+    MAIL_USERNAME: str | None = os.getenv("MAIL_USERNAME")
+    MAIL_PASSWORD: str | None = os.getenv("MAIL_PASSWORD")
+    MAIL_FROM: str | None = os.getenv("MAIL_FROM")
+    MAIL_PORT: int | None = int(os.getenv("MAIL_PORT", 587))
+    MAIL_SERVER: str | None = os.getenv("MAIL_SERVER")
+    MAIL_STARTTLS: bool = os.getenv("MAIL_STARTTLS", "True").lower() == "true"
+    MAIL_SSL_TLS: bool = os.getenv("MAIL_SSL_TLS", "False").lower() == "true"
+    USE_CREDENTIALS: bool = os.getenv("USE_CREDENTIALS", "True").lower() == "true"
+
+    BROKER_URL: str | None = os.getenv("BROKER_URL")
     POSTGRES_PASSWORD: str | None = os.getenv("POSTGRES_PASSWORD")
     POSTGRES_DB: str | None = os.getenv("POSTGRES_DB")
     POSTGRES_HOST: str | None = os.getenv("POSTGRES_HOST")

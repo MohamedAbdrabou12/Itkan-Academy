@@ -6,7 +6,7 @@ from app.core.config import settings
 
 # Create FastAPI app instance
 app = FastAPI(
-    title=settings.APP_NAME,
+    title="Itkan Academy",
     version="1.0",
     description="Itkan Academy API — powered by Mohamed Abdrabou",
 )
@@ -19,6 +19,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 # Include API v2 router
 app.include_router(api_router, prefix="/api/v1")

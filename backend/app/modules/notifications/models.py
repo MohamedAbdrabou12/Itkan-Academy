@@ -1,15 +1,14 @@
-# app/modules/notifications/models.py
-from __future__ import annotations
-from datetime import datetime
-from typing import Optional, Dict, TYPE_CHECKING
-
-from sqlalchemy import DateTime, ForeignKey, String, JSON
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-
+from sqlalchemy import String, JSON, DateTime, func
 from app.db.base import Base
+from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import ForeignKey, String, JSON, DateTime
+from enum import Enum
+from datetime import datetime
 
-if TYPE_CHECKING:
-    from app.modules.users.models import User
+
+class NotificationStatus(Enum):
+    READ = "READ"
+    UNREAD = "UNREAD"
 
 
 class Notification(Base):
@@ -19,16 +18,12 @@ class Notification(Base):
     user_id: Mapped[int] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
-    channel: Mapped[str] = mapped_column(String(20), nullable=False)
-    template: Mapped[Optional[str]] = mapped_column(String(100))
-    payload: Mapped[Optional[Dict]] = mapped_column(JSON)
-    status: Mapped[str] = mapped_column(String(20), default="pending")
-    sent_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
+    channel: Mapped[str] = mapped_column(String(100))
+    template: Mapped[str] = mapped_column(String(100))
+    payload: Mapped[JSON] = mapped_column(JSON)
+    status: Mapped[str] = mapped_column(String(100))
+    failed_message: Mapped[str] = mapped_column(String(255), nullable=True)
+    sent_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=datetime.utcnow
-    )
-
-    # Relationships
-    user: Mapped[User] = relationship(
-        "User", back_populates="notifications", lazy="selectin"
+        DateTime(timezone=True), server_default=func.now()
     )

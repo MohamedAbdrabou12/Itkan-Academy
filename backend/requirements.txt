@@ -1,5 +1,6 @@
 alembic==1.17.0
 amqp==5.3.1
+fastapi-mail>=1.4.1
 annotated-doc==0.0.3
 annotated-types==0.7.0
 anyio==4.11.0
