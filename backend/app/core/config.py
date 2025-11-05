@@ -1,5 +1,6 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import Field
+import os
 
 
 class Settings(BaseSettings):
@@ -10,14 +11,30 @@ class Settings(BaseSettings):
     ENV: str = Field(default="development")
 
     # Database
-    POSTGRES_USER: str = Field(..., env="POSTGRES_USER")
-    POSTGRES_PASSWORD: str = Field(..., env="POSTGRES_PASSWORD")
-    POSTGRES_DB: str = Field(..., env="POSTGRES_DB")
-    POSTGRES_HOST: str = Field(..., env="POSTGRES_HOST")
-    POSTGRES_PORT: int = Field(..., env="POSTGRES_PORT")
+    POSTGRES_USER: str | None = os.getenv("POSTGRES_USER")
+    POSTGRES_PASSWORD: str = Field(
+        default="postgres", description="PostgreSQL password"
+    )
+    POSTGRES_DB: str = Field(
+        default="itkan_academy_db", description="PostgreSQL database name"
+    )
+    POSTGRES_HOST: str = Field(default="localhost", description="PostgreSQL host")
+    POSTGRES_PORT: int = Field(default=5432, description="PostgreSQL port")
 
     # Security
-    SECRET_KEY: str | None = Field(None, env="SECRET_KEY")
+    SECRET_KEY: str = Field(default="supersecretkey", alias="SECRET_KEY")
+
+    # Email Configuration
+    MAIL_USERNAME: str | None = os.getenv("MAIL_USERNAME")
+    MAIL_PASSWORD: str | None = os.getenv("MAIL_PASSWORD")
+    MAIL_FROM: str | None = os.getenv("MAIL_FROM")
+    MAIL_PORT: int | None = int(os.getenv("MAIL_PORT", 587))
+    MAIL_SERVER: str | None = os.getenv("MAIL_SERVER")
+    MAIL_STARTTLS: bool = os.getenv("MAIL_STARTTLS", "True").lower() == "true"
+    MAIL_SSL_TLS: bool = os.getenv("MAIL_SSL_TLS", "False").lower() == "true"
+    USE_CREDENTIALS: bool = os.getenv("USE_CREDENTIALS", "True").lower() == "true"
+
+    BROKER_URL: str | None = os.getenv("BROKER_URL")
 
     @property
     def DATABASE_URL(self) -> str:

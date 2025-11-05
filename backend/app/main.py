@@ -23,8 +23,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+from app.modules.notifications.router import router as notifications_router
+
 # Include API v2 router
 app.include_router(api_router, prefix="/api/v1")
+app.include_router(notifications_router, prefix="/api/v1/notifications", tags=["notifications"])
+
 
 
 # Main application entry point
