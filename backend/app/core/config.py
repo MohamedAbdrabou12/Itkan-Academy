@@ -1,28 +1,13 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import Field
 import os
 
 
 class Settings(BaseSettings):
-    """Application configuration loaded from environment variables."""
-
-    # General
-    APP_NAME: str = Field(default="Itkan Academy")
-    ENV: str = Field(default="development")
+    APP_NAME: str | None = os.getenv("APP_NAME")
+    ENV: str | None = os.getenv("ENV")
 
     # Database
     POSTGRES_USER: str | None = os.getenv("POSTGRES_USER")
-    POSTGRES_PASSWORD: str = Field(
-        default="postgres", description="PostgreSQL password"
-    )
-    POSTGRES_DB: str = Field(
-        default="itkan_academy_db", description="PostgreSQL database name"
-    )
-    POSTGRES_HOST: str = Field(default="localhost", description="PostgreSQL host")
-    POSTGRES_PORT: int = Field(default=5432, description="PostgreSQL port")
-
-    # Security
-    SECRET_KEY: str = Field(default="supersecretkey", alias="SECRET_KEY")
 
     # Email Configuration
     MAIL_USERNAME: str | None = os.getenv("MAIL_USERNAME")
@@ -35,6 +20,13 @@ class Settings(BaseSettings):
     USE_CREDENTIALS: bool = os.getenv("USE_CREDENTIALS", "True").lower() == "true"
 
     BROKER_URL: str | None = os.getenv("BROKER_URL")
+    POSTGRES_PASSWORD: str | None = os.getenv("POSTGRES_PASSWORD")
+    POSTGRES_DB: str | None = os.getenv("POSTGRES_DB")
+    POSTGRES_HOST: str | None = os.getenv("POSTGRES_HOST")
+    POSTGRES_PORT: str | None = os.getenv("POSTGRES_PORT")
+
+    # Security
+    SECRET_KEY: str | None = os.getenv("SECRET_KEY")
 
     @property
     def DATABASE_URL(self) -> str:

@@ -1,34 +1,28 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.core.config import settings
 from app.api.v1 import api_router
-
+from app.core.config import settings
 
 # Create FastAPI app instance
 app = FastAPI(
-    title=settings.APP_NAME,
-    version="2.0",
+    title="Itkan Academy",
+    version="1.0",
     description="Itkan Academy API — powered by Mohamed Abdrabou",
 )
 
 # Add CORS middleware (if frontend will call this API)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "*"
-    ],  # you can add specific origins in production as  ["http://localhost:5173"]
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-from app.modules.notifications.router import router as notifications_router
 
 # Include API v2 router
 app.include_router(api_router, prefix="/api/v1")
-app.include_router(notifications_router, prefix="/api/v1/notifications", tags=["notifications"])
-
 
 
 # Main application entry point

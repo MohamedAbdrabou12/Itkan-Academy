@@ -1,8 +1,8 @@
-# # app/modules/roles/schemas/role.py
 from datetime import datetime
-from typing import Optional, List
+from typing import List, Optional
+
+from app.modules.permissions.schemas import PermissionRead
 from pydantic import BaseModel
-from app.modules.permissions.schemas.permission import PermissionRead
 
 
 class RoleBase(BaseModel):

@@ -1,13 +1,11 @@
-# app/core/authrization.py
-from fastapi import Depends, HTTPException, status
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
-
-from app.db.session import get_db
 from app.core.auth import get_current_user
-from app.modules.users.models import User
+from app.db.session import get_db
+from app.modules.permissions.models import Permission
 from app.modules.roles.models import Role
-from app.modules.permissions.models.permission import Permission
+from app.modules.users.models import User
+from fastapi import Depends, HTTPException, status
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
 async def get_user_permissions(db: AsyncSession, user: User) -> list[str]:

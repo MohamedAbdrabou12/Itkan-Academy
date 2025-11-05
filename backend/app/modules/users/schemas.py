@@ -1,14 +1,8 @@
-# backend/app/modules/users/schemas.py
 from datetime import datetime
 from typing import Optional
-from enum import Enum
+
+from app.modules.users.models import UserStatus
 from pydantic import BaseModel, EmailStr
-
-
-class UserStatus(str, Enum):
-    pending = "pending"
-    active = "active"
-    rejected = "rejected"
 
 
 class UserBase(BaseModel):

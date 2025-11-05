@@ -1,40 +1,38 @@
 from __future__ import annotations
-from datetime import date, datetime
-from typing import Optional, List, Dict, TYPE_CHECKING
 
-from sqlalchemy import String, JSON, Date, ForeignKey, DateTime
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from datetime import date, datetime
+from typing import TYPE_CHECKING, Dict, List, Optional
 
 from app.db.base import Base
+from sqlalchemy import JSON, Date, DateTime, ForeignKey, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 
 # Avoid circular imports
 if TYPE_CHECKING:
-    from app.modules.users.models import User  # noqa: F401
+    from app.modules.attendance.models import Attendance
     from app.modules.branches.models import Branch  # noqa: F401
     from app.modules.classes.models import Class
-    from app.modules.attendance.models import Attendance
-    from app.modules.evaluations.models.daily_evaluation import DailyEvaluation
+    from app.modules.evaluations.models import DailyEvaluation
     from app.modules.financial.models.invoice import Invoice
+    from app.modules.users.models import User  # noqa: F401
 
 
 class Student(Base):
     __tablename__ = "students"
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    parent_name: Mapped[str] = mapped_column(String(120))
+    admission_date: Mapped[Optional[date]] = mapped_column(Date)
+    curriculum_progress: Mapped[Optional[Dict]] = mapped_column(JSON)
+
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
-    parent_user_id: Mapped[Optional[int]] = mapped_column(
-        ForeignKey("users.id", ondelete="SET NULL")
-    )
     branch_id: Mapped[int] = mapped_column(
         ForeignKey("branches.id", ondelete="CASCADE")
     )
     class_id: Mapped[Optional[int]] = mapped_column(
         ForeignKey("classes.id", ondelete="SET NULL")
     )
-
-    admission_date: Mapped[Optional[date]] = mapped_column(Date)
-    status: Mapped[str] = mapped_column(String(30), default="active")
-    curriculum_progress: Mapped[Optional[Dict]] = mapped_column(JSON)
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=datetime.utcnow

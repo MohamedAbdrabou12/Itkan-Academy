@@ -1,0 +1,68 @@
+[
+  {
+    "id": 1,
+    "name": "Student",
+    "name_in_arabic": "طالب",
+    "description": "Student role with basic access to personal information and learning materials"
+  },
+  {
+    "id": 2,
+    "name": "Teacher",
+    "name_in_arabic": "معلم",
+    "description": "Teacher role with access to classroom management and student evaluation"
+  },
+  {
+    "id": 3,
+    "name": "General Manager",
+    "name_in_arabic": "المدير العام",
+    "description": "Overall management and supervision of all educational and administrative affairs"
+  },
+  {
+    "id": 4,
+    "name": "Education Affairs Manager",
+    "name_in_arabic": "مدير الشؤون التعليمية",
+    "description": "Manages educational programs, supervision, and academic affairs"
+  },
+  {
+    "id": 5,
+    "name": "General Education Supervisor",
+    "name_in_arabic": "المشرف العام للتعليم",
+    "description": "Oversees educational quality and branch supervision systems"
+  },
+  {
+    "id": 6,
+    "name": "Branch Supervisor",
+    "name_in_arabic": "مشرف الفرع",
+    "description": "Manages teachers, absences, evaluations, and reports at branch level"
+  },
+  {
+    "id": 7,
+    "name": "Academic Affairs Manager",
+    "name_in_arabic": "مدير الشؤون الأكاديمية",
+    "description": "Manages curriculum, teacher training, and examination systems"
+  },
+  {
+    "id": 8,
+    "name": "Administrative Affairs Manager",
+    "name_in_arabic": "مدير الشؤون الإدارية",
+    "description": "Oversees staff, student, and financial administration systems"
+  },
+  {
+    "id": 9,
+    "name": "Staff Affairs Manager",
+    "name_in_arabic": "مدير شؤون الموظفين",
+    "description": "Manages staff records, reports, penalties, rewards, and salaries"
+  },
+  {
+    "id": 10,
+    "name": "Student Affairs Manager",
+    "name_in_arabic": "مدير شؤون الطلاب",
+    "description": "Manages student records, subscriptions, communications, and events"
+  },
+  {
+    "id": 11,
+    "name": "Financial Affairs Manager",
+    "name_in_arabic": "مدير الشؤون المالية",
+    "description": "Manages accounting, purchases, maintenance, and rental operations"
+  }
+]
