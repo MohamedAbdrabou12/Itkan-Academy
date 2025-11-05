@@ -1,8 +1,17 @@
-# # app/modules/roles/schemas/role.py
 from datetime import datetime
-from typing import Optional, List
+from typing import Generic, List, Optional, TypeVar
+
 from pydantic import BaseModel
-from app.modules.permissions.schemas.permission import PermissionRead
+
+T = TypeVar("T")
+
+
+class PaginatedResponse(BaseModel, Generic[T]):
+    data: List[T]
+    total: int
+    page: int
+    page_size: int
+    total_pages: int
 
 
 class RoleBase(BaseModel):
@@ -19,11 +28,14 @@ class RoleUpdate(BaseModel):
     description: Optional[str] = None
 
 
-class RoleRead(RoleBase):
+class RoleRead(BaseModel):
     id: int
+    name: str
+    description: str
+    name_in_arabic: str
     created_at: datetime
-    updated_at: datetime
-    permissions: List[PermissionRead] = []
+    # updated_at: datetime
+    # permissions: List[PermissionRead] = []
 
     class Config:
         from_attributes = True

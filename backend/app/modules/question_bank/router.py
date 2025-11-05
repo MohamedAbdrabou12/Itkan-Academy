@@ -12,10 +12,10 @@ from app.modules.question_bank.schemas import (
 )
 from app.modules.question_bank.crud import question_bank_crud
 
-router = APIRouter(prefix="/question-bank", tags=["Question Bank"])
+question_bank_router = APIRouter(prefix="/question-bank", tags=["Question Bank"])
 
 
-@router.get(
+@question_bank_router.get(
     "/",
     response_model=List[QuestionBankRead],
     dependencies=[
@@ -27,7 +27,7 @@ async def list_questions(db: AsyncSession = Depends(get_db)):
     return await question_bank_crud.get_all(db)
 
 
-@router.get(
+@question_bank_router.get(
     "/{question_id}",
     response_model=QuestionBankRead,
     dependencies=[
@@ -42,7 +42,7 @@ async def get_question(question_id: int, db: AsyncSession = Depends(get_db)):
     return question
 
 
-@router.post(
+@question_bank_router.post(
     "/",
     response_model=QuestionBankRead,
     status_code=status.HTTP_201_CREATED,
@@ -57,7 +57,7 @@ async def create_question(
     return await question_bank_crud.create(db, question_in)
 
 
-@router.put(
+@question_bank_router.put(
     "/{question_id}",
     response_model=QuestionBankRead,
     dependencies=[
@@ -76,7 +76,7 @@ async def update_question(
     return await question_bank_crud.update(db, question, question_in)
 
 
-@router.delete(
+@question_bank_router.delete(
     "/{question_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     dependencies=[

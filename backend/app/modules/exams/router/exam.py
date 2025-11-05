@@ -8,10 +8,10 @@ from app.core.authorization import require_permission
 from app.modules.exams.schemas.exam import ExamCreate, ExamRead, ExamUpdate
 from app.modules.exams.crud.exam import exam_crud
 
-router = APIRouter(prefix="/exams", tags=["Exams"])
+exam_router = APIRouter(prefix="/exams", tags=["Exams"])
 
 
-@router.get(
+@exam_router.get(
     "/",
     response_model=List[ExamRead],
     dependencies=[Depends(get_current_user), Depends(require_permission("exam:view"))],
@@ -20,7 +20,7 @@ async def list_exams(db: AsyncSession = Depends(get_db)):
     return await exam_crud.get_all(db)
 
 
-@router.get(
+@exam_router.get(
     "/{exam_id}",
     response_model=ExamRead,
     dependencies=[Depends(get_current_user), Depends(require_permission("exam:view"))],
@@ -32,7 +32,7 @@ async def get_exam(exam_id: int, db: AsyncSession = Depends(get_db)):
     return exam
 
 
-@router.post(
+@exam_router.post(
     "/",
     response_model=ExamRead,
     status_code=status.HTTP_201_CREATED,
@@ -45,7 +45,7 @@ async def create_exam(exam_in: ExamCreate, db: AsyncSession = Depends(get_db)):
     return await exam_crud.create(db, exam_in)
 
 
-@router.put(
+@exam_router.put(
     "/{exam_id}",
     response_model=ExamRead,
     dependencies=[
@@ -62,7 +62,7 @@ async def update_exam(
     return await exam_crud.update(db, exam, exam_in)
 
 
-@router.delete(
+@exam_router.delete(
     "/{exam_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     dependencies=[
