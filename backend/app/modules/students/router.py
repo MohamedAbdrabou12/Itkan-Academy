@@ -1,24 +1,24 @@
-from fastapi import APIRouter, Depends, HTTPException, status
 from typing import List
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db.session import get_db
 from app.core.auth import get_current_user
 from app.core.authorization import require_permission
-from app.modules.students.schemas import StudentCreate, StudentRead, StudentUpdate
+from app.db.session import get_db
 from app.modules.students.crud import student_crud
+from app.modules.students.schemas import StudentCreate, StudentRead, StudentUpdate
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
 
-router = APIRouter(prefix="/students", tags=["Students"])
+students_router = APIRouter(prefix="/students", tags=["Students"])
 
 
-@router.get("/", response_model=List[StudentRead])
+@students_router.get("/", response_model=List[StudentRead])
 async def list_students(
     db: AsyncSession = Depends(get_db), current_user=Depends(get_current_user)
 ):
     return await student_crud.get_all(db)
 
 
-@router.get("/{student_id}", response_model=StudentRead)
+@students_router.get("/{student_id}", response_model=StudentRead)
 async def get_student(
     student_id: int,
     db: AsyncSession = Depends(get_db),
@@ -30,7 +30,7 @@ async def get_student(
     return student
 
 
-@router.post(
+@students_router.post(
     "/",
     response_model=StudentRead,
     status_code=status.HTTP_201_CREATED,
@@ -43,7 +43,7 @@ async def create_student(student_in: StudentCreate, db: AsyncSession = Depends(g
     return await student_crud.create(db, student_in)
 
 
-@router.put(
+@students_router.put(
     "/{student_id}",
     response_model=StudentRead,
     dependencies=[
@@ -60,7 +60,7 @@ async def update_student(
     return await student_crud.update(db, student, student_in)
 
 
-@router.delete(
+@students_router.delete(
     "/{student_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     dependencies=[

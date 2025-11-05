@@ -8,17 +8,17 @@ from app.core.authorization import require_permission
 from app.modules.staff.schemas import StaffCreate, StaffRead, StaffUpdate
 from app.modules.staff.crud import staff_crud
 
-router = APIRouter(prefix="/staff", tags=["Staff"])
+staff_router = APIRouter(prefix="/staff", tags=["Staff"])
 
 
-@router.get("/", response_model=List[StaffRead])
+@staff_router.get("/", response_model=List[StaffRead])
 async def list_staff(
     db: AsyncSession = Depends(get_db), current_user=Depends(get_current_user)
 ):
     return await staff_crud.get_all(db)
 
 
-@router.get("/{staff_id}", response_model=StaffRead)
+@staff_router.get("/{staff_id}", response_model=StaffRead)
 async def get_staff(
     staff_id: int,
     db: AsyncSession = Depends(get_db),
@@ -30,7 +30,7 @@ async def get_staff(
     return staff
 
 
-@router.post(
+@staff_router.post(
     "/",
     response_model=StaffRead,
     status_code=status.HTTP_201_CREATED,
@@ -43,7 +43,7 @@ async def create_staff(staff_in: StaffCreate, db: AsyncSession = Depends(get_db)
     return await staff_crud.create(db, staff_in)
 
 
-@router.put(
+@staff_router.put(
     "/{staff_id}",
     response_model=StaffRead,
     dependencies=[
@@ -60,7 +60,7 @@ async def update_staff(
     return await staff_crud.update(db, staff, staff_in)
 
 
-@router.delete(
+@staff_router.delete(
     "/{staff_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     dependencies=[

@@ -8,17 +8,17 @@ from app.core.authorization import require_permission
 from app.modules.classes.schemas import ClassCreate, ClassRead, ClassUpdate
 from app.modules.classes.crud import class_crud
 
-router = APIRouter(prefix="/classes", tags=["Classes"])
+class_router = APIRouter(prefix="/classes", tags=["Classes"])
 
 
-@router.get("/", response_model=List[ClassRead])
+@class_router.get("/", response_model=List[ClassRead])
 async def list_classes(
     db: AsyncSession = Depends(get_db), current_user=Depends(get_current_user)
 ):
     return await class_crud.get_all(db)
 
 
-@router.get("/{class_id}", response_model=ClassRead)
+@class_router.get("/{class_id}", response_model=ClassRead)
 async def get_class(
     class_id: int,
     db: AsyncSession = Depends(get_db),
@@ -30,7 +30,7 @@ async def get_class(
     return class_
 
 
-@router.post(
+@class_router.post(
     "/",
     response_model=ClassRead,
     status_code=status.HTTP_201_CREATED,
@@ -43,7 +43,7 @@ async def create_class(class_in: ClassCreate, db: AsyncSession = Depends(get_db)
     return await class_crud.create(db, class_in)
 
 
-@router.put(
+@class_router.put(
     "/{class_id}",
     response_model=ClassRead,
     dependencies=[
@@ -60,7 +60,7 @@ async def update_class(
     return await class_crud.update(db, class_, class_in)
 
 
-@router.delete(
+@class_router.delete(
     "/{class_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     dependencies=[

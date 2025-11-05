@@ -1,27 +1,48 @@
-# # app/modules/roles/router.py
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.ext.asyncio import AsyncSession
-from typing import List
+from typing import Optional
 
-from app.db.session import get_db
 from app.core.auth import get_current_user
 from app.core.authorization import require_permission
-from app.modules.roles.schemas import RoleCreate, RoleRead, RoleUpdate
+from app.db.session import get_db
 from app.modules.roles.crud import role_crud
-
-router = APIRouter(prefix="/roles", tags=["Roles"])
-
-
-@router.get(
-    "/",
-    response_model=List[RoleRead],
-    dependencies=[Depends(get_current_user), Depends(require_permission("role:view"))],
+from app.modules.roles.schemas import (
+    PaginatedResponse,
+    RoleCreate,
+    RoleRead,
+    RoleUpdate,
 )
-async def list_roles(db: AsyncSession = Depends(get_db)):
-    return await role_crud.get_all(db)
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from sqlalchemy.ext.asyncio import AsyncSession
+
+role_router = APIRouter(prefix="/roles", tags=["Roles"])
 
 
-@router.get(
+@role_router.get(
+    "/",
+    response_model=PaginatedResponse[RoleRead],
+    # dependencies=[Depends(get_current_user), Depends(require_permission("role:view"))],
+)
+async def list_roles(
+    # Pagination
+    page: int = Query(1, ge=1, description="Page number"),
+    page_size: int = Query(10, ge=1, le=100, description="Items per page"),
+    # Search
+    search: Optional[str] = Query(None, description="Search in name"),
+    # Sorting
+    sort_by: Optional[str] = Query("id", description="Field to sort by"),
+    sort_order: Optional[str] = Query("asc", description="Sort order: asc or desc"),
+    db: AsyncSession = Depends(get_db),
+):
+    return await role_crud.get_all(
+        db=db,
+        page=page,
+        page_size=page_size,
+        search=search,
+        sort_by=sort_by,
+        sort_order=sort_order,
+    )
+
+
+@role_router.get(
     "/{role_id}",
     response_model=RoleRead,
     dependencies=[Depends(get_current_user), Depends(require_permission("role:view"))],
@@ -33,7 +54,7 @@ async def get_role(role_id: int, db: AsyncSession = Depends(get_db)):
     return role
 
 
-@router.post(
+@role_router.post(
     "/",
     response_model=RoleRead,
     status_code=status.HTTP_201_CREATED,
@@ -46,7 +67,7 @@ async def create_role(role_in: RoleCreate, db: AsyncSession = Depends(get_db)):
     return await role_crud.create(db, role_in)
 
 
-@router.put(
+@role_router.put(
     "/{role_id}",
     response_model=RoleRead,
     dependencies=[
@@ -63,7 +84,7 @@ async def update_role(
     return await role_crud.update(db, role, role_in)
 
 
-@router.delete(
+@role_router.delete(
     "/{role_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     dependencies=[
