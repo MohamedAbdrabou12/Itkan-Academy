@@ -4,10 +4,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
 from fastapi import Request
-
 from app.core.security import get_password_hash as hash_password
 from app.modules.users.models import User, UserStatus
 from app.modules.users.schemas import UserCreate, UserUpdate
+from app.core.utils import create_password_reset_token
+from app.core.config import settings  # noqa
+from app.services.notification_service.tasks.email import send_email_task
+from app.services.notification_service.utils.template_engine import render_template
 
 
 class UserCRUD:
@@ -51,7 +54,8 @@ class UserCRUD:
         return result.scalars().first()
 
     async def create(self, db: AsyncSession, obj_in: UserCreate) -> User:
-        hashed_password = hash_password(obj_in.password)
+        hashed_password = ""
+
         db_obj = User(
             name=obj_in.name,
             email=obj_in.email,
@@ -64,6 +68,21 @@ class UserCRUD:
         db.add(db_obj)
         await db.commit()
         await db.refresh(db_obj)
+
+        # Generate reset password token
+        token = create_password_reset_token(db_obj.id)
+        # reset_link = f"{settings.FRONTEND_URL.rstrip('/')}/reset-password?token={token}"
+        reset_link = f"https://www.google.com/search?q={token}"  # Temporary for testing
+
+        # Render email using template
+        subject, body_html = render_template(
+            "reset_password.html",
+            {"username": db_obj.name, "reset_link": reset_link},
+        )
+
+        # Send email asynchronously via Celery
+        send_email_task.delay(db_obj.email, subject, body_html)
+
         return db_obj
 
     async def update(self, db: AsyncSession, db_obj: User, obj_in: UserUpdate) -> User:

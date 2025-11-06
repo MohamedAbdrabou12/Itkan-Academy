@@ -3,9 +3,12 @@ from typing import List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from fastapi import Request
-
 from app.modules.staff.models import Staff
 from app.modules.staff.schemas import StaffCreate, StaffUpdate
+from app.core.utils import create_password_reset_token
+from app.core.config import settings  # noqa
+from app.services.notification_service.tasks.email import send_email_task
+from app.services.notification_service.utils.template_engine import render_template
 
 
 class StaffCRUD:
@@ -42,6 +45,20 @@ class StaffCRUD:
         db.add(staff)
         await db.commit()
         await db.refresh(staff)
+
+        # Generate reset password token
+        token = create_password_reset_token(staff.user_id)
+        # reset_link = f"{settings.FRONTEND_URL.rstrip('/')}/reset-password?token={token}"
+        reset_link = f"https://www.google.com/search?q={token}"  # Temporary for testing
+        # Render email template
+        subject, body_html = render_template(
+            "reset_password.html",
+            {"username": staff.user.name, "reset_link": reset_link},
+        )
+
+        # Send email asynchronously via Celery
+        send_email_task.delay(staff.user.email, subject, body_html)
+
         return staff
 
     async def update(
