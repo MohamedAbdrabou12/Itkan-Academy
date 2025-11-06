@@ -1,57 +1,67 @@
+# backend/app/modules/users/crud.py
 from typing import List, Optional
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
+from sqlalchemy.orm import selectinload
+from fastapi import Request
 
 from app.core.security import get_password_hash as hash_password
 from app.modules.users.models import User, UserStatus
 from app.modules.users.schemas import UserCreate, UserUpdate
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
-from sqlalchemy.orm import selectinload
 
 
 class UserCRUD:
-    async def get_all(self, db: AsyncSession) -> List[User]:
-        result = await db.execute(
-            select(User).options(
-                selectinload(User.role),
-            )
-        )
+    async def get_all(
+        self, db: AsyncSession, request: Optional[Request] = None
+    ) -> List[User]:
+        stmt = select(User).options(selectinload(User.role), selectinload(User.branch))
+
+        # Branch scoping if middleware set branch_id
+        if request:
+            branch_id = getattr(request.state, "branch_id", None)
+            if branch_id is not None:
+                stmt = stmt.where(User.branch_id == branch_id)
+
+        result = await db.execute(stmt)
         return result.scalars().all()
 
-    async def get_by_id(self, db: AsyncSession, user_id: int) -> Optional[User]:
-        result = await db.execute(
+    async def get_by_id(
+        self, db: AsyncSession, user_id: int, request: Optional[Request] = None
+    ) -> Optional[User]:
+        stmt = (
             select(User)
             .where(User.id == user_id)
-            .options(
-                selectinload(User.role),
-            )
+            .options(selectinload(User.role), selectinload(User.branch))
         )
+
+        if request:
+            branch_id = getattr(request.state, "branch_id", None)
+            if branch_id is not None:
+                stmt = stmt.where(User.branch_id == branch_id)
+
+        result = await db.execute(stmt)
         return result.scalars().first()
 
     async def get_by_email(self, db: AsyncSession, email: str) -> Optional[User]:
         result = await db.execute(
             select(User)
             .where(User.email == email)
-            .options(
-                selectinload(User.role),
-            )
+            .options(selectinload(User.role), selectinload(User.branch))
         )
         return result.scalars().first()
 
     async def create(self, db: AsyncSession, obj_in: UserCreate) -> User:
         hashed_password = hash_password(obj_in.password)
         db_obj = User(
-            full_name=obj_in.full_name,
+            name=obj_in.name,
             email=obj_in.email,
             phone=obj_in.phone,
             password_hash=hashed_password,
             role_id=obj_in.role_id,
             branch_id=obj_in.branch_id,
-            is_active=obj_in.is_active,
-            mfa_enabled=obj_in.mfa_enabled,
             status=obj_in.status or UserStatus.pending,
         )
         db.add(db_obj)
-        await db.flush()
         await db.commit()
         await db.refresh(db_obj)
         return db_obj

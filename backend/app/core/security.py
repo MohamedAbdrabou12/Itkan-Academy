@@ -1,3 +1,4 @@
+# backend/app/core/security.py
 from pwdlib import PasswordHash  # type: ignore
 
 password_hash = PasswordHash.recommended()

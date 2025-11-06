@@ -1,25 +1,41 @@
+# backend/app/modules/permissions/crud.py
 from typing import List, Optional
-
-from app.modules.permissions.models import Permission
-from app.modules.permissions.schemas import (
-    PermissionCreate,
-    PermissionUpdate,
-)
+from fastapi import Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
+from app.modules.permissions.models import Permission
+from app.modules.permissions.schemas import PermissionCreate, PermissionUpdate
+
 
 class PermissionCRUD:
-    async def get_all(self, db: AsyncSession) -> List[Permission]:
-        result = await db.execute(select(Permission))
+    async def get_all(
+        self, db: AsyncSession, request: Optional[Request] = None
+    ) -> List[Permission]:
+        query = select(Permission)
+
+        # Branch scoping placeholder
+        if request:
+            branch_id = getattr(request.state, "branch_id", None)
+            if branch_id is not None:
+                # Permissions are usually global; placeholder for future branch filtering
+                pass
+
+        result = await db.execute(query)
         return result.scalars().all()
 
     async def get_by_id(
-        self, db: AsyncSession, permission_id: int
+        self, db: AsyncSession, permission_id: int, request: Optional[Request] = None
     ) -> Optional[Permission]:
-        result = await db.execute(
-            select(Permission).where(Permission.id == permission_id)
-        )
+        stmt = select(Permission).where(Permission.id == permission_id)
+
+        # Branch scoping placeholder
+        if request:
+            branch_id = getattr(request.state, "branch_id", None)
+            if branch_id is not None:
+                pass
+
+        result = await db.execute(stmt)
         return result.scalars().first()
 
     async def get_by_code(self, db: AsyncSession, code: str) -> Optional[Permission]:

@@ -1,3 +1,4 @@
+# backend/app/core/authorization.py
 from app.core.auth import get_current_user
 from app.db.session import get_db
 from app.modules.permissions.models import Permission

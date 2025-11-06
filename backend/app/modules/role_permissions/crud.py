@@ -1,20 +1,31 @@
+# backend/app/modules/role_permissions/crud.py
 from typing import List, Optional
-
-from app.modules.role_permissions.models import RolePermission
-from app.modules.role_permissions.schemas import RolePermissionCreate
+from fastapi import Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
 
+from app.modules.role_permissions.models import RolePermission
+from app.modules.role_permissions.schemas import RolePermissionCreate
+
 
 class RolePermissionCRUD:
-    async def get_all(self, db: AsyncSession) -> List[RolePermission]:
-        result = await db.execute(
-            select(RolePermission).options(
-                selectinload(RolePermission.role),
-                selectinload(RolePermission.permission),
-            )
+    async def get_all(
+        self, db: AsyncSession, request: Optional[Request] = None
+    ) -> List[RolePermission]:
+        query = select(RolePermission).options(
+            selectinload(RolePermission.role),
+            selectinload(RolePermission.permission),
         )
+
+        # Branch scoping placeholder
+        if request:
+            branch_id = getattr(request.state, "branch_id", None)
+            if branch_id is not None:
+                # Currently all role-permissions are global; placeholder for branch filtering
+                pass
+
+        result = await db.execute(query)
         return result.scalars().all()
 
     async def create(

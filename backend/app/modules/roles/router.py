@@ -1,4 +1,7 @@
+# backend/app/modules/roles/router.py
 from typing import Optional
+from fastapi import APIRouter, Depends, HTTPException, Request, Query, status
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.auth import get_current_user
 from app.core.authorization import require_permission
@@ -10,8 +13,6 @@ from app.modules.roles.schemas import (
     RoleRead,
     RoleUpdate,
 )
-from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy.ext.asyncio import AsyncSession
 
 role_router = APIRouter(prefix="/roles", tags=["Roles"])
 
@@ -19,21 +20,20 @@ role_router = APIRouter(prefix="/roles", tags=["Roles"])
 @role_router.get(
     "/",
     response_model=PaginatedResponse[RoleRead],
-    # dependencies=[Depends(get_current_user), Depends(require_permission("role:view"))],
+    dependencies=[Depends(get_current_user), Depends(require_permission("role:view"))],
 )
 async def list_roles(
-    # Pagination
+    request: Request,
     page: int = Query(1, ge=1, description="Page number"),
     page_size: int = Query(10, ge=1, le=100, description="Items per page"),
-    # Search
     search: Optional[str] = Query(None, description="Search in name"),
-    # Sorting
     sort_by: Optional[str] = Query("id", description="Field to sort by"),
     sort_order: Optional[str] = Query("asc", description="Sort order: asc or desc"),
     db: AsyncSession = Depends(get_db),
 ):
     return await role_crud.get_all(
         db=db,
+        request=request,
         page=page,
         page_size=page_size,
         search=search,
@@ -47,8 +47,8 @@ async def list_roles(
     response_model=RoleRead,
     dependencies=[Depends(get_current_user), Depends(require_permission("role:view"))],
 )
-async def get_role(role_id: int, db: AsyncSession = Depends(get_db)):
-    role = await role_crud.get_by_id(db, role_id)
+async def get_role(role_id: int, request: Request, db: AsyncSession = Depends(get_db)):
+    role = await role_crud.get_by_id(db, role_id, request)
     if not role:
         raise HTTPException(status_code=404, detail="Role not found")
     return role

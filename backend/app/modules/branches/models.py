@@ -1,15 +1,14 @@
+# backend/app/modules/branches/models.py
 from __future__ import annotations
 from datetime import datetime
 from typing import Optional, List, TYPE_CHECKING
-
 from sqlalchemy import String, Text, Boolean, DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-
 from app.db.base import Base
 
-# Avoid circular imports
 if TYPE_CHECKING:
     from app.modules.classes.models import Class
+    from app.modules.users.models import User
 
 
 class Branch(Base):
@@ -31,5 +30,9 @@ class Branch(Base):
 
     # Relationships
     classes: Mapped[List[Class]] = relationship(
+        back_populates="branch", lazy="selectin", cascade="all, delete-orphan"
+    )
+
+    users: Mapped[List[User]] = relationship(
         back_populates="branch", lazy="selectin", cascade="all, delete-orphan"
     )

@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+# backend/app/modules/classes/router.py
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from typing import List
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -12,19 +13,15 @@ class_router = APIRouter(prefix="/classes", tags=["Classes"])
 
 
 @class_router.get("/", response_model=List[ClassRead])
-async def list_classes(
-    db: AsyncSession = Depends(get_db), current_user=Depends(get_current_user)
-):
-    return await class_crud.get_all(db)
+async def list_classes(request: Request, db: AsyncSession = Depends(get_db)):
+    return await class_crud.get_all(db, request=request)
 
 
 @class_router.get("/{class_id}", response_model=ClassRead)
 async def get_class(
-    class_id: int,
-    db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_current_user),
+    class_id: int, request: Request, db: AsyncSession = Depends(get_db)
 ):
-    class_ = await class_crud.get_by_id(db, class_id)
+    class_ = await class_crud.get_by_id(db, class_id, request=request)
     if not class_:
         raise HTTPException(status_code=404, detail="Class not found")
     return class_
@@ -54,7 +51,7 @@ async def create_class(class_in: ClassCreate, db: AsyncSession = Depends(get_db)
 async def update_class(
     class_id: int, class_in: ClassUpdate, db: AsyncSession = Depends(get_db)
 ):
-    class_ = await class_crud.get_by_id(db, class_id)
+    class_ = await class_crud.get_by_id(db, class_id, request=None)
     if not class_:
         raise HTTPException(status_code=404, detail="Class not found")
     return await class_crud.update(db, class_, class_in)

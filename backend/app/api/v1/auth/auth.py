@@ -1,3 +1,4 @@
+# backend/app/api/v1/auth/auth.py
 from app.api.v1.auth.schemas import (
     ActivateUserRequest,
     ChangePasswordRequest,

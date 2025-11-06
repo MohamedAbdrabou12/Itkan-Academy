@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1 import api_router
 from app.core.config import settings
+from app.core.middleware import BranchScopeMiddleware
 
 # Create FastAPI app instance
 app = FastAPI(
@@ -20,12 +21,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Add BranchScopeMiddleware BEFORE registering API routers
+app.add_middleware(BranchScopeMiddleware)
 
-# Include API v2 router
+# Include API v1 router
 app.include_router(api_router, prefix="/api/v1")
 
 
-# Main application entry point
+# Main application startup event
 @app.on_event("startup")
 async def on_startup():
     print("🚀 Mohamed Abdrabou — Itkan Academy API started successfully.")

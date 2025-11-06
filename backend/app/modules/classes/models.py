@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from app.modules.branches.models import Branch  # noqa: F401
     from app.modules.students.models import Student  # noqa: F401
     from app.modules.attendance.models import Attendance  # noqa: F401
-    from app.modules.evaluations.models.daily_evaluation import DailyEvaluation  # noqa: F401
+    from app.modules.evaluations.models import DailyEvaluation  # noqa: F401
 
 
 class Class(Base):
