@@ -14,7 +14,6 @@ class UserBase(BaseModel):
 
 
 class UserCreate(UserBase):
-    password: str
     role_id: Optional[int] = None
 
 

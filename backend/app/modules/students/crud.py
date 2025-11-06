@@ -6,6 +6,12 @@ from fastapi import Request
 
 from app.modules.students.models import Student
 from app.modules.students.schemas import StudentCreate, StudentUpdate
+from app.modules.users.models import User
+from app.core.utils import create_password_reset_token
+from app.core.config import settings  # noqa
+from app.services.notification_service.tasks.email import send_email_task
+
+from app.services.notification_service.utils.template_engine import render_template
 
 
 class StudentCRUD:
@@ -42,6 +48,24 @@ class StudentCRUD:
         db.add(student)
         await db.commit()
         await db.refresh(student)
+
+        # Generate reset password token
+        token = create_password_reset_token(student.user_id)
+        # reset_link = f"{settings.FRONTEND_URL.rstrip('/')}/reset-password?token={token}"
+        reset_link = f"https://www.google.com/search?q={token}"  # Temporary for testing
+
+        # Render email using template
+        subject, body_body = render_template(
+            "reset_password.html",
+            {"username": student_in.parent_name, "reset_link": reset_link},
+        )
+
+        # Get the user's email
+        user = await db.get(User, student.user_id)
+
+        # Send email asynchronously via Celery
+        send_email_task.delay(user.email, subject, body_body)
+
         return student
 
     async def update(
