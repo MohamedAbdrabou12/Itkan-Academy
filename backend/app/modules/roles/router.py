@@ -1,4 +1,3 @@
-# backend/app/modules/roles/router.py
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Request, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession

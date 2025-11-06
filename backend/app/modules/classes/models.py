@@ -1,6 +1,6 @@
-# app/modules/classes/models.py
 from __future__ import annotations
 from datetime import datetime
+from enum import Enum
 from typing import List, Optional, Dict, TYPE_CHECKING
 
 from sqlalchemy import ForeignKey, String, JSON, DateTime
@@ -15,6 +15,10 @@ if TYPE_CHECKING:
     from app.modules.attendance.models import Attendance  # noqa: F401
     from app.modules.evaluations.models import DailyEvaluation  # noqa: F401
 
+class ClassStatus(Enum):
+    active = "active"
+    deactive = "deactive"
+
 
 class Class(Base):
     __tablename__ = "classes"
@@ -25,6 +29,9 @@ class Class(Base):
     )
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     schedule: Mapped[Optional[Dict]] = mapped_column(JSON)
+    status: Mapped[ClassStatus] = mapped_column(
+        String(10), default=ClassStatus.active, nullable=False
+    )
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=datetime.utcnow

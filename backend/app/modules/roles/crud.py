@@ -1,4 +1,3 @@
-# backend/app/modules/roles/crud.py
 from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -27,7 +26,9 @@ class RoleCRUD:
         # Apply search
         if search:
             search_filter = or_(
-                Role.name.ilike(f"%{search}%"), Role.name_in_arabic.ilike(f"%{search}%")
+                Role.name.ilike(f"%{search}%"),
+                Role.name_in_arabic.ilike(f"%{search}%"),
+                Role.description.ilike(f"%{search}%"),
             )
             query = query.where(search_filter)
 

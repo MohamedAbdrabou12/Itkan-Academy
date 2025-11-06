@@ -1,6 +1,7 @@
-# backend/app/modules/branches/schemas.py
 from datetime import datetime
-from typing import Optional
+from typing import List, Optional
+
+from app.modules.branches.models import BranchStatus
 from pydantic import BaseModel
 
 
@@ -9,7 +10,7 @@ class BranchBase(BaseModel):
     address: Optional[str] = None
     phone: Optional[str] = None
     email: Optional[str] = None
-    active: Optional[bool] = True
+    status: BranchStatus
 
 
 class BranchCreate(BranchBase):
@@ -21,14 +22,31 @@ class BranchUpdate(BaseModel):
     address: Optional[str] = None
     phone: Optional[str] = None
     email: Optional[str] = None
-    active: Optional[bool] = None
+    status: Optional[BranchStatus]
 
 
-class BranchRead(BranchBase):
+
+class BranchRead(BaseModel):
     id: int
+    name: str
+    email: Optional[str]
+    phone: Optional[str]
+    address: Optional[str]
+    status: str
     created_at: datetime
-    updated_at: datetime
-    users_count: Optional[int] = None  # Optional enhancement
+    users_count: Optional[int] = 0
 
     class Config:
         from_attributes = True
+
+
+class PaginationInfo(BaseModel):
+    page: int
+    pageSize: int
+    total: int
+    totalPages: int
+
+
+class BranchesResponse(BaseModel):
+    branches: List[BranchRead]
+    pagination: PaginationInfo

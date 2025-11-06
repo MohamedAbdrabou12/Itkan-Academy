@@ -18,10 +18,6 @@ depends_on = None
 
 
 def upgrade() -> None:
-    op.add_column(
-        "notifications",
-        sa.Column("failed_message", sa.String(length=255), nullable=True),
-    )
     op.create_foreign_key(
         "fk_notifications_user_id",
         "notifications",
@@ -34,4 +30,3 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     op.drop_constraint("fk_notifications_user_id", "notifications", type_="foreignkey")
-    op.drop_column("notifications", "failed_message")
