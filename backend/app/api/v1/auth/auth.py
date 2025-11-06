@@ -6,8 +6,17 @@ from app.api.v1.auth.schemas import (
     RegisterRequest,
     TokenResponse,
     UserRead,
+    ForgotPasswordRequest,
+    ResetPasswordRequest,
+    PasswordResetResponse,
 )
-from app.core.auth import AuthService, get_current_user
+from app.core.auth import (
+    AuthService,
+    get_current_user,
+    # create_password_reset_token,
+    # verify_password_reset_token,
+)
+from app.core.utils import create_password_reset_token, verify_password_reset_token
 from app.core.authorization import require_permission
 from app.core.security import get_password_hash
 from app.db.session import get_db
@@ -29,11 +38,7 @@ auth_router = APIRouter(prefix="/auth")
 async def register_student(
     payload: RegisterRequest, db: AsyncSession = Depends(get_db)
 ):
-    """
-    Public endpoint for student registration.
-    """
     try:
-        # Check if email already exists
         existing = await user_crud.get_by_email(db, payload.email)
         if existing:
             raise HTTPException(
@@ -41,7 +46,6 @@ async def register_student(
                 detail="Email already registered",
             )
 
-        # Get Student role
         result = await db.execute(select(Role).where(Role.name == "Student"))
         role = result.scalar_one_or_none()
         if not role:
@@ -50,7 +54,6 @@ async def register_student(
                 detail="Default role 'student' not found",
             )
 
-        # Create User
         user = User(
             name=payload.name,
             email=payload.email,
@@ -84,7 +87,6 @@ async def register_student(
 
     except HTTPException:
         raise
-
     except Exception:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -107,7 +109,6 @@ async def login(payload: LoginRequest, db: AsyncSession = Depends(get_db)):
         )
 
     token = AuthService.generate_access_token_for_user(user)
-
     return TokenResponse(
         access_token=token,
         user=UserRead(
@@ -199,5 +200,48 @@ async def update_user_status(
     db.add(user)
     await db.commit()
     await db.refresh(user)
-
     return {"message": f"User status updated to {user.status}"}
+
+
+# Forgot password (generate reset token)
+@auth_router.post("/forgot-password", response_model=PasswordResetResponse)
+async def forgot_password(
+    payload: ForgotPasswordRequest, db: AsyncSession = Depends(get_db)
+):
+    user = await user_crud.get_by_email(db, payload.email)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No account found with that email",
+        )
+
+    token = create_password_reset_token({"sub": str(user.id)})
+    return PasswordResetResponse(message=f"Password reset token generated: {token}")
+
+
+# Reset password using token
+@auth_router.post("/reset-password", response_model=PasswordResetResponse)
+async def reset_password(
+    payload: ResetPasswordRequest, db: AsyncSession = Depends(get_db)
+):
+    try:
+        user_id = verify_password_reset_token(payload.token)
+    except HTTPException as e:
+        raise e
+
+    user = await user_crud.get_by_id(db, user_id)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
+
+    user.password_hash = get_password_hash(payload.new_password)
+    if user.status != UserStatus.active:
+        user.status = UserStatus.active
+
+    db.add(user)
+    await db.commit()
+    await db.refresh(user)
+    return PasswordResetResponse(
+        message="Password has been updated. You can now log in."
+    )

@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Json
+from pydantic import BaseModel, Json  # noqa
 from typing import Literal
 from typing import Optional, Dict, Any
 import uuid
@@ -24,7 +24,7 @@ class Notification(NotificationBase):
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class NotificationRequest(BaseModel):

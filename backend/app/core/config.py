@@ -28,6 +28,9 @@ class Settings(BaseSettings):
     # Security
     SECRET_KEY: str | None = os.getenv("SECRET_KEY")
 
+    # Frontend URL for password reset links
+    FRONTEND_URL: str | None = os.getenv("FRONTEND_URL")
+
     @property
     def DATABASE_URL(self) -> str:
         """Generate async PostgreSQL database URL."""

@@ -5,7 +5,11 @@ celery_app = Celery(
     "notification_tasks",
     broker=settings.BROKER_URL,
     backend=settings.BROKER_URL,
-    include=["app.services"],
+    include=[
+        "app.services.notification_service.tasks.email",
+        "app.services.notification_service.tasks.web",
+        "app.services",
+    ],
 )
 
 celery_app.conf.update(
