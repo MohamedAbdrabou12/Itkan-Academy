@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+# backend/app/modules/question_bank/router.py
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from typing import List
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -23,8 +24,8 @@ question_bank_router = APIRouter(prefix="/question-bank", tags=["Question Bank"]
         Depends(require_permission("question:view")),
     ],
 )
-async def list_questions(db: AsyncSession = Depends(get_db)):
-    return await question_bank_crud.get_all(db)
+async def list_questions(request: Request, db: AsyncSession = Depends(get_db)):
+    return await question_bank_crud.get_all(db, request=request)
 
 
 @question_bank_router.get(
@@ -35,8 +36,10 @@ async def list_questions(db: AsyncSession = Depends(get_db)):
         Depends(require_permission("question:view")),
     ],
 )
-async def get_question(question_id: int, db: AsyncSession = Depends(get_db)):
-    question = await question_bank_crud.get_by_id(db, question_id)
+async def get_question(
+    question_id: int, request: Request, db: AsyncSession = Depends(get_db)
+):
+    question = await question_bank_crud.get_by_id(db, question_id, request=request)
     if not question:
         raise HTTPException(status_code=404, detail="Question not found")
     return question
@@ -70,7 +73,7 @@ async def update_question(
     question_in: QuestionBankUpdate,
     db: AsyncSession = Depends(get_db),
 ):
-    question = await question_bank_crud.get_by_id(db, question_id)
+    question = await question_bank_crud.get_by_id(db, question_id, request=None)
     if not question:
         raise HTTPException(status_code=404, detail="Question not found")
     return await question_bank_crud.update(db, question, question_in)

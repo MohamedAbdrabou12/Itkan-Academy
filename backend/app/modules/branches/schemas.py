@@ -1,5 +1,6 @@
+# backend/app/modules/branches/schemas.py
 from datetime import datetime
-from typing import Optional, List  # noqa F401
+from typing import Optional
 from pydantic import BaseModel
 
 
@@ -27,6 +28,7 @@ class BranchRead(BranchBase):
     id: int
     created_at: datetime
     updated_at: datetime
+    users_count: Optional[int] = None  # Optional enhancement
 
     class Config:
         from_attributes = True

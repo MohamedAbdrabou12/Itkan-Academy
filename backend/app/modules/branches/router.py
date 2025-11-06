@@ -1,30 +1,41 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+# backend/app/modules/branches/router.py
 from typing import List
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import get_db
 from app.core.auth import get_current_user
 from app.core.authorization import require_permission
-from app.modules.branches.schemas import BranchCreate, BranchRead, BranchUpdate
 from app.modules.branches.crud import branch_crud
+from app.modules.branches.schemas import BranchCreate, BranchRead, BranchUpdate
 
 branch_router = APIRouter(prefix="/branches", tags=["Branches"])
 
 
-@branch_router.get("/", response_model=List[BranchRead])
-async def list_branches(
-    db: AsyncSession = Depends(get_db), current_user=Depends(get_current_user)
-):
-    return await branch_crud.get_all(db)
+@branch_router.get(
+    "/",
+    response_model=List[BranchRead],
+    dependencies=[
+        Depends(get_current_user),
+        Depends(require_permission("branch:view")),
+    ],
+)
+async def list_branches(request: Request, db: AsyncSession = Depends(get_db)):
+    return await branch_crud.get_all(db, request=request)
 
 
-@branch_router.get("/{branch_id}", response_model=BranchRead)
+@branch_router.get(
+    "/{branch_id}",
+    response_model=BranchRead,
+    dependencies=[
+        Depends(get_current_user),
+        Depends(require_permission("branch:view")),
+    ],
+)
 async def get_branch(
-    branch_id: int,
-    db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_current_user),
+    branch_id: int, request: Request, db: AsyncSession = Depends(get_db)
 ):
-    branch = await branch_crud.get_by_id(db, branch_id)
+    branch = await branch_crud.get_by_id(db, branch_id, request=request)
     if not branch:
         raise HTTPException(status_code=404, detail="Branch not found")
     return branch

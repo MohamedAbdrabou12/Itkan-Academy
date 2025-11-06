@@ -1,4 +1,7 @@
+# backend/app/modules/role_permissions/router.py
 from typing import List
+from fastapi import APIRouter, Depends, HTTPException, Response, Request, status
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.auth import get_current_user
 from app.core.authorization import require_permission
@@ -8,8 +11,6 @@ from app.modules.role_permissions.schemas import (
     RolePermissionCreate,
     RolePermissionRead,
 )
-from fastapi import APIRouter, Depends, HTTPException, Response, status
-from sqlalchemy.ext.asyncio import AsyncSession
 
 role_permissions_router = APIRouter(
     prefix="/role-permissions", tags=["Role Permissions"]
@@ -24,8 +25,8 @@ role_permissions_router = APIRouter(
         Depends(require_permission("role_permission:view")),
     ],
 )
-async def list_role_permissions(db: AsyncSession = Depends(get_db)):
-    return await role_permission_crud.get_all(db)
+async def list_role_permissions(request: Request, db: AsyncSession = Depends(get_db)):
+    return await role_permission_crud.get_all(db, request=request)
 
 
 @role_permissions_router.post(

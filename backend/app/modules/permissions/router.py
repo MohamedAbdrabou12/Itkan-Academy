@@ -1,4 +1,7 @@
-from typing import List
+# backend/app/modules/permissions/router.py
+from typing import List, Optional  # noqa: F401
+from fastapi import APIRouter, Depends, HTTPException, Response, Request, status
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.auth import get_current_user
 from app.core.authorization import require_permission
@@ -9,8 +12,6 @@ from app.modules.permissions.schemas import (
     PermissionRead,
     PermissionUpdate,
 )
-from fastapi import APIRouter, Depends, HTTPException, Response, status
-from sqlalchemy.ext.asyncio import AsyncSession
 
 permissions_router = APIRouter(prefix="/permissions", tags=["Permissions"])
 
@@ -23,8 +24,8 @@ permissions_router = APIRouter(prefix="/permissions", tags=["Permissions"])
         Depends(require_permission("permission:view")),
     ],
 )
-async def list_permissions(db: AsyncSession = Depends(get_db)):
-    return await permission_crud.get_all(db)
+async def list_permissions(request: Request, db: AsyncSession = Depends(get_db)):
+    return await permission_crud.get_all(db, request=request)
 
 
 @permissions_router.get(
@@ -35,8 +36,10 @@ async def list_permissions(db: AsyncSession = Depends(get_db)):
         Depends(require_permission("permission:view")),
     ],
 )
-async def get_permission(permission_id: int, db: AsyncSession = Depends(get_db)):
-    permission = await permission_crud.get_by_id(db, permission_id)
+async def get_permission(
+    permission_id: int, request: Request, db: AsyncSession = Depends(get_db)
+):
+    permission = await permission_crud.get_by_id(db, permission_id, request)
     if not permission:
         raise HTTPException(status_code=404, detail="Permission not found")
     return permission

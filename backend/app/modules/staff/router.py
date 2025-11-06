@@ -1,30 +1,34 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+# backend/app/modules/staff/router.py
 from typing import List
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
-
 from app.db.session import get_db
 from app.core.auth import get_current_user
 from app.core.authorization import require_permission
-from app.modules.staff.schemas import StaffCreate, StaffRead, StaffUpdate
 from app.modules.staff.crud import staff_crud
+from app.modules.staff.schemas import StaffCreate, StaffRead, StaffUpdate
 
 staff_router = APIRouter(prefix="/staff", tags=["Staff"])
 
 
-@staff_router.get("/", response_model=List[StaffRead])
-async def list_staff(
-    db: AsyncSession = Depends(get_db), current_user=Depends(get_current_user)
-):
-    return await staff_crud.get_all(db)
+@staff_router.get(
+    "/",
+    response_model=List[StaffRead],
+    dependencies=[Depends(get_current_user), Depends(require_permission("staff:view"))],
+)
+async def list_staff(request: Request, db: AsyncSession = Depends(get_db)):
+    return await staff_crud.get_all(db, request)
 
 
-@staff_router.get("/{staff_id}", response_model=StaffRead)
+@staff_router.get(
+    "/{staff_id}",
+    response_model=StaffRead,
+    dependencies=[Depends(get_current_user), Depends(require_permission("staff:view"))],
+)
 async def get_staff(
-    staff_id: int,
-    db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_current_user),
+    staff_id: int, request: Request, db: AsyncSession = Depends(get_db)
 ):
-    staff = await staff_crud.get_by_id(db, staff_id)
+    staff = await staff_crud.get_by_id(db, staff_id, request)
     if not staff:
         raise HTTPException(status_code=404, detail="Staff not found")
     return staff
@@ -54,7 +58,7 @@ async def create_staff(staff_in: StaffCreate, db: AsyncSession = Depends(get_db)
 async def update_staff(
     staff_id: int, staff_in: StaffUpdate, db: AsyncSession = Depends(get_db)
 ):
-    staff = await staff_crud.get_by_id(db, staff_id)
+    staff = await staff_crud.get_by_id(db, staff_id, request=None)
     if not staff:
         raise HTTPException(status_code=404, detail="Staff not found")
     return await staff_crud.update(db, staff, staff_in)

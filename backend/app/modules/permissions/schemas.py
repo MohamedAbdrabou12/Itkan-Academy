@@ -1,4 +1,4 @@
-# app/modules/permissions/schemas/permission.py
+# app/modules/permissions/schemas.py
 from datetime import datetime
 from typing import Optional
 

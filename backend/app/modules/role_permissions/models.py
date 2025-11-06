@@ -1,3 +1,4 @@
+# backend/app/modules/role_permissions/models.py
 from app.db.base import Base
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship

@@ -1,12 +1,12 @@
+# backend/app/modules/staff/schemas.py
 from datetime import datetime
 from typing import Dict, Optional
-
 from pydantic import BaseModel
 
 
 class StaffBase(BaseModel):
     user_id: int
-    branch_id: int
+    branch_id: Optional[int] = None
     position: Optional[str] = None
     salary_meta: Optional[Dict] = None
 
