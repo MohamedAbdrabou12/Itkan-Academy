@@ -13,8 +13,6 @@ from app.api.v1.auth.schemas import (
 from app.core.auth import (
     AuthService,
     get_current_user,
-    # create_password_reset_token,
-    # verify_password_reset_token,
 )
 from app.core.utils import create_password_reset_token, verify_password_reset_token
 from app.core.authorization import require_permission
@@ -60,7 +58,7 @@ async def register_student(
             password_hash=get_password_hash(payload.password),
             role_id=role.id,
             phone=payload.phone,
-            status=UserStatus.pending,
+            status=UserStatus.pending.value,
         )
 
         db.add(user)
@@ -70,7 +68,6 @@ async def register_student(
         student = Student(
             parent_name=payload.parent_name,
             user_id=user.id,
-            branch_id=payload.branch_id,
         )
 
         db.add(student)
@@ -83,6 +80,7 @@ async def register_student(
             email=user.email,
             role_name=role.name,
             status=user.status,
+            branch_id=user.branch_id,  # add branch_id to response
         )
 
     except HTTPException:
@@ -103,7 +101,7 @@ async def login(payload: LoginRequest, db: AsyncSession = Depends(get_db)):
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password"
         )
 
-    if user.status != UserStatus.active:
+    if user.status != UserStatus.active.value:  # check for active status
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail="Account is not activated yet"
         )
