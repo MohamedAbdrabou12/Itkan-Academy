@@ -1,4 +1,3 @@
-# backend/app/modules/roles/router.py
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Request, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -20,7 +19,7 @@ role_router = APIRouter(prefix="/roles", tags=["Roles"])
 @role_router.get(
     "/",
     response_model=PaginatedResponse[RoleRead],
-    dependencies=[Depends(get_current_user), Depends(require_permission("role:view"))],
+    # dependencies=[Depends(get_current_user), Depends(require_permission("role:view"))],
 )
 async def list_roles(
     request: Request,

@@ -1,4 +1,3 @@
-# backend/app/modules/users/models.py
 from __future__ import annotations
 from datetime import datetime
 from enum import Enum
@@ -14,11 +13,11 @@ if TYPE_CHECKING:
     from app.modules.branches.models import Branch
 
 
-class UserStatus(str, Enum):
+class UserStatus(Enum):
     pending = "pending"
     active = "active"
     rejected = "rejected"
-    deleted = "deleted"
+    deactive = "deactive"
 
 
 class User(Base):
@@ -75,3 +74,4 @@ class User(Base):
     @property
     def permission_code(self) -> Optional[str]:
         return self.role.permission_code if self.role else None
+    
