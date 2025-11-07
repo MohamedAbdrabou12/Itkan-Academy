@@ -1,11 +1,11 @@
 from math import ceil
 from typing import Any, Dict, Optional
-from fastapi import Request
+from fastapi import Request, HTTPException
 from sqlalchemy import asc, desc, func, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
-from app.modules.branches.models import Branch
+from app.modules.branches.models import Branch, BranchStatus
 from app.modules.branches.schemas import BranchCreate, BranchUpdate
 
 
@@ -107,18 +107,31 @@ class BranchCRUD:
         return branch
 
     async def create(self, db: AsyncSession, branch_in: BranchCreate) -> Branch:
-        branch = Branch(**branch_in.dict())
+        branch = Branch(**branch_in.model_dump())
         db.add(branch)
         await db.commit()
         await db.refresh(branch)
         return branch
 
     async def update(
-        self, db: AsyncSession, branch: Branch, branch_in: BranchUpdate
+        self, db: AsyncSession, branch_id: int, branch_in: BranchUpdate
     ) -> Branch:
-        data = branch_in.dict(exclude_unset=True)
-        for field, value in data.items():
+        # Get the existing branch
+        branch = await self.get_by_id(db, branch_id)
+        if not branch:
+            raise HTTPException(status_code=404, detail="Branch not found")
+
+        # Convert Pydantic model to dict, excluding unset fields
+        update_data = branch_in.model_dump(exclude_unset=True)
+
+        # Handle enum conversion
+        if "status" in update_data and isinstance(update_data["status"], BranchStatus):
+            update_data["status"] = update_data["status"].value
+
+        # Update only the fields that were provided
+        for field, value in update_data.items():
             setattr(branch, field, value)
+
         db.add(branch)
         await db.commit()
         await db.refresh(branch)

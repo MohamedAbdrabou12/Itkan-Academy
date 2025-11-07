@@ -4,7 +4,12 @@ from app.core.auth import get_current_user
 from app.core.authorization import require_permission
 from app.db.session import get_db
 from app.modules.branches.crud import branch_crud
-from app.modules.branches.schemas import BranchCreate, BranchRead, BranchUpdate, BranchesResponse
+from app.modules.branches.schemas import (
+    BranchCreate,
+    BranchRead,
+    BranchUpdate,
+    BranchesResponse,
+)
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -80,10 +85,7 @@ async def create_branch(branch_in: BranchCreate, db: AsyncSession = Depends(get_
 async def update_branch(
     branch_id: int, branch_in: BranchUpdate, db: AsyncSession = Depends(get_db)
 ):
-    branch = await branch_crud.get_by_id(db, branch_id)
-    if not branch:
-        raise HTTPException(status_code=404, detail="Branch not found")
-    return await branch_crud.update(db, branch, branch_in)
+    return await branch_crud.update(db, branch_id, branch_in)
 
 
 @branch_router.delete(

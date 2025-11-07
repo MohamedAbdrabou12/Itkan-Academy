@@ -12,6 +12,9 @@ class BranchBase(BaseModel):
     email: Optional[str] = None
     status: BranchStatus
 
+    class Config:
+        use_enum_values = True
+
 
 class BranchCreate(BranchBase):
     pass
@@ -25,14 +28,13 @@ class BranchUpdate(BaseModel):
     status: Optional[BranchStatus]
 
 
-
 class BranchRead(BaseModel):
     id: int
     name: str
     email: Optional[str]
     phone: Optional[str]
     address: Optional[str]
-    status: str
+    status: BranchStatus
     created_at: datetime
     users_count: Optional[int] = 0
 
