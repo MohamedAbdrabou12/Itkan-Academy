@@ -1,12 +1,15 @@
 from math import ceil
 from typing import Any, Dict, Optional
-from fastapi import Request, HTTPException
-from sqlalchemy import asc, desc, func, or_
+
+from app.modules.branches.models import Branch, BranchStatus
+from app.modules.branches.schemas import BranchCreate, BranchUpdate
+from app.modules.classes.models import Class, ClassStatus
+from app.modules.users.models import User
+from fastapi import HTTPException, Request
+from sqlalchemy import asc, desc, func, or_, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
-from app.modules.branches.models import Branch, BranchStatus
-from app.modules.branches.schemas import BranchCreate, BranchUpdate
 
 
 class BranchCRUD:
@@ -121,6 +124,12 @@ class BranchCRUD:
         if not branch:
             raise HTTPException(status_code=404, detail="Branch not found")
 
+        # Store old status to check if we're deactivating
+        old_status = branch.status
+        old_status_value = (
+            old_status.value if isinstance(old_status, BranchStatus) else old_status
+        )
+
         # Convert Pydantic model to dict, excluding unset fields
         update_data = branch_in.model_dump(exclude_unset=True)
 
@@ -133,15 +142,33 @@ class BranchCRUD:
             setattr(branch, field, value)
 
         db.add(branch)
+        await db.flush()  # Flush to get the updated branch status
+
+        # Check if status changed from active to deactive
+        new_status = update_data.get("status", old_status_value)
+        if old_status_value == "active" and new_status == "deactive":
+            await self.deactivate_related_entities(db, branch_id)
+
         await db.commit()
         await db.refresh(branch)
         return branch
 
-    async def delete(self, db: AsyncSession, branch_id: int) -> None:
-        branch = await self.get_by_id(db, branch_id)
-        if branch:
-            await db.delete(branch)
-            await db.commit()
+    async def deactivate_related_entities(self, db: AsyncSession, branch_id: int):
+        # Update users status to deactive
+        user_update_stmt = (
+            update(User)
+            .where(User.branch_id == branch_id)
+            .values(status=BranchStatus.deactive)
+        )
+        await db.execute(user_update_stmt)
+
+        # Update classes status to deactive
+        class_update_stmt = (
+            update(Class)
+            .where(Class.branch_id == branch_id)
+            .values(status=ClassStatus.deactive)
+        )
+        await db.execute(class_update_stmt)
 
 
 branch_crud = BranchCRUD()

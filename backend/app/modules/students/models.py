@@ -1,4 +1,3 @@
-# backend/app/modules/students/models.py
 from __future__ import annotations
 
 from datetime import date, datetime
@@ -28,9 +27,6 @@ class Student(Base):
     curriculum_progress: Mapped[Optional[Dict]] = mapped_column(JSON)
 
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
-    branch_id: Mapped[int] = mapped_column(
-        ForeignKey("branches.id", ondelete="CASCADE")
-    )
     class_id: Mapped[Optional[int]] = mapped_column(
         ForeignKey("classes.id", ondelete="SET NULL")
     )
