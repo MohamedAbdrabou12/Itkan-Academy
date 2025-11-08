@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List, Optional
+from typing import Optional
 
 from app.modules.branches.models import BranchStatus
 from pydantic import BaseModel
@@ -36,19 +36,7 @@ class BranchRead(BaseModel):
     address: Optional[str]
     status: BranchStatus
     created_at: datetime
-    users_count: Optional[int] = 0
 
     class Config:
         from_attributes = True
 
-
-class PaginationInfo(BaseModel):
-    page: int
-    pageSize: int
-    total: int
-    totalPages: int
-
-
-class BranchesResponse(BaseModel):
-    branches: List[BranchRead]
-    pagination: PaginationInfo

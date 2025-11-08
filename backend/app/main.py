@@ -4,6 +4,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.v1 import api_router
 from app.core.config import settings
 from app.core.middleware import BranchScopeMiddleware
+from fastapi_pagination import add_pagination
+
 
 # Create FastAPI app instance
 app = FastAPI(
@@ -11,6 +13,9 @@ app = FastAPI(
     version="1.0",
     description="Itkan Academy API — powered by Mohamed Abdrabou",
 )
+
+add_pagination(app)
+
 
 # Add CORS middleware (if frontend will call this API)
 app.add_middleware(

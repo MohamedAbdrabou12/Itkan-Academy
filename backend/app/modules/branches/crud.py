@@ -1,4 +1,3 @@
-from math import ceil
 from typing import Any, Dict, Optional
 
 from app.modules.branches.models import Branch, BranchStatus
@@ -6,7 +5,8 @@ from app.modules.branches.schemas import BranchCreate, BranchUpdate
 from app.modules.classes.models import Class, ClassStatus
 from app.modules.users.models import User
 from fastapi import HTTPException, Request
-from sqlalchemy import asc, desc, func, or_, update
+from fastapi_pagination.ext.sqlalchemy import paginate as sqlalchemy_paginate
+from sqlalchemy import asc, desc, or_, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
@@ -16,14 +16,10 @@ class BranchCRUD:
     async def get_all(
         self,
         db: AsyncSession,
-        request: Optional[Request] = None,
-        page: int = 1,
-        page_size: int = 10,
         search: Optional[str] = None,
         sort_by: Optional[str] = "id",
         sort_order: Optional[str] = "asc",
     ) -> Dict[str, Any]:
-        # Base query
         query = select(Branch).options(selectinload(Branch.users))
 
         # Apply search filter
@@ -35,17 +31,6 @@ class BranchCRUD:
                 Branch.address.ilike(f"%{search}%"),
             )
             query = query.where(search_filter)
-
-        # Branch scoping placeholder
-        if request:
-            branch_id = getattr(request.state, "branch_id", None)
-            if branch_id is not None:
-                query = query.where(Branch.id == branch_id)
-
-        # Get total count for pagination
-        count_query = select(func.count()).select_from(query.subquery())
-        total_result = await db.execute(count_query)
-        total = total_result.scalar_one()
 
         sort_columns = {
             "id": Branch.id,
@@ -65,30 +50,9 @@ class BranchCRUD:
         else:
             query = query.order_by(asc(sort_column))
 
-        # Apply pagination
-        offset = (page - 1) * page_size
-        query = query.offset(offset).limit(page_size)
-
-        # Execute query
-        result = await db.execute(query)
-        branches = result.scalars().all()
-
-        # Add users count to each branch
-        for branch in branches:
-            branch.users_count = len(branch.users)  # type: ignore
-
-        # Calculate pagination info
-        total_pages = ceil(total / page_size) if page_size > 0 else 1
-
-        return {
-            "branches": branches,
-            "pagination": {
-                "page": page,
-                "pageSize": page_size,
-                "total": total,
-                "totalPages": total_pages,
-            },
-        }
+        result = await sqlalchemy_paginate(db, query)
+        
+        return result
 
     async def get_by_id(
         self, db: AsyncSession, branch_id: int, request: Optional[Request] = None
@@ -158,7 +122,7 @@ class BranchCRUD:
         user_update_stmt = (
             update(User)
             .where(User.branch_id == branch_id)
-            .values(status=BranchStatus.deactive)
+            .values(status=BranchStatus.deactive.value)
         )
         await db.execute(user_update_stmt)
 
@@ -166,7 +130,7 @@ class BranchCRUD:
         class_update_stmt = (
             update(Class)
             .where(Class.branch_id == branch_id)
-            .values(status=ClassStatus.deactive)
+            .values(status=ClassStatus.deactive.value)
         )
         await db.execute(class_update_stmt)
 
