@@ -1,4 +1,5 @@
 # backend/app/modules/users/crud.py
+# # ==========================================================================================
 from typing import List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -19,7 +20,6 @@ class UserCRUD:
     ) -> List[User]:
         stmt = select(User).options(selectinload(User.role), selectinload(User.branch))
 
-        # Branch scoping if middleware set branch_id
         if request:
             branch_id = getattr(request.state, "branch_id", None)
             if branch_id is not None:
@@ -53,17 +53,27 @@ class UserCRUD:
         )
         return result.scalars().first()
 
-    async def create(self, db: AsyncSession, obj_in: UserCreate) -> User:
-        hashed_password = ""
+    async def create(self, db: AsyncSession, obj_in: dict | UserCreate) -> User:
+        # دعم dict أو Pydantic object
+        data = (
+            obj_in.dict(exclude_unset=True)
+            if not isinstance(obj_in, dict)
+            else obj_in.copy()
+        )
+
+        hashed_password = data.get("password_hash", "")
+        status = data.get("status", UserStatus.pending)
+        if isinstance(status, UserStatus):
+            status = status.value  # تحويل Enum لـ str
 
         db_obj = User(
-            name=obj_in.name,
-            email=obj_in.email,
-            phone=obj_in.phone,
+            name=data["name"],
+            email=data["email"],
+            phone=data.get("phone"),
             password_hash=hashed_password,
-            role_id=obj_in.role_id,
-            branch_id=obj_in.branch_id,
-            status=obj_in.status or UserStatus.pending,
+            role_id=data.get("role_id"),
+            branch_id=data.get("branch_id"),
+            status=status,
         )
         db.add(db_obj)
         await db.commit()
@@ -71,7 +81,6 @@ class UserCRUD:
 
         # Generate reset password token
         token = create_password_reset_token(db_obj.id)
-        # reset_link = f"{settings.FRONTEND_URL.rstrip('/')}/reset-password?token={token}"
         reset_link = f"https://www.google.com/search?q={token}"  # Temporary for testing
 
         # Render email using template
@@ -79,18 +88,26 @@ class UserCRUD:
             "reset_password.html",
             {"username": db_obj.name, "reset_link": reset_link},
         )
-
-        # Send email asynchronously via Celery
         send_email_task.delay(db_obj.email, subject, body_html)
 
         return db_obj
 
-    async def update(self, db: AsyncSession, db_obj: User, obj_in: UserUpdate) -> User:
-        data = obj_in.dict(exclude_unset=True)
+    async def update(
+        self, db: AsyncSession, db_obj: User, obj_in: dict | UserUpdate
+    ) -> User:
+        data = (
+            obj_in.dict(exclude_unset=True) if not isinstance(obj_in, dict) else obj_in
+        )
+
         if "password" in data:
             data["password_hash"] = hash_password(data.pop("password"))
+
+        if "status" in data and isinstance(data["status"], UserStatus):
+            data["status"] = data["status"].value
+
         for field, value in data.items():
             setattr(db_obj, field, value)
+
         db.add(db_obj)
         await db.commit()
         await db.refresh(db_obj)

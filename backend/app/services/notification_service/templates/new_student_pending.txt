@@ -1,0 +1,2 @@
+New Student Pending Review
+A new student {{ student_name }} (ID: {{ student_id }}) was added by {{ created_by }} and is awaiting HR review.
