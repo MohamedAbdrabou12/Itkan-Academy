@@ -1,3 +1,4 @@
+# backend/app/modules/users/models.py
 from __future__ import annotations
 from datetime import datetime
 from enum import Enum
@@ -11,6 +12,7 @@ if TYPE_CHECKING:
     from app.modules.notifications.models import Notification
     from app.modules.roles.models import Role
     from app.modules.branches.models import Branch
+    from app.modules.students.models import Student
 
 
 class UserStatus(Enum):
@@ -61,6 +63,9 @@ class User(Base):
         lazy="selectin",
         cascade="all, delete-orphan",
     )
+    student: Mapped[Optional[Student]] = (  # One-to-one relationship with Student
+        relationship("Student", back_populates="user", uselist=False)
+    )
 
     # Computed attributes (not stored in DB)
     @property
@@ -74,4 +79,3 @@ class User(Base):
     @property
     def permission_code(self) -> Optional[str]:
         return self.role.permission_code if self.role else None
-    

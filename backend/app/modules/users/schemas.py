@@ -1,8 +1,9 @@
 # backend/app/modules/users/schemas.py
 from datetime import datetime
 from typing import Optional
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, field_validator
 from app.modules.users.models import UserStatus
+import re
 
 
 class UserBase(BaseModel):
@@ -11,6 +12,12 @@ class UserBase(BaseModel):
     phone: Optional[str] = None
     branch_id: Optional[int] = None
     status: UserStatus = UserStatus.pending
+
+    @field_validator("phone")
+    def validate_phone(cls, v):
+        if v and not re.match(r"^\+?\d{10,15}$", v):
+            raise ValueError("Invalid phone number format")
+        return v
 
 
 class UserCreate(UserBase):
@@ -26,6 +33,11 @@ class UserUpdate(BaseModel):
     branch_id: Optional[int] = None
     status: Optional[UserStatus] = None
 
+    @field_validator("phone")
+    def validate_phone(cls, v):
+        if v and not re.match(r"^\+?\d{10,15}$", v):
+            raise ValueError("Invalid phone number format")
+        return v
 
 class UserRead(UserBase):
     id: int
