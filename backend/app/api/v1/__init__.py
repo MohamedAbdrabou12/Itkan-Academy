@@ -20,6 +20,7 @@ from app.modules.roles.router import role_router
 from app.modules.staff.router import staff_router
 from app.modules.students.router import students_router
 from app.modules.users.router import user_router
+from app.modules.teachers.router import teachers_router
 from fastapi import APIRouter
 
 # Initialize API Router
@@ -47,3 +48,4 @@ api_router.include_router(exam_router, tags=["Exams"])
 api_router.include_router(exam_question_router, tags=["Exam Questions"])
 api_router.include_router(exam_answer_router, tags=["Exam Answers"])
 api_router.include_router(exam_attempt_router, tags=["Exam Attempts"])
+api_router.include_router(teachers_router, tags=["Teachers"])

@@ -14,6 +14,8 @@ if TYPE_CHECKING:
     from app.modules.students.models import Student  # noqa: F401
     from app.modules.attendance.models import Attendance  # noqa: F401
     from app.modules.evaluations.models import DailyEvaluation  # noqa: F401
+    from app.modules.teachers.models import Teacher, TeacherClass  # noqa: F401
+
 
 class ClassStatus(Enum):
     active = "active"
@@ -52,4 +54,16 @@ class Class(Base):
     )
     daily_evaluations: Mapped[List[DailyEvaluation]] = relationship(
         "DailyEvaluation", back_populates="class_", lazy="selectin"
+    )
+    teachers: Mapped[List[Teacher]] = relationship(
+        "Teacher",
+        secondary="teacher_classes",
+        back_populates="classes",
+        lazy="selectin",
+    )
+    teacher_links: Mapped[List["TeacherClass"]] = relationship(
+        "TeacherClass",
+        back_populates="class_",
+        cascade="all, delete-orphan",
+        lazy="selectin",
     )
