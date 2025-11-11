@@ -11,7 +11,7 @@ from app.db.base import Base
 # Avoid circular imports
 if TYPE_CHECKING:
     from app.modules.branches.models import Branch  # noqa: F401
-    from app.modules.students.models import Student  # noqa: F401
+    from app.modules.students.models import Student, StudentClass  # noqa: F401
     from app.modules.attendance.models import Attendance  # noqa: F401
     from app.modules.evaluations.models import DailyEvaluation  # noqa: F401
     from app.modules.teachers.models import Teacher, TeacherClass  # noqa: F401
@@ -43,11 +43,20 @@ class Class(Base):
     )
 
     # Relationships
+    student_links: Mapped[List["StudentClass"]] = relationship(
+        "StudentClass",
+        back_populates="class_",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+    )
+    students: Mapped[List["Student"]] = relationship(
+        "Student",
+        secondary="student_classes",
+        back_populates="classes",
+        lazy="selectin",
+    )
     branch: Mapped[Branch] = relationship(
         "Branch", back_populates="classes", lazy="selectin"
-    )
-    students: Mapped[List[Student]] = relationship(
-        "Student", back_populates="class_", lazy="selectin"
     )
     attendance_records: Mapped[List[Attendance]] = relationship(
         "Attendance", back_populates="class_", lazy="selectin"

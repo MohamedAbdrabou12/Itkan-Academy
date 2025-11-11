@@ -1,12 +1,13 @@
 # backend/app/modules/students/schemas.py
 from datetime import date, datetime
-from typing import Dict, Optional
+from typing import Dict, Optional, List
 from pydantic import BaseModel, EmailStr, field_validator
 import re
 
+
 class StudentBase(BaseModel):
     parent_name: str
-    class_id: Optional[int] = None
+    class_ids: Optional[List[int]] = None
     admission_date: Optional[date] = None
     curriculum_progress: Optional[Dict] = None
 
@@ -14,12 +15,13 @@ class StudentBase(BaseModel):
     @classmethod
     def validate_admission_date(cls, v: Optional[date]) -> Optional[date]:
         from datetime import date as d
+
         if v and v > d.today():
             raise ValueError("Admission date cannot be in the future")
         return v
 
+
 class StudentCreate(StudentBase):
-    # user-related fields in frontend sends them, service will create User via user_crud
     name: str
     email: EmailStr
     phone: Optional[str] = None
@@ -31,14 +33,13 @@ class StudentCreate(StudentBase):
             raise ValueError("Invalid phone number format")
         return v
 
+
 class StudentUpdate(BaseModel):
-    # both user and student shared fields can be updated (except password)
     name: Optional[str] = None
     email: Optional[EmailStr] = None
     phone: Optional[str] = None
-
     parent_name: Optional[str] = None
-    class_id: Optional[int] = None
+    class_ids: Optional[List[int]] = None
     branch_id: Optional[int] = None
     admission_date: Optional[date] = None
     curriculum_progress: Optional[Dict] = None
@@ -47,6 +48,7 @@ class StudentUpdate(BaseModel):
     @classmethod
     def validate_admission_date(cls, v: Optional[date]) -> Optional[date]:
         from datetime import date as d
+
         if v and v > d.today():
             raise ValueError("Admission date cannot be in the future")
         return v
@@ -57,23 +59,19 @@ class StudentUpdate(BaseModel):
             raise ValueError("Invalid phone number format")
         return v
 
+
 class StudentRead(BaseModel):
     id: int
-
-    # user fields (exposed, no password)
     name: str
     email: str
     phone: Optional[str]
     role_id: Optional[int]
     branch_id: Optional[int]
     status: str
-
-    # student-specific
     parent_name: str
-    class_id: Optional[int]
+    class_ids: Optional[List[int]] = None
     admission_date: Optional[date]
     curriculum_progress: Optional[Dict]
-
     created_at: datetime
     updated_at: datetime
 
