@@ -7,6 +7,7 @@ from pydantic import BaseModel
 class RoleBase(BaseModel):
     name: str
     description: Optional[str] = None
+    name_in_arabic: str
 
 
 class RoleCreate(RoleBase):

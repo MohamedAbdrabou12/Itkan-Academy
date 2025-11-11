@@ -13,6 +13,7 @@ if TYPE_CHECKING:
     from app.modules.roles.models import Role
     from app.modules.branches.models import Branch
     from app.modules.students.models import Student
+    from app.modules.teachers.models import Teacher
 
 
 class UserStatus(Enum):
@@ -65,6 +66,9 @@ class User(Base):
     )
     student: Mapped[Optional[Student]] = (  # One-to-one relationship with Student
         relationship("Student", back_populates="user", uselist=False)
+    )
+    teacher: Mapped[Optional[Teacher]] = (  # One-to-one relationship with Teacher
+        relationship("Teacher", back_populates="user", uselist=False)
     )
 
     # Computed attributes (not stored in DB)

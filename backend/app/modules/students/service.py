@@ -1,5 +1,5 @@
 # backend/app/modules/students/service.py
-from datetime import datetime
+from datetime import datetime  # noqa
 from typing import List, Optional, Dict
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -36,7 +36,9 @@ class StudentService:
         }
 
     @staticmethod
-    async def list_students(db: AsyncSession, status: Optional[str] = None) -> List[Dict]:
+    async def list_students(
+        db: AsyncSession, status: Optional[str] = None
+    ) -> List[Dict]:
         students = await student_crud.get_all(db, status)
         return [await StudentService._serialize_student(s) for s in students]
 
@@ -60,7 +62,10 @@ class StudentService:
 
         # Branch validation
         if creator and getattr(creator, "role_name", "").lower() != "admin":
-            if student_in.branch_id is None or student_in.branch_id != creator.branch_id:
+            if (
+                student_in.branch_id is None
+                or student_in.branch_id != creator.branch_id
+            ):
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="branch_id must match creator's branch",
@@ -107,7 +112,9 @@ class StudentService:
         return await StudentService._serialize_student(student)
 
     @staticmethod
-    async def update_student(db: AsyncSession, student_id: int, student_in: StudentUpdate) -> Dict:
+    async def update_student(
+        db: AsyncSession, student_id: int, student_in: StudentUpdate
+    ) -> Dict:
         student = await student_crud.get_by_id(db, student_id)
         if not student:
             raise HTTPException(status_code=404, detail="Student not found")
@@ -129,9 +136,11 @@ class StudentService:
             if "email" in user_fields and user_fields["email"] != user.email:
                 exist = await user_crud.get_by_email(db, user_fields["email"])
                 if exist:
-                    raise HTTPException(status_code=400, detail="Email already registered")
+                    raise HTTPException(
+                        status_code=400, detail="Email already registered"
+                    )
             # this will handle updating user fields and commit
-            updated_user = await user_crud.update(db, user, UserUpdate(**user_fields))
+            updated_user = await user_crud.update(db, user, UserUpdate(**user_fields))  # noqa
 
         # Update student-only fields
         student_fields = data
@@ -142,7 +151,7 @@ class StudentService:
         student.user = await db.get(User, student.user_id)
         return await StudentService._serialize_student(student)
 
-    # student deletion is soft-deactivation of linked user  
+    # student deletion is soft-deactivation of linked user
     @staticmethod
     async def delete_student(db: AsyncSession, student_id: int) -> dict:
         student = await student_crud.get_by_id(db, student_id)
@@ -173,7 +182,9 @@ class StudentService:
         return await StudentService._serialize_student(student)
 
     @staticmethod
-    async def approve_student(db: AsyncSession, student_id: int, approver: Optional[User] = None) -> Dict:
+    async def approve_student(
+        db: AsyncSession, student_id: int, approver: Optional[User] = None
+    ) -> Dict:
         student = await student_crud.get_by_id(db, student_id)
         if not student:
             raise HTTPException(status_code=404, detail="Student not found")
@@ -201,14 +212,18 @@ class StudentService:
                 template_type="student_approved",
                 payload=payload,
             )
-        except Exception:           #later we can change it to log the error depending on our logging strategy
+        except (
+            Exception
+        ):  # later we can change it to log the error depending on our logging strategy
             pass
 
         student.user = user
         return await StudentService._serialize_student(student)
 
     @staticmethod
-    async def reject_student(db: AsyncSession, student_id: int, approver: Optional[User] = None) -> Dict:
+    async def reject_student(
+        db: AsyncSession, student_id: int, approver: Optional[User] = None
+    ) -> Dict:
         student = await student_crud.get_by_id(db, student_id)
         if not student:
             raise HTTPException(status_code=404, detail="Student not found")
@@ -240,12 +255,17 @@ class StudentService:
         return await StudentService._serialize_student(student)
 
     @staticmethod
-    async def _notify_hr_new_student(db: AsyncSession, student: Student, creator: Optional[User] = None):
+    async def _notify_hr_new_student(
+        db: AsyncSession, student: Student, creator: Optional[User] = None
+    ):
         from app.modules.roles.models import Role
         from app.modules.users.models import User as UserModel
+
         # check for HR or admin users to notify
         role_res = await db.execute(select(Role).where(Role.name.ilike("admin")))
-        hr_role = role_res.scalar_one_or_none()    # later we can add hr role also to get notified
+        hr_role = (
+            role_res.scalar_one_or_none()
+        )  # later we can add hr role also to get notified
         if not hr_role:
             return
 
@@ -256,7 +276,9 @@ class StudentService:
 
         payload = {
             "student_id": student.id,
-            "student_name": creator.name if creator else (student.user.name if getattr(student, "user", None) else "Unknown"),
+            "student_name": creator.name
+            if creator
+            else (student.user.name if getattr(student, "user", None) else "Unknown"),
             "created_by": creator.name if creator else "System",
         }
 
