@@ -4,6 +4,7 @@ from typing import List, Optional, Dict
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+
 from app.modules.students.models import Student
 from app.modules.students.schemas import StudentCreate, StudentUpdate
 from app.modules.students.crud import student_crud
@@ -19,6 +20,11 @@ class StudentService:
     @staticmethod
     async def _serialize_student(student: Student) -> Dict:
         user = getattr(student, "user", None)
+        class_ids = (
+            [c.id for c in getattr(student, "classes", [])]
+            if getattr(student, "classes", None)
+            else []
+        )
         return {
             "id": student.id,
             "name": user.name if user else None,
@@ -28,7 +34,7 @@ class StudentService:
             "branch_id": user.branch_id if user else None,
             "status": user.status if user else None,
             "parent_name": student.parent_name,
-            "class_id": student.class_id,
+            "class_ids": class_ids,
             "admission_date": student.admission_date,
             "curriculum_progress": student.curriculum_progress,
             "created_at": student.created_at,
@@ -55,12 +61,10 @@ class StudentService:
     async def create_student(
         db: AsyncSession, student_in: StudentCreate, creator: Optional[User] = None
     ) -> Dict:
-        # Email must be unique
         existing = await user_crud.get_by_email(db, student_in.email)
         if existing:
             raise HTTPException(status_code=400, detail="Email already registered")
 
-        # Branch validation
         if creator and getattr(creator, "role_name", "").lower() != "admin":
             if (
                 student_in.branch_id is None
@@ -71,21 +75,24 @@ class StudentService:
                     detail="branch_id must match creator's branch",
                 )
 
-        # Class belongs to same branch if class_id provided
-        if student_in.class_id:
-            cls = await db.get(Class, student_in.class_id)
-            if not cls:
-                raise HTTPException(status_code=404, detail="Class not found")
-            if cls.branch_id != student_in.branch_id:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="class_id does not belong to the provided branch",
-                )
+        class_objs = []
+        if student_in.class_ids:
+            for cid in student_in.class_ids:
+                cls = await db.get(Class, cid)
+                if not cls:
+                    raise HTTPException(
+                        status_code=404, detail=f"Class {cid} not found"
+                    )
+                if cls.branch_id != student_in.branch_id:
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail=f"class {cid} does not belong to the provided branch",
+                    )
+                class_objs.append(cls)
 
-        #  Always use role student from DB
-        student_role = await db.execute(select(Role).where(Role.name.ilike("student")))
-        student_role = student_role.scalar_one_or_none()
-        role_id = student_role.id if student_role else student_in.role_id
+        role_res = await db.execute(select(Role).where(Role.name.ilike("student")))
+        student_role = role_res.scalar_one_or_none()
+        role_id = student_role.id if student_role else None
 
         user_payload = UserCreateSchema(
             name=student_in.name,
@@ -100,11 +107,16 @@ class StudentService:
         student_payload = {
             "user_id": user.id,
             "parent_name": student_in.parent_name,
-            "class_id": student_in.class_id,
             "admission_date": student_in.admission_date,
             "curriculum_progress": student_in.curriculum_progress,
         }
         student = await student_crud.create(db, student_payload)
+
+        if class_objs:
+            student.classes = class_objs
+            db.add(student)
+            await db.commit()
+            await db.refresh(student)
 
         await StudentService._notify_hr_new_student(db, student, creator)
 
@@ -119,46 +131,60 @@ class StudentService:
         if not student:
             raise HTTPException(status_code=404, detail="Student not found")
 
-        # load user
         user = await db.get(User, student.user_id)
         if not user:
             raise HTTPException(status_code=404, detail="Linked user not found")
 
         data = student_in.dict(exclude_unset=True)
 
-        # Update user-shared fields
         user_fields = {}
         for f in ("name", "email", "phone", "branch_id"):
             if f in data:
                 user_fields[f] = data.pop(f)
         if user_fields:
-            # email uniqueness check if email is changed
             if "email" in user_fields and user_fields["email"] != user.email:
                 exist = await user_crud.get_by_email(db, user_fields["email"])
                 if exist:
                     raise HTTPException(
                         status_code=400, detail="Email already registered"
                     )
-            # this will handle updating user fields and commit
-            updated_user = await user_crud.update(db, user, UserUpdate(**user_fields))  # noqa
+            await user_crud.update(db, user, UserUpdate(**user_fields))
 
-        # Update student-only fields
-        student_fields = data
-        if student_fields:
-            student = await student_crud.update(db, student, student_fields)
+        class_ids = data.pop("class_ids", None)
+        if data:
+            student = await student_crud.update(db, student, data)
 
-        # refresh and serialize
+        if class_ids is not None:
+            class_objs = []
+            for cid in class_ids:
+                cls = await db.get(Class, cid)
+                if not cls:
+                    raise HTTPException(
+                        status_code=404, detail=f"Class {cid} not found"
+                    )
+                if cls.branch_id != (user.branch_id if user else None):
+                    raise HTTPException(
+                        status_code=400, detail=f"class {cid} not in current branch"
+                    )
+                class_objs.append(cls)
+            # Use crud helper to update join table
+            await student_crud.update_student_classes(db, student, class_ids)
+            # refresh relations
+            await db.refresh(student)
+            student.classes = class_objs
+            db.add(student)
+            await db.commit()
+            await db.refresh(student)
+
         student.user = await db.get(User, student.user_id)
         return await StudentService._serialize_student(student)
 
-    # student deletion is soft-deactivation of linked user
     @staticmethod
     async def delete_student(db: AsyncSession, student_id: int) -> dict:
         student = await student_crud.get_by_id(db, student_id)
         if not student:
             raise HTTPException(status_code=404, detail="Student not found")
 
-        # prevent delete if attendance or invoices exist
         attendance_exists = bool(student.attendance_records)
         payment_exists = bool(student.invoices)
         if attendance_exists or payment_exists:
@@ -167,7 +193,6 @@ class StudentService:
                 detail="Cannot delete student with attendance or payments",
             )
 
-        # soft deactivate user and do not delete student
         user = await db.get(User, student.user_id)
         if not user:
             raise HTTPException(status_code=404, detail="Linked user not found")
@@ -193,13 +218,11 @@ class StudentService:
         if not user:
             raise HTTPException(status_code=404, detail="Linked user not found")
 
-        # Approver must have permission checked at route level here just set status
         user.status = UserStatus.active.value
         db.add(user)
         await db.commit()
         await db.refresh(student)
 
-        # notify student (web) that approved (optional)
         payload = {
             "student_id": student.id,
             "student_name": user.name,
@@ -212,9 +235,7 @@ class StudentService:
                 template_type="student_approved",
                 payload=payload,
             )
-        except (
-            Exception
-        ):  # later we can change it to log the error depending on our logging strategy
+        except Exception:
             pass
 
         student.user = user
@@ -261,11 +282,8 @@ class StudentService:
         from app.modules.roles.models import Role
         from app.modules.users.models import User as UserModel
 
-        # check for HR or admin users to notify
         role_res = await db.execute(select(Role).where(Role.name.ilike("admin")))
-        hr_role = (
-            role_res.scalar_one_or_none()
-        )  # later we can add hr role also to get notified
+        hr_role = role_res.scalar_one_or_none()
         if not hr_role:
             return
 
