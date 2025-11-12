@@ -4,9 +4,11 @@ import sys
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from scripts.branches import add_branches
-from scripts.roles import add_roles
 from app.core.config import settings
+from scripts.branches import add_branches
+from scripts.permissions import add_permissions
+from scripts.role_permissions import add_role_permissions
+from scripts.roles import add_roles
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
     async_sessionmaker,
@@ -29,6 +31,8 @@ async def seed_data():
     async with AsyncSessionLocal() as db:
         await add_branches(db)
         await add_roles(db)
+        await add_permissions(db)
+        await add_role_permissions(db)
         await db.commit()
         print("\nAll data committed successfully!")
 

@@ -24,11 +24,10 @@ class RoleCRUD:
         if search:
             search_filter = or_(
                 Role.name.ilike(f"%{search}%"),
-                Role.name_in_arabic.ilike(f"%{search}%"),
+                Role.name_ar.ilike(f"%{search}%"),
                 Role.description.ilike(f"%{search}%"),
             )
             query = query.where(search_filter)
-
 
         # Apply sorting
         sort_column_name = sort_by or "id"
@@ -41,9 +40,8 @@ class RoleCRUD:
         )
 
         result = await sqlalchemy_paginate(db, query)
-        
-        return result
 
+        return result
 
     async def get_by_id(
         self, db: AsyncSession, role_id: int, request: Optional[Request] = None
