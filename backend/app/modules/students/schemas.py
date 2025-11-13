@@ -1,8 +1,9 @@
 # backend/app/modules/students/schemas.py
-from datetime import date, datetime
+from datetime import date, datetime  # noqa F401
 from typing import Dict, Optional, List
 from pydantic import BaseModel, EmailStr, field_validator
 import re
+from app.modules.users.schemas import UserRead
 
 
 class StudentBase(BaseModel):
@@ -25,12 +26,20 @@ class StudentCreate(StudentBase):
     name: str
     email: EmailStr
     phone: Optional[str] = None
-    branch_id: int
+    branch_ids: Optional[List[int]] = None
 
     @field_validator("phone")
     def validate_phone(cls, v):
         if v and not re.match(r"^\+?\d{10,15}$", v):
             raise ValueError("Invalid phone number format")
+        return v
+
+    # validate that only one branch is assigned for student
+    @field_validator("branch_ids")
+    def validate_single_branch(cls, v):
+        if v:
+            if len(v) > 1:
+                raise ValueError("Student can be assigned to only one branch.")
         return v
 
 
@@ -40,7 +49,7 @@ class StudentUpdate(BaseModel):
     phone: Optional[str] = None
     parent_name: Optional[str] = None
     class_ids: Optional[List[int]] = None
-    branch_id: Optional[int] = None
+    branch_ids: Optional[List[int]] = None
     admission_date: Optional[date] = None
     curriculum_progress: Optional[Dict] = None
 
@@ -60,20 +69,12 @@ class StudentUpdate(BaseModel):
         return v
 
 
-class StudentRead(BaseModel):
-    id: int
-    name: str
-    email: str
-    phone: Optional[str]
-    role_id: Optional[int]
-    branch_id: Optional[int]
-    status: str
+class StudentRead(UserRead):
     parent_name: str
     class_ids: Optional[List[int]] = None
     admission_date: Optional[date]
     curriculum_progress: Optional[Dict]
-    created_at: datetime
-    updated_at: datetime
+    branch_ids: Optional[List[int]] = []
 
     class Config:
         from_attributes = True

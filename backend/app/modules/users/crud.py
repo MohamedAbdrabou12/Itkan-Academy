@@ -1,123 +1,230 @@
 # backend/app/modules/users/crud.py
-# # ==========================================================================================
 from typing import List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
+from sqlalchemy import delete as sa_delete
 from fastapi import Request
+from fastapi import HTTPException
 from app.core.security import get_password_hash as hash_password
-from app.modules.users.models import User, UserStatus
+from app.modules.users.models import User, UserBranch, UserStatus
 from app.modules.users.schemas import UserCreate, UserUpdate
 from app.core.utils import create_password_reset_token
-from app.core.config import settings  # noqa
 from app.services.notification_service.tasks.email import send_email_task
 from app.services.notification_service.utils.template_engine import render_template
+from app.modules.users.schemas import UserRead, BranchInfo
+from app.modules.branches.models import Branch
+
+
+def map_user_to_read(user: User) -> UserRead:
+    """
+    Map User ORM object to UserRead schema including branches and permissions.
+    """
+    return UserRead(
+        id=user.id,
+        name=user.name,
+        email=user.email,
+        phone=user.phone,
+        role_id=user.role_id,
+        role_name=user.role_name,
+        branch_name=user.branch_name,
+        permission_code=user.role.permission_links if user.role else None,
+        status=user.status,
+        last_login=user.last_login,
+        created_at=user.created_at,
+        updated_at=user.updated_at,
+        branch_ids=[link.branch_id for link in user.branch_links]
+        if user.branch_links
+        else None,
+        branches=[BranchInfo.from_orm(link.branch) for link in user.branch_links]
+        if user.branch_links
+        else None,
+    )
 
 
 class UserCRUD:
+    """
+    CRUD operations for User entity including branch-aware queries.
+    """
+
     async def get_all(
         self, db: AsyncSession, request: Optional[Request] = None
     ) -> List[User]:
-        stmt = select(User).options(selectinload(User.role), selectinload(User.branch))
-
+        """
+        Get all users. Optionally filter by active branch from request context.
+        """
+        stmt = select(User).options(
+            selectinload(User.role),
+            selectinload(User.branches),
+            selectinload(User.branch_links),
+        )
         if request:
-            branch_id = getattr(request.state, "branch_id", None)
-            if branch_id is not None:
-                stmt = stmt.where(User.branch_id == branch_id)
-
+            active_branch = getattr(request.state, "active_branch_id", None)
+            if active_branch is not None:
+                stmt = stmt.where(User.branch_id == active_branch)
         result = await db.execute(stmt)
         return result.scalars().all()
 
     async def get_by_id(
         self, db: AsyncSession, user_id: int, request: Optional[Request] = None
     ) -> Optional[User]:
+        """
+        Get a single user by ID. Optionally filter by active branch.
+        """
         stmt = (
             select(User)
             .where(User.id == user_id)
-            .options(selectinload(User.role), selectinload(User.branch))
+            .options(
+                selectinload(User.role),
+                selectinload(User.branches),
+                selectinload(User.branch_links),
+            )
         )
-
         if request:
-            branch_id = getattr(request.state, "branch_id", None)
-            if branch_id is not None:
-                stmt = stmt.where(User.branch_id == branch_id)
-
+            active_branch = getattr(request.state, "active_branch_id", None)
+            if active_branch is not None:
+                stmt = stmt.where(User.branch_id == active_branch)
         result = await db.execute(stmt)
         return result.scalars().first()
 
     async def get_by_email(self, db: AsyncSession, email: str) -> Optional[User]:
-        result = await db.execute(
+        """
+        Get a user by email. No branch filtering.
+        """
+        stmt = (
             select(User)
             .where(User.email == email)
-            .options(selectinload(User.role), selectinload(User.branch))
+            .options(
+                selectinload(User.role),
+                selectinload(User.branches),
+                selectinload(User.branch_links),
+            )
         )
+        result = await db.execute(stmt)
         return result.scalars().first()
 
-    async def create(self, db: AsyncSession, obj_in: dict | UserCreate) -> User:
-        # دعم dict أو Pydantic object
+    async def _sync_user_branches(
+        self, db: AsyncSession, user: User, branch_ids: List[int]
+    ):
+        """
+        Internal helper to sync user's many-to-many branches and set primary branch_id.
+        """
+        await db.execute(sa_delete(UserBranch).where(UserBranch.user_id == user.id))
+        for bid in branch_ids:
+            db.add(UserBranch(user_id=user.id, branch_id=bid))
+        user.branch_id = branch_ids[0] if branch_ids else None
+        db.add(user)
+        await db.commit()
+        await db.refresh(user)
+
+    async def create(
+        self, db: AsyncSession, obj_in: dict | UserCreate
+    ) -> Optional[User]:
+        """
+        Create a new user, sync branches, and send initial password reset email.
+        """
         data = (
             obj_in.dict(exclude_unset=True)
             if not isinstance(obj_in, dict)
             else obj_in.copy()
         )
-
-        hashed_password = data.get("password_hash", "")
-        status = data.get("status", UserStatus.pending)
-        if isinstance(status, UserStatus):
-            status = status.value  # تحويل Enum لـ str
+        if "password" in data:
+            data["password_hash"] = hash_password(data.pop("password"))
+        status_val = data.get("status", UserStatus.pending.value)
+        if isinstance(status_val, UserStatus):
+            status_val = status_val.value
 
         db_obj = User(
             name=data["name"],
             email=data["email"],
             phone=data.get("phone"),
-            password_hash=hashed_password,
+            password_hash=data.get("password_hash", ""),
             role_id=data.get("role_id"),
             branch_id=data.get("branch_id"),
-            status=status,
+            status=status_val,
         )
         db.add(db_obj)
         await db.commit()
         await db.refresh(db_obj)
 
-        # Generate reset password token
-        token = create_password_reset_token(db_obj.id)
-        reset_link = f"https://www.google.com/search?q={token}"  # Temporary for testing
+        branch_ids = data.get("branch_ids")
+        if branch_ids:
+            # check that all branch_ids exist in branches table
+            result = await db.execute(
+                select(Branch.id).where(Branch.id.in_(branch_ids))
+            )
+            existing_ids = [row[0] for row in result.fetchall()]
 
-        # Render email using template
+            if set(branch_ids) - set(existing_ids):
+                missing = set(branch_ids) - set(existing_ids)
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Invalid or missing branch_ids: {', '.join(map(str, missing))}",
+                )
+
+            await self._sync_user_branches(db, db_obj, branch_ids)
+
+        # send reset password email
+        token = create_password_reset_token(db_obj.id)
+        reset_link = f"https://www.google.com/search?q={token}"
         subject, body_html = render_template(
-            "reset_password.html",
-            {"username": db_obj.name, "reset_link": reset_link},
+            "reset_password.html", {"username": db_obj.name, "reset_link": reset_link}
         )
         send_email_task.delay(db_obj.email, subject, body_html)
 
+        await db.refresh(db_obj)
         return db_obj
 
     async def update(
         self, db: AsyncSession, db_obj: User, obj_in: dict | UserUpdate
-    ) -> User:
+    ) -> Optional[User]:
+        """
+        Update user fields and optionally sync branches.
+        """
         data = (
-            obj_in.dict(exclude_unset=True) if not isinstance(obj_in, dict) else obj_in
+            obj_in.dict(exclude_unset=True)
+            if not isinstance(obj_in, dict)
+            else obj_in.copy()
         )
-
         if "password" in data:
             data["password_hash"] = hash_password(data.pop("password"))
-
         if "status" in data and isinstance(data["status"], UserStatus):
             data["status"] = data["status"].value
 
+        branch_ids = data.pop("branch_ids", None)
         for field, value in data.items():
             setattr(db_obj, field, value)
 
         db.add(db_obj)
         await db.commit()
         await db.refresh(db_obj)
+
+        if branch_ids is not None:
+            await self._sync_user_branches(db, db_obj, branch_ids)
+            await db.refresh(db_obj)
+
         return db_obj
 
-    async def delete(self, db: AsyncSession, user_id: int) -> None:
+    async def delete(self, db: AsyncSession, user_id: int) -> Optional[User]:
+        """
+        Soft-delete user by setting status to deactive.
+        """
         user = await self.get_by_id(db, user_id)
         if user:
-            await db.delete(user)
+            user.status = UserStatus.deactive.value
+            db.add(user)
             await db.commit()
+            await db.refresh(user)
+        return user
+
+    async def assign_branches(
+        self, db: AsyncSession, user: User, branch_ids: List[int]
+    ):
+        """
+        Public method to assign multiple branches and update main branch.
+        """
+        await self._sync_user_branches(db, user, branch_ids)
+        return user
 
 
 user_crud = UserCRUD()
