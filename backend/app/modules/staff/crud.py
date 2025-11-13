@@ -1,70 +1,44 @@
 # backend/app/modules/staff/crud.py
-from typing import List, Optional
+from typing import Optional, List
+from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from fastapi import Request
+from sqlalchemy.orm import joinedload
+from sqlalchemy import delete as sa_delete
 from app.modules.staff.models import Staff
-from app.modules.staff.schemas import StaffCreate, StaffUpdate
-from app.core.utils import create_password_reset_token
-from app.core.config import settings  # noqa
-from app.services.notification_service.tasks.email import send_email_task
-from app.services.notification_service.utils.template_engine import render_template
+from app.modules.users.models import User, UserBranch, UserStatus
 
 
 class StaffCRUD:
-    async def get_all(
-        self, db: AsyncSession, request: Optional[Request] = None
-    ) -> List[Staff]:
-        stmt = select(Staff).order_by(Staff.id)
-
-        # Branch scoping
-        if request:
-            branch_id = getattr(request.state, "branch_id", None)
-            if branch_id is not None:
-                stmt = stmt.where(Staff.branch_id == branch_id)
-
+    async def get_all(self, db: AsyncSession):
+        stmt = select(Staff).options(joinedload(Staff.user)).order_by(Staff.id)
         result = await db.execute(stmt)
         return result.scalars().all()
 
-    async def get_by_id(
-        self, db: AsyncSession, staff_id: int, request: Optional[Request] = None
-    ) -> Optional[Staff]:
-        stmt = select(Staff).where(Staff.id == staff_id)
-
-        # Branch scoping
-        if request:
-            branch_id = getattr(request.state, "branch_id", None)
-            if branch_id is not None:
-                stmt = stmt.where(Staff.branch_id == branch_id)
-
+    async def get_by_id(self, db: AsyncSession, staff_id: int) -> Optional[Staff]:
+        stmt = select(Staff).where(Staff.id == staff_id).options(joinedload(Staff.user))
         result = await db.execute(stmt)
         return result.scalars().first()
 
-    async def create(self, db: AsyncSession, staff_in: StaffCreate) -> Staff:
-        staff = Staff(**staff_in.dict())
+    async def _sync_user_branches(
+        self, db: AsyncSession, user: User, branch_ids: List[int]
+    ):
+        await db.execute(sa_delete(UserBranch).where(UserBranch.user_id == user.id))
+        for bid in branch_ids:
+            db.add(UserBranch(user_id=user.id, branch_id=bid))
+        user.branch_id = branch_ids[0] if branch_ids else None
+        db.add(user)
+        await db.commit()
+        await db.refresh(user)
+
+    async def create(self, db: AsyncSession, data: dict) -> Staff:
+        staff = Staff(**data)
         db.add(staff)
         await db.commit()
         await db.refresh(staff)
-
-        # Generate reset password token
-        token = create_password_reset_token(staff.user_id)
-        # reset_link = f"{settings.FRONTEND_URL.rstrip('/')}/reset-password?token={token}"
-        reset_link = f"https://www.google.com/search?q={token}"  # Temporary for testing
-        # Render email template
-        subject, body_html = render_template(
-            "reset_password.html",
-            {"username": staff.user.name, "reset_link": reset_link},
-        )
-
-        # Send email asynchronously via Celery
-        send_email_task.delay(staff.user.email, subject, body_html)
-
         return staff
 
-    async def update(
-        self, db: AsyncSession, staff: Staff, staff_in: StaffUpdate
-    ) -> Staff:
-        data = staff_in.dict(exclude_unset=True)
+    async def update(self, db: AsyncSession, staff: Staff, data: dict) -> Staff:
         for field, value in data.items():
             setattr(staff, field, value)
         db.add(staff)
@@ -72,11 +46,34 @@ class StaffCRUD:
         await db.refresh(staff)
         return staff
 
-    async def delete(self, db: AsyncSession, staff_id: int) -> None:
-        staff = await self.get_by_id(db, staff_id)
-        if staff:
-            await db.delete(staff)
+    async def delete(self, db: AsyncSession, staff: Staff) -> Staff:
+        user = await db.get(User, staff.user_id)
+        if user:
+            user.status = UserStatus.deactive.value
+            db.add(user)
             await db.commit()
+        await db.refresh(staff)
+        return staff
+
+    async def approve(self, db: AsyncSession, staff: Staff) -> Staff:
+        user = await db.get(User, staff.user_id)
+        if not user:
+            raise HTTPException(status_code=404, detail="Linked user not found")
+        user.status = UserStatus.active.value
+        db.add(user)
+        await db.commit()
+        await db.refresh(staff)
+        return staff
+
+    async def reject(self, db: AsyncSession, staff: Staff) -> Staff:
+        user = await db.get(User, staff.user_id)
+        if not user:
+            raise HTTPException(status_code=404, detail="Linked user not found")
+        user.status = UserStatus.rejected.value
+        db.add(user)
+        await db.commit()
+        await db.refresh(staff)
+        return staff
 
 
 staff_crud = StaffCRUD()

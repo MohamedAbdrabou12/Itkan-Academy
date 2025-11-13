@@ -1,0 +1,706 @@
+[
+  {
+    "id": 1001,
+    "code": "academic.curriculum.*",
+    "name": "Full Curriculum Management",
+    "name_ar": "إدارة المناهج الكاملة",
+    "description": "Complete control over all curriculum operations",
+    "description_ar": "التحكم الكامل في جميع عمليات المناهج"
+  },
+  {
+    "id": 1002,
+    "code": "academic.curriculum.view",
+    "name": "View Curriculum",
+    "name_ar": "عرض المنهج",
+    "description": "Access to view curriculum and timetable",
+    "description_ar": "الوصول لعرض المنهج والجدول الزمني"
+  },
+  {
+    "id": 1003,
+    "code": "academic.performance.*",
+    "name": "Full Performance Management",
+    "name_ar": "إدارة الأداء الكاملة",
+    "description": "Complete control over performance reports",
+    "description_ar": "التحكم الكامل في تقارير الأداء"
+  },
+  {
+    "id": 1004,
+    "code": "academic.performance.view",
+    "name": "View Performance Reports",
+    "name_ar": "عرض تقارير الأداء",
+    "description": "View memorization, revision and performance reports",
+    "description_ar": "عرض تقارير الحفظ والمراجعة والأداء"
+  },
+  {
+    "id": 1005,
+    "code": "financial.invoices.*",
+    "name": "Full Invoice Management",
+    "name_ar": "إدارة الفواتير الكاملة",
+    "description": "Complete control over all invoice operations",
+    "description_ar": "التحكم الكامل في جميع عمليات الفواتير"
+  },
+  {
+    "id": 1006,
+    "code": "financial.invoices.pay",
+    "name": "Pay Invoices",
+    "name_ar": "دفع الفواتير",
+    "description": "Paying student invoices (tuition)",
+    "description_ar": "دفع فواتير الطلاب (الرسوم الدراسية)"
+  },
+  {
+    "id": 1007,
+    "code": "financial.payments.*",
+    "name": "Full Payments Management",
+    "name_ar": "إدارة المدفوعات الكاملة",
+    "description": "Complete control over payment operations",
+    "description_ar": "التحكم الكامل في عمليات الدفع"
+  },
+  {
+    "id": 1008,
+    "code": "financial.payments.view",
+    "name": "View Payment History",
+    "name_ar": "عرض سجل المدفوعات",
+    "description": "Viewing historical payments",
+    "description_ar": "عرض المدفوعات السابقة"
+  },
+  {
+    "id": 1009,
+    "code": "academic.exams.*",
+    "name": "Full Exams Management",
+    "name_ar": "إدارة الامتحانات الكاملة",
+    "description": "Complete control over all exam operations",
+    "description_ar": "التحكم الكامل في جميع عمليات الامتحانات"
+  },
+  {
+    "id": 1010,
+    "code": "academic.exams.view",
+    "name": "View Exams",
+    "name_ar": "عرض الامتحانات",
+    "description": "Access to view available exams",
+    "description_ar": "الوصول لعرض الامتحانات المتاحة"
+  },
+  {
+    "id": 1011,
+    "code": "academic.exams.perform",
+    "name": "Take Exams",
+    "name_ar": "أداء الامتحانات",
+    "description": "Taking exams",
+    "description_ar": "أداء الامتحانات"
+  },
+  {
+    "id": 1012,
+    "code": "communication.management.*",
+    "name": "Full Communication Management",
+    "name_ar": "إدارة الاتصالات الكاملة",
+    "description": "Complete control over communication operations",
+    "description_ar": "التحكم الكامل في عمليات الاتصال"
+  },
+  {
+    "id": 1013,
+    "code": "communication.management.contact",
+    "name": "Contact School Management",
+    "name_ar": "الاتصال بإدارة المدرسة",
+    "description": "Communication with school management",
+    "description_ar": "التواصل مع إدارة المدرسة"
+  },
+  {
+    "id": 1014,
+    "code": "academic.classes.*",
+    "name": "Full Classes Management",
+    "name_ar": "إدارة الفصول الكاملة",
+    "description": "Complete control over all class operations",
+    "description_ar": "التحكم الكامل في جميع عمليات الفصول"
+  },
+  {
+    "id": 1015,
+    "code": "academic.classes.view",
+    "name": "View Classes",
+    "name_ar": "عرض الفصول",
+    "description": "Access to view class information",
+    "description_ar": "الوصول لعرض معلومات الفصول"
+  },
+  {
+    "id": 1016,
+    "code": "attendance.daily.*",
+    "name": "Full Daily Attendance Management",
+    "name_ar": "إدارة الحضور اليومي الكاملة",
+    "description": "Complete control over daily attendance",
+    "description_ar": "التحكم الكامل في الحضور اليومي"
+  },
+  {
+    "id": 1017,
+    "code": "attendance.daily.manage",
+    "name": "Manage Daily Attendance",
+    "name_ar": "إدارة الحضور اليومي",
+    "description": "Taking Daily Attendance and Evaluations",
+    "description_ar": "تسجيل الحضور اليومي والتقييمات"
+  },
+  {
+    "id": 1018,
+    "code": "communication.supervisor.*",
+    "name": "Full Supervisor Communication",
+    "name_ar": "الاتصال الكامل بالمشرف",
+    "description": "Complete control over supervisor communication",
+    "description_ar": "التحكم الكامل في الاتصال بالمشرف"
+  },
+  {
+    "id": 1019,
+    "code": "communication.supervisor.contact",
+    "name": "Contact Branch Supervisor",
+    "name_ar": "الاتصال بمشرف الفرع",
+    "description": "Communicating with branch supervisor",
+    "description_ar": "التواصل مع مشرف الفرع"
+  },
+  {
+    "id": 1020,
+    "code": "reports.*",
+    "name": "Full Reports Access",
+    "name_ar": "الوصول الكامل للتقارير",
+    "description": "Complete access to all reports",
+    "description_ar": "الوصول الكامل لجميع التقارير"
+  },
+  {
+    "id": 1021,
+    "code": "reports.academic.view",
+    "name": "View Academic Reports",
+    "name_ar": "عرض التقارير الأكاديمية",
+    "description": "Access to academic reports",
+    "description_ar": "الوصول للتقارير الأكاديمية"
+  },
+  {
+    "id": 1022,
+    "code": "reports.staff.view",
+    "name": "View Staff Reports",
+    "name_ar": "عرض تقارير الموظفين",
+    "description": "Access to staff reports",
+    "description_ar": "الوصول لتقارير الموظفين"
+  },
+  {
+    "id": 1023,
+    "code": "reports.financial.view",
+    "name": "View Financial Reports",
+    "name_ar": "عرض التقارير المالية",
+    "description": "Access to financial reports",
+    "description_ar": "الوصول للتقارير المالية"
+  },
+  {
+    "id": 1024,
+    "code": "reports.branch.*",
+    "name": "Full Branch Reports Management",
+    "name_ar": "إدارة تقارير الفروع الكاملة",
+    "description": "Complete control over branch reports",
+    "description_ar": "التحكم الكامل في تقارير الفروع"
+  },
+  {
+    "id": 1025,
+    "code": "reports.branch.view",
+    "name": "View Branch Reports",
+    "name_ar": "عرض تقارير الفروع",
+    "description": "Access to branch performance reports",
+    "description_ar": "الوصول لتقارير أداء الفروع"
+  },
+  {
+    "id": 1026,
+    "code": "system.permissions.*",
+    "name": "Full Permissions Management",
+    "name_ar": "إدارة الصلاحيات الكاملة",
+    "description": "Complete control over permissions management",
+    "description_ar": "التحكم الكامل في إدارة الصلاحيات"
+  },
+  {
+    "id": 1027,
+    "code": "system.permissions.manage",
+    "name": "Manage Permissions",
+    "name_ar": "إدارة الصلاحيات",
+    "description": "Giving permissions to supervisors",
+    "description_ar": "منح الصلاحيات للمشرفين"
+  },
+  {
+    "id": 1028,
+    "code": "system.branches.*",
+    "name": "Full Branches Management",
+    "name_ar": "إدارة الفروع الكاملة",
+    "description": "Complete control over branches",
+    "description_ar": "التحكم الكامل في الفروع"
+  },
+  {
+    "id": 1029,
+    "code": "system.branches.manage",
+    "name": "Manage Branches",
+    "name_ar": "إدارة الفروع",
+    "description": "Full management of branches",
+    "description_ar": "الإدارة الكاملة للفروع"
+  },
+  {
+    "id": 1030,
+    "code": "communication.announcements.*",
+    "name": "Full Announcements Management",
+    "name_ar": "إدارة الإعلانات الكاملة",
+    "description": "Complete control over announcements",
+    "description_ar": "التحكم الكامل في الإعلانات"
+  },
+  {
+    "id": 1031,
+    "code": "communication.announcements.send",
+    "name": "Send Announcements",
+    "name_ar": "إرسال الإعلانات",
+    "description": "Sending announcements to the system",
+    "description_ar": "إرسال الإعلانات للنظام"
+  },
+  {
+    "id": 1032,
+    "code": "teacher.management.*",
+    "name": "Full Teacher Management",
+    "name_ar": "إدارة المعلمين الكاملة",
+    "description": "Complete control over teacher management",
+    "description_ar": "التحكم الكامل في إدارة المعلمين"
+  },
+  {
+    "id": 1033,
+    "code": "teacher.management.manage",
+    "name": "Manage Teachers",
+    "name_ar": "إدارة المعلمين",
+    "description": "Full teacher management capabilities",
+    "description_ar": "القدرات الكاملة لإدارة المعلمين"
+  },
+  {
+    "id": 1034,
+    "code": "attendance.teacher.*",
+    "name": "Full Teacher Attendance Management",
+    "name_ar": "إدارة حضور المعلمين الكاملة",
+    "description": "Complete control over teacher attendance",
+    "description_ar": "التحكم الكامل في حضور المعلمين"
+  },
+  {
+    "id": 1035,
+    "code": "attendance.teacher.manage",
+    "name": "Manage Teacher Attendance",
+    "name_ar": "إدارة حضور المعلمين",
+    "description": "Manage teacher absence records",
+    "description_ar": "إدارة سجلات غياب المعلمين"
+  },
+  {
+    "id": 1036,
+    "code": "evaluation.teacher.*",
+    "name": "Full Teacher Evaluation Management",
+    "name_ar": "إدارة تقييم المعلمين الكاملة",
+    "description": "Complete control over teacher evaluations",
+    "description_ar": "التحكم الكامل في تقييمات المعلمين"
+  },
+  {
+    "id": 1037,
+    "code": "evaluation.teacher.manage",
+    "name": "Manage Teacher Evaluations",
+    "name_ar": "إدارة تقييمات المعلمين",
+    "description": "Manage teacher performance evaluations",
+    "description_ar": "إدارة تقييمات أداء المعلمين"
+  },
+  {
+    "id": 1038,
+    "code": "reports.teacher.*",
+    "name": "Full Teacher Reports Management",
+    "name_ar": "إدارة تقارير المعلمين الكاملة",
+    "description": "Complete control over teacher reports",
+    "description_ar": "التحكم الكامل في تقارير المعلمين"
+  },
+  {
+    "id": 1039,
+    "code": "reports.teacher.view",
+    "name": "View Teacher Reports",
+    "name_ar": "عرض تقارير المعلمين",
+    "description": "Access teacher performance reports",
+    "description_ar": "الوصول لتقارير أداء المعلمين"
+  },
+  {
+    "id": 1040,
+    "code": "reports.student.*",
+    "name": "Full Student Reports Management",
+    "name_ar": "إدارة تقارير الطلاب الكاملة",
+    "description": "Complete control over student reports",
+    "description_ar": "التحكم الكامل في تقارير الطلاب"
+  },
+  {
+    "id": 1041,
+    "code": "reports.student.view",
+    "name": "View Student Reports",
+    "name_ar": "عرض تقارير الطلاب",
+    "description": "Access student performance reports",
+    "description_ar": "الوصول لتقارير أداء الطلاب"
+  },
+  {
+    "id": 1042,
+    "code": "system.assignments.*",
+    "name": "Full Assignments Management",
+    "name_ar": "إدارة التعيينات الكاملة",
+    "description": "Complete control over assignments",
+    "description_ar": "التحكم الكامل في التعيينات"
+  },
+  {
+    "id": 1043,
+    "code": "system.assignments.manage",
+    "name": "Manage Assignments",
+    "name_ar": "إدارة التعيينات",
+    "description": "Assigning students and teachers to classes",
+    "description_ar": "تعيين الطلاب والمعلمين للفصول"
+  },
+  {
+    "id": 1044,
+    "code": "system.teacher_permissions.*",
+    "name": "Full Teacher Permissions Management",
+    "name_ar": "إدارة صلاحيات المعلمين الكاملة",
+    "description": "Complete control over teacher permissions",
+    "description_ar": "التحكم الكامل في صلاحيات المعلمين"
+  },
+  {
+    "id": 1045,
+    "code": "system.teacher_permissions.manage",
+    "name": "Manage Teacher Permissions",
+    "name_ar": "إدارة صلاحيات المعلمين",
+    "description": "Giving permissions to Teachers",
+    "description_ar": "منح الصلاحيات للمعلمين"
+  },
+  {
+    "id": 1046,
+    "code": "academic.exams.supervise",
+    "name": "Supervise Exams",
+    "name_ar": "الإشراف على الامتحانات",
+    "description": "Oversee and manage exams",
+    "description_ar": "الإشراف على الامتحانات وإدارتها"
+  },
+  {
+    "id": 1047,
+    "code": "academic.curriculum.manage",
+    "name": "Manage Curriculum",
+    "name_ar": "إدارة المنهج",
+    "description": "Full curriculum management",
+    "description_ar": "الإدارة الكاملة للمنهج"
+  },
+  {
+    "id": 1048,
+    "code": "training.teacher.*",
+    "name": "Full Teacher Training Management",
+    "name_ar": "إدارة تدريب المعلمين الكاملة",
+    "description": "Complete control over teacher training",
+    "description_ar": "التحكم الكامل في تدريب المعلمين"
+  },
+  {
+    "id": 1049,
+    "code": "training.teacher.manage",
+    "name": "Manage Teacher Training",
+    "name_ar": "إدارة تدريب المعلمين",
+    "description": "Organize teacher training classes",
+    "description_ar": "تنظيم فصول تدريب المعلمين"
+  },
+  {
+    "id": 1050,
+    "code": "academic.exams.coordinate",
+    "name": "Coordinate Exams",
+    "name_ar": "تنسيق الامتحانات",
+    "description": "Coordinate exams across supervisors, teachers, students",
+    "description_ar": "تنسيق الامتحانات بين المشرفين والمعلمين والطلاب"
+  },
+  {
+    "id": 1051,
+    "code": "reports.administrative.*",
+    "name": "Full Administrative Reports Management",
+    "name_ar": "إدارة التقارير الإدارية الكاملة",
+    "description": "Complete control over administrative reports",
+    "description_ar": "التحكم الكامل في التقارير الإدارية"
+  },
+  {
+    "id": 1052,
+    "code": "reports.administrative.view",
+    "name": "View Administrative Reports",
+    "name_ar": "عرض التقارير الإدارية",
+    "description": "Access administrative performance reports",
+    "description_ar": "الوصول لتقارير الأداء الإداري"
+  },
+  {
+    "id": 1053,
+    "code": "reports.administrative.approve",
+    "name": "Approve Administrative Reports",
+    "name_ar": "اعتماد التقارير الإدارية",
+    "description": "Approve administrative reports",
+    "description_ar": "اعتماد التقارير الإدارية"
+  },
+  {
+    "id": 1054,
+    "code": "reports.financial_expenses.*",
+    "name": "Full Financial Expenses Management",
+    "name_ar": "إدارة المصروفات المالية الكاملة",
+    "description": "Complete control over financial expenses",
+    "description_ar": "التحكم الكامل في المصروفات المالية"
+  },
+  {
+    "id": 1055,
+    "code": "reports.financial_expenses.approve",
+    "name": "Approve Financial Expenses",
+    "name_ar": "اعتماد المصروفات المالية",
+    "description": "Approve financial expense reports",
+    "description_ar": "اعتماد تقارير المصروفات المالية"
+  },
+  {
+    "id": 1056,
+    "code": "activities.student.*",
+    "name": "Full Student Activities Management",
+    "name_ar": "إدارة أنشطة الطلاب الكاملة",
+    "description": "Complete control over student activities",
+    "description_ar": "التحكم الكامل في أنشطة الطلاب"
+  },
+  {
+    "id": 1057,
+    "code": "activities.student.approve",
+    "name": "Approve Student Activities",
+    "name_ar": "اعتماد أنشطة الطلاب",
+    "description": "Review and approve student activities",
+    "description_ar": "مراجعة واعتماد أنشطة الطلاب"
+  },
+  {
+    "id": 1058,
+    "code": "staff.management.*",
+    "name": "Full Staff Management",
+    "name_ar": "إدارة الموظفين الكاملة",
+    "description": "Complete control over staff management",
+    "description_ar": "التحكم الكامل في إدارة الموظفين"
+  },
+  {
+    "id": 1059,
+    "code": "staff.management.manage",
+    "name": "Manage Staff",
+    "name_ar": "إدارة الموظفين",
+    "description": "Full staff management capabilities",
+    "description_ar": "القدرات الكاملة لإدارة الموظفين"
+  },
+  {
+    "id": 1060,
+    "code": "penalty.staff.*",
+    "name": "Full Staff Penalty Management",
+    "name_ar": "إدارة جزاءات الموظفين الكاملة",
+    "description": "Complete control over staff penalties",
+    "description_ar": "التحكم الكامل في جزاءات الموظفين"
+  },
+  {
+    "id": 1061,
+    "code": "penalty.staff.manage",
+    "name": "Manage Staff Penalties",
+    "name_ar": "إدارة جزاءات الموظفين",
+    "description": "Manage staff penalties and rewards",
+    "description_ar": "إدارة جزاءات ومكافآت الموظفين"
+  },
+  {
+    "id": 1062,
+    "code": "penalty.teacher.*",
+    "name": "Full Teacher Penalty Management",
+    "name_ar": "إدارة جزاءات المعلمين الكاملة",
+    "description": "Complete control over teacher penalties",
+    "description_ar": "التحكم الكامل في جزاءات المعلمين"
+  },
+  {
+    "id": 1063,
+    "code": "penalty.teacher.manage",
+    "name": "Manage Teacher Penalties",
+    "name_ar": "إدارة جزاءات المعلمين",
+    "description": "Manage teacher penalties and rewards",
+    "description_ar": "إدارة جزاءات ومكافآت المعلمين"
+  },
+  {
+    "id": 1064,
+    "code": "salary.staff.*",
+    "name": "Full Staff Salary Management",
+    "name_ar": "إدارة رواتب الموظفين الكاملة",
+    "description": "Complete control over staff salaries",
+    "description_ar": "التحكم الكامل في رواتب الموظفين"
+  },
+  {
+    "id": 1065,
+    "code": "salary.staff.manage",
+    "name": "Manage Staff Salaries",
+    "name_ar": "إدارة رواتب الموظفين",
+    "description": "Manage staff monthly salaries",
+    "description_ar": "إدارة الرواتب الشهرية للموظفين"
+  },
+  {
+    "id": 1066,
+    "code": "salary.teacher.*",
+    "name": "Full Teacher Salary Management",
+    "name_ar": "إدارة رواتب المعلمين الكاملة",
+    "description": "Complete control over teacher salaries",
+    "description_ar": "التحكم الكامل في رواتب المعلمين"
+  },
+  {
+    "id": 1067,
+    "code": "salary.teacher.manage",
+    "name": "Manage Teacher Salaries",
+    "name_ar": "إدارة رواتب المعلمين",
+    "description": "Manage teacher monthly salaries",
+    "description_ar": "إدارة الرواتب الشهرية للمعلمين"
+  },
+  {
+    "id": 1068,
+    "code": "student.management.*",
+    "name": "Full Student Management",
+    "name_ar": "إدارة الطلاب الكاملة",
+    "description": "Complete control over student management",
+    "description_ar": "التحكم الكامل في إدارة الطلاب"
+  },
+  {
+    "id": 1069,
+    "code": "student.management.manage",
+    "name": "Manage Students",
+    "name_ar": "إدارة الطلاب",
+    "description": "Full student management capabilities",
+    "description_ar": "القدرات الكاملة لإدارة الطلاب"
+  },
+  {
+    "id": 1070,
+    "code": "attendance.student.*",
+    "name": "Full Student Attendance Management",
+    "name_ar": "إدارة حضور الطلاب الكاملة",
+    "description": "Complete control over student attendance",
+    "description_ar": "التحكم الكامل في حضور الطلاب"
+  },
+  {
+    "id": 1071,
+    "code": "attendance.student.manage",
+    "name": "Manage Student Attendance",
+    "name_ar": "إدارة حضور الطلاب",
+    "description": "Manage student absence records",
+    "description_ar": "إدارة سجلات غياب الطلاب"
+  },
+  {
+    "id": 1072,
+    "code": "financial.subscriptions.*",
+    "name": "Full Subscriptions Management",
+    "name_ar": "إدارة الاشتراكات الكاملة",
+    "description": "Complete control over subscriptions",
+    "description_ar": "التحكم الكامل في الاشتراكات"
+  },
+  {
+    "id": 1073,
+    "code": "financial.subscriptions.manage",
+    "name": "Manage Subscriptions",
+    "name_ar": "إدارة الاشتراكات",
+    "description": "Manage student subscriptions and invoices",
+    "description_ar": "إدارة اشتراكات الطلاب والفواتير"
+  },
+  {
+    "id": 1074,
+    "code": "communication.messages.*",
+    "name": "Full Messages Management",
+    "name_ar": "إدارة الرسائل الكاملة",
+    "description": "Complete control over messages",
+    "description_ar": "التحكم الكامل في الرسائل"
+  },
+  {
+    "id": 1075,
+    "code": "communication.messages.send",
+    "name": "Send Messages",
+    "name_ar": "إرسال الرسائل",
+    "description": "Send messages to students/parents",
+    "description_ar": "إرسال رسائل للطلاب/أولياء الأمور"
+  },
+  {
+    "id": 1076,
+    "code": "activities.seminars.*",
+    "name": "Full Seminars Management",
+    "name_ar": "إدارة الندوات الكاملة",
+    "description": "Complete control over seminars",
+    "description_ar": "التحكم الكامل في الندوات"
+  },
+  {
+    "id": 1077,
+    "code": "activities.seminars.organize",
+    "name": "Organize Seminars",
+    "name_ar": "تنظيم الندوات",
+    "description": "Organize educational seminars",
+    "description_ar": "تنظيم الندوات التعليمية"
+  },
+  {
+    "id": 1078,
+    "code": "activities.competitions.*",
+    "name": "Full Competitions Management",
+    "name_ar": "إدارة المسابقات الكاملة",
+    "description": "Complete control over competitions",
+    "description_ar": "التحكم الكامل في المسابقات"
+  },
+  {
+    "id": 1079,
+    "code": "activities.competitions.manage",
+    "name": "Manage Competitions",
+    "name_ar": "إدارة المسابقات",
+    "description": "Manage student competitions and activities",
+    "description_ar": "إدارة مسابقات وأنشطة الطلاب"
+  },
+  {
+    "id": 1080,
+    "code": "activities.parties.*",
+    "name": "Full Parties Management",
+    "name_ar": "إدارة الحفلات الكاملة",
+    "description": "Complete control over parties",
+    "description_ar": "التحكم الكامل في الحفلات"
+  },
+  {
+    "id": 1081,
+    "code": "activities.parties.manage",
+    "name": "Manage Parties",
+    "name_ar": "إدارة الحفلات",
+    "description": "Organize student parties and events",
+    "description_ar": "تنظيم حفلات وفعاليات الطلاب"
+  },
+  {
+    "id": 1082,
+    "code": "financial.accounts.*",
+    "name": "Full Accounts Management",
+    "name_ar": "إدارة الحسابات الكاملة",
+    "description": "Complete control over accounts",
+    "description_ar": "التحكم الكامل في الحسابات"
+  },
+  {
+    "id": 1083,
+    "code": "financial.accounts.manage",
+    "name": "Manage Accounts",
+    "name_ar": "إدارة الحسابات",
+    "description": "Handle general accounting operations",
+    "description_ar": "معالجة عمليات المحاسبة العامة"
+  },
+  {
+    "id": 1084,
+    "code": "financial.expenses.*",
+    "name": "Full Expenses Management",
+    "name_ar": "إدارة المصروفات الكاملة",
+    "description": "Complete control over expenses",
+    "description_ar": "التحكم الكامل في المصروفات"
+  },
+  {
+    "id": 1085,
+    "code": "financial.expenses.manage",
+    "name": "Manage Expenses",
+    "name_ar": "إدارة المصروفات",
+    "description": "Manage maintenance, rent and other expenses",
+    "description_ar": "إدارة الصيانة والإيجار والمصروفات الأخرى"
+  },
+  {
+    "id": 1086,
+    "code": "salary.staff.approve",
+    "name": "Approve Staff Salaries",
+    "name_ar": "اعتماد رواتب الموظفين",
+    "description": "Approve staff monthly salaries",
+    "description_ar": "اعتماد الرواتب الشهرية للموظفين"
+  },
+  {
+    "id": 1087,
+    "code": "salary.teacher.approve",
+    "name": "Approve Teacher Salaries",
+    "name_ar": "اعتماد رواتب المعلمين",
+    "description": "Approve teacher monthly salaries",
+    "description_ar": "اعتماد الرواتب الشهرية للمعلمين"
+  },
+  {
+    "id": 1088,
+    "code": "reports.financial.generate",
+    "name": "Generate Financial Reports",
+    "name_ar": "إنشاء التقارير المالية",
+    "description": "Generate financial reports for students, teachers, school",
+    "description_ar": "إنشاء تقارير مالية للطلاب والمعلمين والمدرسة"
+  }
+]

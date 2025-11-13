@@ -24,7 +24,7 @@ class RoleCRUD:
         if search:
             search_filter = or_(
                 Role.name.ilike(f"%{search}%"),
-                Role.name_in_arabic.ilike(f"%{search}%"),
+                Role.name_ar.ilike(f"%{search}%"),
                 Role.description.ilike(f"%{search}%"),
             )
             query = query.where(search_filter)

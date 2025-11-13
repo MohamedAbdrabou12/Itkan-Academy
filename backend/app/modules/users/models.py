@@ -3,7 +3,6 @@ from __future__ import annotations
 from datetime import datetime
 from enum import Enum
 from typing import TYPE_CHECKING, Optional, List
-
 from app.db.base import Base
 from sqlalchemy import DateTime, ForeignKey, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -15,6 +14,7 @@ if TYPE_CHECKING:
     from app.modules.students.models import Student
     from app.modules.teachers.models import Teacher
     from app.modules.exams.models.exam_attempt import ExamAttempt
+    from app.modules.staff.models import Staff
 
 
 class UserStatus(Enum):
@@ -24,6 +24,29 @@ class UserStatus(Enum):
     deactive = "deactive"
 
 
+class UserBranch(Base):
+    """
+    Association table mapping users <-> branches (many-to-many).
+    Using a mapped-class allows adding extra fields later (role_in_branch, joined_at, etc.)
+    """
+
+    __tablename__ = "user_branches"
+
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), primary_key=True
+    )
+    branch_id: Mapped[int] = mapped_column(
+        ForeignKey("branches.id", ondelete="CASCADE"), primary_key=True
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=datetime.utcnow
+    )
+
+    # relationships (optional convenience backrefs)
+    user = relationship("User", back_populates="branch_links", lazy="selectin")
+    branch = relationship("Branch", back_populates="user_links", lazy="selectin")
+
+
 class User(Base):
     __tablename__ = "users"
 
@@ -31,6 +54,8 @@ class User(Base):
     role_id: Mapped[Optional[int]] = mapped_column(
         ForeignKey("roles.id", ondelete="SET NULL"), nullable=True
     )
+
+    # keep legacy single-branch field for backward compatibility
     branch_id: Mapped[Optional[int]] = mapped_column(
         ForeignKey("branches.id", ondelete="SET NULL"), nullable=True
     )
@@ -41,8 +66,8 @@ class User(Base):
     )
     phone: Mapped[Optional[str]] = mapped_column(String(20))
     password_hash: Mapped[str] = mapped_column(Text, nullable=False)
-    status: Mapped[UserStatus] = mapped_column(
-        String(20), default=UserStatus.pending, nullable=False
+    status: Mapped[str] = mapped_column(
+        String(20), default=UserStatus.pending.value, nullable=False
     )
     last_login: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(
@@ -53,23 +78,46 @@ class User(Base):
     )
 
     # Relationships
-    role: Mapped[Optional[Role]] = relationship(
+    role: Mapped[Optional["Role"]] = relationship(
         "Role", back_populates="users", lazy="joined"
     )
-    branch: Mapped[Optional[Branch]] = relationship(
+    branch: Mapped[Optional["Branch"]] = relationship(
         "Branch", back_populates="users", lazy="joined"
     )
-    notifications: Mapped[List[Notification]] = relationship(
+
+    # association mapped-class links (user_branches)
+    branch_links: Mapped[List["UserBranch"]] = relationship(
+        "UserBranch",
+        back_populates="user",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+    )
+
+    # convenience many-to-many relationship to branches using the association table
+    branches: Mapped[List["Branch"]] = relationship(
+        "Branch",
+        secondary="user_branches",
+        back_populates="users",
+        lazy="selectin",
+    )
+
+    notifications: Mapped[List["Notification"]] = relationship(
         "Notification",
         back_populates="user",
         lazy="selectin",
         cascade="all, delete-orphan",
     )
-    student: Mapped[Optional[Student]] = (  # One-to-one relationship with Student
-        relationship("Student", back_populates="user", uselist=False)
+    student: Mapped[Optional["Student"]] = relationship(
+        "Student", back_populates="user", uselist=False
     )
-    teacher: Mapped[Optional[Teacher]] = (  # One-to-one relationship with Teacher
-        relationship("Teacher", back_populates="user", uselist=False)
+    teacher: Mapped[Optional["Teacher"]] = relationship(
+        "Teacher", back_populates="user", uselist=False
+    )
+    staff: Mapped[Optional["Staff"]] = relationship(
+        "Staff",
+        back_populates="user",
+        uselist=False,
+        lazy="joined",
     )
     exam_attempts: Mapped[List[ExamAttempt]] = relationship(
         "ExamAttempt", back_populates="student", lazy="selectin"
