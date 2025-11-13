@@ -1,89 +1,79 @@
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import APIRouter, Depends, status
 from typing import List
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import get_db
 from app.core.auth import get_current_user
-from app.core.authorization import require_permission
-
+from app.modules.users.models import User
+from app.modules.exams.schemas.exam import ExamQuestionWithDetails, ExamRead
 from app.modules.exams.schemas.exam_question import (
     ExamQuestionCreate,
-    ExamQuestionRead,
     ExamQuestionUpdate,
 )
-from app.modules.exams.crud.exam_question import exam_question_crud
+from app.modules.exams.services import exam_question_service
 
-exam_question_router = APIRouter(prefix="/exam-questions", tags=["Exam Questions"])
-
-
-@exam_question_router.get(
-    "/",
-    response_model=List[ExamQuestionRead],
-    dependencies=[Depends(get_current_user), Depends(require_permission("exam:view"))],
-)
-async def list_exam_questions(db: AsyncSession = Depends(get_db)):
-    return await exam_question_crud.get_all(db)
-
-
-@exam_question_router.get(
-    "/{exam_id}/{question_id}",
-    response_model=ExamQuestionRead,
-    dependencies=[Depends(get_current_user), Depends(require_permission("exam:view"))],
-)
-async def get_exam_question(
-    exam_id: int, question_id: int, db: AsyncSession = Depends(get_db)
-):
-    exam_question = await exam_question_crud.get_by_ids(db, exam_id, question_id)
-    if not exam_question:
-        raise HTTPException(status_code=404, detail="Exam question not found")
-    return exam_question
+exam_question_router = APIRouter(tags=["Exam Questions"])
 
 
 @exam_question_router.post(
-    "/",
-    response_model=ExamQuestionRead,
+    "/exams/{exam_id}/questions",
     status_code=status.HTTP_201_CREATED,
-    dependencies=[
-        Depends(get_current_user),
-        Depends(require_permission("exam:create")),
-    ],
+    response_model=ExamRead,
 )
-async def create_exam_question(
-    obj_in: ExamQuestionCreate, db: AsyncSession = Depends(get_db)
+async def add_questions_to_exam(
+    exam_id: int,
+    question_in: list[ExamQuestionCreate],
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
 ):
-    return await exam_question_crud.create(db, obj_in)
+    return await exam_question_service.add_questions_to_exam(
+        db, exam_id=exam_id, questions_in=question_in, user=user
+    )
+
+
+@exam_question_router.get(
+    "/exams/{exam_id}/questions", response_model=List[ExamQuestionWithDetails]
+)
+async def get_exam_questions(
+    exam_id: int,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    return await exam_question_service.get_questions_for_exam(
+        db, exam_id=exam_id, user=user
+    )
 
 
 @exam_question_router.put(
-    "/{exam_id}/{question_id}",
-    response_model=ExamQuestionRead,
-    dependencies=[
-        Depends(get_current_user),
-        Depends(require_permission("exam:update")),
-    ],
+    "/exams/{exam_id}/questions/{question_id}", response_model=ExamRead
 )
 async def update_exam_question(
     exam_id: int,
     question_id: int,
-    obj_in: ExamQuestionUpdate,
+    question_in: ExamQuestionUpdate,
     db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
 ):
-    exam_question = await exam_question_crud.get_by_ids(db, exam_id, question_id)
-    if not exam_question:
-        raise HTTPException(status_code=404, detail="Exam question not found")
-    return await exam_question_crud.update(db, exam_question, obj_in)
+    return await exam_question_service.update_question_in_exam(
+        db,
+        exam_id=exam_id,
+        question_id=question_id,
+        question_in=question_in,
+        user=user,
+    )
 
 
 @exam_question_router.delete(
-    "/{exam_id}/{question_id}",
+    "/exams/{exam_id}/questions/{question_id}",
     status_code=status.HTTP_204_NO_CONTENT,
-    dependencies=[
-        Depends(get_current_user),
-        Depends(require_permission("exam:delete")),
-    ],
 )
 async def delete_exam_question(
-    exam_id: int, question_id: int, db: AsyncSession = Depends(get_db)
+    exam_id: int,
+    question_id: int,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
 ):
-    await exam_question_crud.delete(db, exam_id, question_id)
-    return None
+    await exam_question_service.remove_question_from_exam(
+        db, exam_id=exam_id, question_id=question_id, user=user
+    )
+    return

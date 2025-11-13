@@ -2,67 +2,78 @@
   {
     "id": 1001,
     "name": "Student",
-    "name_in_arabic": "طالب",
-    "description": "Student role with basic access to personal information and learning materials"
+    "name_ar": "طالب",
+    "description": "Following up performance, communication with school and paying invoices",
+    "description_ar": "متابعة الأداء، التواصل مع المدرسة ودفع الفواتير"
   },
   {
     "id": 1002,
     "name": "Teacher",
-    "name_in_arabic": "معلم",
-    "description": "Teacher role with access to classroom management and student evaluation"
+    "name_ar": "معلم",
+    "description": "Managing classes, following up with students",
+    "description_ar": "إدارة الفصول، متابعة الطلاب"
   },
   {
     "id": 1003,
     "name": "General Manager",
-    "name_in_arabic": "المدير العام",
-    "description": "Overall management and supervision of all educational and administrative affairs"
+    "name_ar": "المدير العام",
+    "description": "Overall management of academic, staff and financial operations",
+    "description_ar": "الإدارة الشاملة للعمليات الأكاديمية والموظفين والمالية"
   },
   {
     "id": 1004,
     "name": "Education Affairs Manager",
-    "name_in_arabic": "مدير الشؤون التعليمية",
-    "description": "Manages educational programs, supervision, and academic affairs"
+    "name_ar": "مدير الشؤون التعليمية",
+    "description": "Supervise all branches, instructing supervisor and teachers",
+    "description_ar": "الإشراف على جميع الفروع، توجيه المشرفين والمعلمين"
   },
   {
     "id": 1005,
     "name": "General Education Supervisor",
-    "name_in_arabic": "المشرف العام للتعليم",
-    "description": "Oversees educational quality and branch supervision systems"
+    "name_ar": "المشرف العام للتعليم",
+    "description": "Supervise all branches, instructing supervisor and teachers",
+    "description_ar": "الإشراف على جميع الفروع، توجيه المشرفين والمعلمين"
   },
   {
     "id": 1006,
     "name": "Branch Supervisor",
-    "name_in_arabic": "مشرف الفرع",
-    "description": "Manages teachers, absences, evaluations, and reports at branch level"
+    "name_ar": "مشرف الفرع",
+    "description": "Supervise his own branch and giving directions to teachers",
+    "description_ar": "الإشراف على فرعه الخاص وإعطاء التوجيهات للمعلمين"
   },
   {
     "id": 1007,
     "name": "Academic Affairs Manager",
-    "name_in_arabic": "مدير الشؤون الأكاديمية",
-    "description": "Manages curriculum, teacher training, and examination systems"
+    "name_ar": "مدير الشؤون الأكاديمية",
+    "description": "Manages curriculum, teacher training and exams coordination",
+    "description_ar": "إدارة المناهج، تدريب المعلمين وتنسيق الامتحانات"
   },
   {
     "id": 1008,
     "name": "Administrative Affairs Manager",
-    "name_in_arabic": "مدير الشؤون الإدارية",
-    "description": "Oversees staff, student, and financial administration systems"
+    "name_ar": "مدير الشؤون الإدارية",
+    "description": "Following up the administrative work and managing staff, student, and financial affairs",
+    "description_ar": "متابعة العمل الإداري وإدارة شؤون الموظفين والطلاب والمالية"
   },
   {
     "id": 1009,
     "name": "Staff Affairs Manager",
-    "name_in_arabic": "مدير شؤون الموظفين",
-    "description": "Manages staff records, reports, penalties, rewards, and salaries"
+    "name_ar": "مدير شؤون الموظفين",
+    "description": "Managing human resources, staff salaries and hiring",
+    "description_ar": "إدارة الموارد البشرية، رواتب الموظفين والتعيين"
   },
   {
-    "id": 10010,
+    "id": 1010,
     "name": "Student Affairs Manager",
-    "name_in_arabic": "مدير شؤون الطلاب",
-    "description": "Manages student records, subscriptions, communications, and events"
+    "name_ar": "مدير شؤون الطلاب",
+    "description": "Manage non-academic activities, encouraging students and following up behaviors",
+    "description_ar": "إدارة الأنشطة غير الأكاديمية، تشجيع الطلاب ومتابعة السلوكيات"
   },
   {
-    "id": 10011,
+    "id": 1011,
     "name": "Financial Affairs Manager",
-    "name_in_arabic": "مدير الشؤون المالية",
-    "description": "Manages accounting, purchases, maintenance, and rental operations"
+    "name_ar": "مدير الشؤون المالية",
+    "description": "Following up financial data (incoming and outgoing)",
+    "description_ar": "متابعة البيانات المالية (الداخلة والخارجة)"
   }
 ]

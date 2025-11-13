@@ -1,21 +1,30 @@
-from typing import Optional
 from pydantic import BaseModel
+from typing import Optional
 
 
 class ExamQuestionBase(BaseModel):
-    exam_id: int
     question_id: int
-    question_order: Optional[int] = None
+    marks: int
+    order: int
 
 
 class ExamQuestionCreate(ExamQuestionBase):
     pass
 
 
+class AddQuestionToExam(BaseModel):
+    questions: list[ExamQuestionCreate]
+
+
 class ExamQuestionUpdate(BaseModel):
-    question_order: Optional[int] = None
+    marks: Optional[int] = None
+    order: Optional[int] = None
 
 
 class ExamQuestionRead(ExamQuestionBase):
+    id: int
+    exam_id: int
+    branch_id: int
+
     class Config:
         from_attributes = True

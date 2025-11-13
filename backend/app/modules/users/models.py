@@ -13,6 +13,7 @@ if TYPE_CHECKING:
     from app.modules.branches.models import Branch
     from app.modules.students.models import Student
     from app.modules.teachers.models import Teacher
+    from app.modules.exams.models.exam_attempt import ExamAttempt
     from app.modules.staff.models import Staff
 
 
@@ -110,6 +111,9 @@ class User(Base):
         uselist=False,
         lazy="joined",
     )
+    exam_attempts: Mapped[List[ExamAttempt]] = relationship(
+        "ExamAttempt", back_populates="student", lazy="selectin"
+    )
 
     # Computed attributes (not stored in DB)
     @property
@@ -123,3 +127,6 @@ class User(Base):
     @property
     def permission_code(self) -> Optional[str]:
         return self.role.permission_code if self.role else None
+
+    def __repr__(self) -> str:
+        return f"<User(id={self.id}, name='{self.name}')>"

@@ -7,7 +7,7 @@ from pydantic import BaseModel
 class RoleBase(BaseModel):
     name: str
     description: Optional[str] = None
-    name_in_arabic: str
+    name_ar: str
 
 
 class RoleCreate(RoleBase):
@@ -23,7 +23,7 @@ class RoleRead(BaseModel):
     id: int
     name: str
     description: str
-    name_in_arabic: str
+    name_ar: str
     created_at: datetime
     # updated_at: datetime
     # permissions: List[PermissionRead] = []

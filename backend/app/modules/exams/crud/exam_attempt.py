@@ -1,54 +1,89 @@
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
 from typing import List, Optional
-
-from app.modules.exams.models.exam_attempt import ExamAttempt
-from app.modules.exams.schemas.exam_attempt import ExamAttemptCreate, ExamAttemptUpdate
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
+from app.modules.exams.models.exam_attempt import ExamAttempt, ExamAttemptStatus
+from app.modules.exams.schemas.exam_attempt import (
+    ExamAttemptCreate,
+    ExamAttemptUpdate,
+    ExamQuestionAnswers,
+)
+from app.modules.users.models import User
 
 
 class ExamAttemptCRUD:
-    async def get_all(
-        self, db: AsyncSession, exam_id: Optional[int] = None
-    ) -> List[ExamAttempt]:
-        query = select(ExamAttempt)
-        if exam_id:
-            query = query.where(ExamAttempt.exam_id == exam_id)
-        result = await db.execute(query)
-        return result.scalars().all()
+    async def create(
+        self, db: AsyncSession, *, obj_in: ExamAttemptCreate, user: User
+    ) -> ExamAttempt:
+        examAttempt = obj_in.model_dump()
+        examAttempt["student_id"] = user.id
+        examAttempt["status"] = ExamAttemptStatus.STARTED
+        db_obj = ExamAttempt(**examAttempt)
+        db.add(db_obj)
+        await db.commit()
+        await db.refresh(db_obj)
+        return db_obj
 
-    async def get_by_id(
-        self, db: AsyncSession, attempt_id: int
+    async def get(self, db: AsyncSession, id: int) -> Optional[ExamAttempt]:
+        result = await db.execute(select(ExamAttempt).filter(ExamAttempt.id == id))
+        return result.scalars().first()
+
+    async def get_with_user(
+        self, db: AsyncSession, id: int, user: User
     ) -> Optional[ExamAttempt]:
         result = await db.execute(
-            select(ExamAttempt).where(ExamAttempt.id == attempt_id)
+            select(ExamAttempt).filter(
+                ExamAttempt.id == id, ExamAttempt.student_id == user.id
+            )
         )
-        return result.scalar_one_or_none()
+        return result.scalars().first()
 
-    async def create(self, db: AsyncSession, obj_in: ExamAttemptCreate) -> ExamAttempt:
-        attempt = ExamAttempt(**obj_in.dict())
-        db.add(attempt)
-        await db.commit()
-        await db.refresh(attempt)
-        return attempt
+    async def get_multi(self, db: AsyncSession, *, skip: int = 0, limit: int = 100):
+        statement = select(ExamAttempt).offset(skip).limit(limit)
+        result = await db.execute(statement)
+        return result.scalars().all()
+
+    async def get_by_user_and_exam(
+        self, db: AsyncSession, *, user_id: int, exam_id: int
+    ) -> Optional[ExamAttempt]:
+        statement = select(ExamAttempt).where(
+            ExamAttempt.student_id == user_id, ExamAttempt.exam_id == exam_id
+        )
+        result = await db.execute(statement)
+        return result.scalars().first()
 
     async def update(
-        self,
-        db: AsyncSession,
-        attempt: ExamAttempt,
-        obj_in: ExamAttemptUpdate,
+        self, db: AsyncSession, *, db_obj: ExamAttempt, obj_in: ExamAttemptUpdate
     ) -> ExamAttempt:
-        for field, value in obj_in.dict(exclude_unset=True).items():
-            setattr(attempt, field, value)
-        db.add(attempt)
+        update_data = obj_in.model_dump(exclude_unset=True)
+        for field, value in update_data.items():
+            setattr(db_obj, field, value)
+        db.add(db_obj)
         await db.commit()
-        await db.refresh(attempt)
-        return attempt
+        await db.refresh(db_obj)
+        return db_obj
 
-    async def delete(self, db: AsyncSession, attempt_id: int) -> None:
-        attempt = await self.get_by_id(db, attempt_id)
-        if attempt:
-            await db.delete(attempt)
+    async def delete(self, db: AsyncSession, *, id: int):
+        db_obj = await db.get(ExamAttempt, id)
+        if db_obj:
+            await db.delete(db_obj)
             await db.commit()
+        return db_obj
+
+    async def grade_exam(
+        self, db: AsyncSession, *, id: int, exam_answers: list[ExamQuestionAnswers]
+    ):
+        total_score = 0
+        for question in exam_answers:
+            total_score += question.marks_obtained
+
+        db_obj = await db.get(ExamAttempt, id)
+        if db_obj:
+            db_obj.status = ExamAttemptStatus.GRADED
+            db_obj.score = total_score
+            db.add(db_obj)
+            await db.commit()
+            await db.refresh(db_obj)
+        return db_obj
 
 
 exam_attempt_crud = ExamAttemptCRUD()

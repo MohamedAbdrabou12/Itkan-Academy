@@ -1,7 +1,8 @@
-# backend/app/modules/role_permissions/models.py
+from __future__ import annotations
+
 from app.db.base import Base
 from sqlalchemy import ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column
 
 
 class RolePermission(Base):
@@ -12,10 +13,4 @@ class RolePermission(Base):
     )
     permission_id: Mapped[int] = mapped_column(
         ForeignKey("permissions.id", ondelete="CASCADE"), primary_key=True
-    )
-
-    # Relationships
-    role = relationship("Role", back_populates="permission_links", lazy="selectin")
-    permission = relationship(
-        "Permission", back_populates="role_links", lazy="selectin"
     )

@@ -6,7 +6,7 @@ from app.modules.classes.models import Class, ClassStatus
 from app.modules.users.models import User
 from fastapi import HTTPException, Request
 from fastapi_pagination.ext.sqlalchemy import paginate as sqlalchemy_paginate
-from sqlalchemy import asc, desc, or_, update
+from sqlalchemy import asc, desc, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
@@ -24,13 +24,7 @@ class BranchCRUD:
 
         # Apply search filter
         if search:
-            search_filter = or_(
-                Branch.name.ilike(f"%{search}%"),
-                Branch.email.ilike(f"%{search}%"),
-                Branch.phone.ilike(f"%{search}%"),
-                Branch.address.ilike(f"%{search}%"),
-            )
-            query = query.where(search_filter)
+            query = query.where(Branch.name.ilike(f"%{search}%"))
 
         sort_columns = {
             "id": Branch.id,
@@ -51,7 +45,7 @@ class BranchCRUD:
             query = query.order_by(asc(sort_column))
 
         result = await sqlalchemy_paginate(db, query)
-        
+
         return result
 
     async def get_by_id(

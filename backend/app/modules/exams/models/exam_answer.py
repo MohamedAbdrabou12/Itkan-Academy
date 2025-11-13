@@ -1,17 +1,12 @@
-# app/modules/exams/models/exam_answer.py
-from __future__ import annotations
 from datetime import datetime
-from typing import Optional, TYPE_CHECKING
-
-from sqlalchemy import ForeignKey, Text, Boolean, DateTime
+from typing import TYPE_CHECKING
+from app.db.base import Base
+from sqlalchemy import DateTime, Float, ForeignKey, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.db.base import Base
-
-# Avoid circular imports
 if TYPE_CHECKING:
-    from app.modules.exams.models.exam_attempt import ExamAttempt
-    from app.modules.question_bank.models import QuestionBank  # adjust path if needed
+    from .exam_attempt import ExamAttempt
+    from .exam_question import ExamQuestion
 
 
 class ExamAnswer(Base):
@@ -19,20 +14,31 @@ class ExamAnswer(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     attempt_id: Mapped[int] = mapped_column(
-        ForeignKey("exam_attempts.id", ondelete="CASCADE"), nullable=False
+        ForeignKey("exam_attempts.id", ondelete="CASCADE")
     )
     question_id: Mapped[int] = mapped_column(
-        ForeignKey("question_bank.id", ondelete="CASCADE"), nullable=False
+        ForeignKey("exam_questions.id", ondelete="CASCADE")
     )
-    chosen_option: Mapped[Optional[str]] = mapped_column(Text)
-    is_correct: Mapped[Optional[bool]] = mapped_column(Boolean, default=None)
+
+    answer_text: Mapped[str] = mapped_column(Text, nullable=True)
+    selected_option: Mapped[str] = mapped_column(String, nullable=True)
+    marks_obtained: Mapped[float] = mapped_column(Float, nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=datetime.utcnow
     )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow
+    )
 
     # Relationships
-    attempt: Mapped[ExamAttempt] = relationship(
-        "ExamAttempt", back_populates="answers", lazy="selectin"
+    attempt: Mapped["ExamAttempt"] = relationship(back_populates="answers")
+    question: Mapped["ExamQuestion"] = relationship(
+        back_populates="answers", lazy="selectin"
     )
-    question: Mapped[QuestionBank] = relationship("QuestionBank", lazy="selectin")
+
+    __table_args__ = (
+        UniqueConstraint(
+            "attempt_id", "question_id", name="uq_answer_attempt_question"
+        ),
+    )
