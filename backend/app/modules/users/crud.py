@@ -4,8 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
 from sqlalchemy import delete as sa_delete
-from fastapi import Request
-from fastapi import HTTPException
+from fastapi import Request, HTTPException
 from app.core.security import get_password_hash as hash_password
 from app.modules.users.models import User, UserBranch, UserStatus
 from app.modules.users.schemas import UserCreate, UserUpdate
@@ -44,7 +43,7 @@ def map_user_to_read(user: User) -> UserRead:
 
 class UserCRUD:
     """
-    CRUD operations for User entity including branch-aware queries.
+    CRUD operations for User entity using many-to-many branch relation.
     """
 
     async def get_all(
@@ -55,13 +54,16 @@ class UserCRUD:
         """
         stmt = select(User).options(
             selectinload(User.role),
-            selectinload(User.branches),
-            selectinload(User.branch_links),
+            selectinload(User.branch_links).joinedload(UserBranch.branch),
         )
+
         if request:
             active_branch = getattr(request.state, "active_branch_id", None)
             if active_branch is not None:
-                stmt = stmt.where(User.branch_id == active_branch)
+                stmt = stmt.join(User.branch_links).where(
+                    UserBranch.branch_id == active_branch
+                )
+
         result = await db.execute(stmt)
         return result.scalars().all()
 
@@ -76,14 +78,17 @@ class UserCRUD:
             .where(User.id == user_id)
             .options(
                 selectinload(User.role),
-                selectinload(User.branches),
-                selectinload(User.branch_links),
+                selectinload(User.branch_links).joinedload(UserBranch.branch),
             )
         )
+
         if request:
             active_branch = getattr(request.state, "active_branch_id", None)
             if active_branch is not None:
-                stmt = stmt.where(User.branch_id == active_branch)
+                stmt = stmt.join(User.branch_links).where(
+                    UserBranch.branch_id == active_branch
+                )
+
         result = await db.execute(stmt)
         return result.scalars().first()
 
@@ -96,8 +101,7 @@ class UserCRUD:
             .where(User.email == email)
             .options(
                 selectinload(User.role),
-                selectinload(User.branches),
-                selectinload(User.branch_links),
+                selectinload(User.branch_links).joinedload(UserBranch.branch),
             )
         )
         result = await db.execute(stmt)
@@ -107,12 +111,13 @@ class UserCRUD:
         self, db: AsyncSession, user: User, branch_ids: List[int]
     ):
         """
-        Internal helper to sync user's many-to-many branches and set primary branch_id.
+        Sync user's many-to-many branches.
         """
         await db.execute(sa_delete(UserBranch).where(UserBranch.user_id == user.id))
         for bid in branch_ids:
             db.add(UserBranch(user_id=user.id, branch_id=bid))
-        user.branch_id = branch_ids[0] if branch_ids else None
+
+        # user.branch_ids = branch_ids           # we no longer need this line since we don't have branch_ids field
         db.add(user)
         await db.commit()
         await db.refresh(user)
@@ -130,6 +135,7 @@ class UserCRUD:
         )
         if "password" in data:
             data["password_hash"] = hash_password(data.pop("password"))
+
         status_val = data.get("status", UserStatus.pending.value)
         if isinstance(status_val, UserStatus):
             status_val = status_val.value
@@ -140,7 +146,6 @@ class UserCRUD:
             phone=data.get("phone"),
             password_hash=data.get("password_hash", ""),
             role_id=data.get("role_id"),
-            branch_id=data.get("branch_id"),
             status=status_val,
         )
         db.add(db_obj)
@@ -149,14 +154,13 @@ class UserCRUD:
 
         branch_ids = data.get("branch_ids")
         if branch_ids:
-            # check that all branch_ids exist in branches table
             result = await db.execute(
                 select(Branch.id).where(Branch.id.in_(branch_ids))
             )
             existing_ids = [row[0] for row in result.fetchall()]
 
-            if set(branch_ids) - set(existing_ids):
-                missing = set(branch_ids) - set(existing_ids)
+            missing = set(branch_ids) - set(existing_ids)
+            if missing:
                 raise HTTPException(
                     status_code=400,
                     detail=f"Invalid or missing branch_ids: {', '.join(map(str, missing))}",
@@ -164,7 +168,6 @@ class UserCRUD:
 
             await self._sync_user_branches(db, db_obj, branch_ids)
 
-        # send reset password email
         token = create_password_reset_token(db_obj.id)
         reset_link = f"https://www.google.com/search?q={token}"
         subject, body_html = render_template(
@@ -221,7 +224,7 @@ class UserCRUD:
         self, db: AsyncSession, user: User, branch_ids: List[int]
     ):
         """
-        Public method to assign multiple branches and update main branch.
+        Assign multiple branches to user.
         """
         await self._sync_user_branches(db, user, branch_ids)
         return user

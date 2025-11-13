@@ -18,7 +18,6 @@ class UserBase(BaseModel):
     name: str
     email: EmailStr
     phone: Optional[str] = None
-    # branch_id: Optional[int] = None
     branch_ids: Optional[List[int]] = None
 
     @field_validator("phone")

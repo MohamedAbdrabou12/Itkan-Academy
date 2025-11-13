@@ -91,13 +91,14 @@ class StaffService:
         role_id = staff_in.role_id
 
         # create user
-        primary_branch_id = staff_in.branch_ids[0]
+        # primary_branch_id = staff_in.branch_ids[0]
         user_payload = UserCreateSchema(
             name=staff_in.name,
             email=staff_in.email,
             phone=staff_in.phone,
             role_id=role_id,
-            branch_id=primary_branch_id,
+            branch_ids=staff_in.branch_ids,  # many-to-many
+            # branch_id=primary_branch_id,
             status=UserStatus.pending,
         )
         user = await user_crud.create(db, user_payload)

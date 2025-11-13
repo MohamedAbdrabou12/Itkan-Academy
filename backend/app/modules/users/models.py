@@ -54,11 +54,6 @@ class User(Base):
         ForeignKey("roles.id", ondelete="SET NULL"), nullable=True
     )
 
-    # keep legacy single-branch field for backward compatibility
-    branch_id: Mapped[Optional[int]] = mapped_column(
-        ForeignKey("branches.id", ondelete="SET NULL"), nullable=True
-    )
-
     name: Mapped[str] = mapped_column(String(120), nullable=False)
     email: Mapped[str] = mapped_column(
         String(120), unique=True, nullable=False, index=True
@@ -79,9 +74,6 @@ class User(Base):
     # Relationships
     role: Mapped[Optional["Role"]] = relationship(
         "Role", back_populates="users", lazy="joined"
-    )
-    branch: Mapped[Optional["Branch"]] = relationship(
-        "Branch", back_populates="users", lazy="joined"
     )
 
     # association mapped-class links (user_branches)

@@ -119,14 +119,15 @@ class TeacherService:
         role_id = teacher_role.id if teacher_role else None
 
         # For simplicity, assign the first branch as user's primary branch
-        primary_branch_id = teacher_in.branch_ids[0]
+        # primary_branch_id = teacher_in.branch_ids[0]
 
         user_payload = UserCreateSchema(
             name=teacher_in.name,
             email=teacher_in.email,
             phone=teacher_in.phone,
             role_id=role_id,
-            branch_id=primary_branch_id,
+            branch_ids=teacher_in.branch_ids,  # allow multiple branches
+            # branch_id=primary_branch_id,
             status=UserStatus.pending,
         )
         user = await user_crud.create(db, user_payload)

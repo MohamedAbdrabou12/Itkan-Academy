@@ -29,7 +29,7 @@ class Branch(Base):
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     address: Mapped[Optional[str]] = mapped_column(Text)
     phone: Mapped[Optional[str]] = mapped_column(String(20))
-    email: Mapped[Optional[str]] = mapped_column(String(100))
+    email: Mapped[Optional[str]] = mapped_column(String(100), unique=True)
     status: Mapped[str] = mapped_column(
         String(10), default=BranchStatus.active.value, nullable=False
     )
@@ -45,9 +45,6 @@ class Branch(Base):
     classes: Mapped[List[Class]] = relationship(
         back_populates="branch", lazy="selectin", cascade="all, delete-orphan"
     )
-
-    # Legacy one-to-many (for backward compatibility)
-    users: Mapped[List[User]] = relationship(back_populates="branch", lazy="selectin")
 
     # Association mapped-class links (user_branches)
     user_links: Mapped[List[UserBranch]] = relationship(
