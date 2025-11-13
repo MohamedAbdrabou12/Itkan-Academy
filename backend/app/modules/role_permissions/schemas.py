@@ -1,7 +1,7 @@
-# backend/app/modules/role_permissions/schemas.py
-from typing import Optional
+from typing import List, Optional
 
-from pydantic import BaseModel
+from app.modules.permissions.schemas import Permission
+from pydantic import BaseModel, ConfigDict
 
 
 class RolePermissionBase(BaseModel):
@@ -9,13 +9,21 @@ class RolePermissionBase(BaseModel):
     permission_id: int
 
 
-class RolePermissionCreate(RolePermissionBase):
-    pass
-
-
-class RolePermissionRead(RolePermissionBase):
-    role_name: Optional[str] = None
-    permission_code: Optional[str] = None
+class RolePermission(RolePermissionBase):
+    permission: Optional[Permission] = None
 
     class Config:
         from_attributes = True
+
+
+class PermissionUpdateRequest(BaseModel):
+    permission_ids: List[int]
+
+
+class RolePermissionResponse(BaseModel):
+    role_id: int
+    permission_id: int
+    permission_data: Optional[Permission] = None
+
+    model_config = ConfigDict(from_attributes=True)
+
