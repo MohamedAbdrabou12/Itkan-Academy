@@ -86,6 +86,12 @@ class Student(Base):
         "Invoice", back_populates="student", lazy="selectin"
     )
 
+    @property
+    def branch_ids(self) -> List[int]:
+        if self.user and self.user.branches:
+            return [b.id for b in self.user.branches]
+        return []
+
     def __repr__(self):
         name = getattr(self.user, "name", None)
         return f"<Student(id={self.id}, user={name})>"
