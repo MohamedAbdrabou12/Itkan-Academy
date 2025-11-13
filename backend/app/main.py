@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1 import api_router
 from app.core.config import settings
-from app.core.middleware import BranchScopeMiddleware
+from app.core.middleware import BranchContextMiddleware
 from fastapi_pagination import add_pagination
 
 
@@ -26,8 +26,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Add BranchScopeMiddleware BEFORE registering API routers
-app.add_middleware(BranchScopeMiddleware)
+# calling branch context middleware
+app.add_middleware(BranchContextMiddleware)
 
 # Include API v1 router
 app.include_router(api_router, prefix="/api/v1")

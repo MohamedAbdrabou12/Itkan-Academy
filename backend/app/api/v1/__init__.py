@@ -6,8 +6,8 @@ from app.modules.branches.router import branch_router
 from app.modules.classes.router import class_router
 from app.modules.evaluations.router import daily_evaluation_router
 from app.modules.exams.router.exam import exam_router
-from app.modules.exams.router.exam_answer import exam_answer_router
-from app.modules.exams.router.exam_attempt import exam_attempt_router
+from app.modules.exams.router.exam_answer import exam_answers_router
+from app.modules.exams.router.exam_attempt import exam_attempts_router
 from app.modules.exams.router.exam_question import exam_question_router
 from app.modules.financial.router.invoice import invoice_router
 from app.modules.financial.router.payment import payment_router
@@ -46,6 +46,6 @@ api_router.include_router(payment_router, tags=["Payments"])
 api_router.include_router(report_job_router, tags=["Report Jobs"])
 api_router.include_router(exam_router, tags=["Exams"])
 api_router.include_router(exam_question_router, tags=["Exam Questions"])
-api_router.include_router(exam_answer_router, tags=["Exam Answers"])
-api_router.include_router(exam_attempt_router, tags=["Exam Attempts"])
+api_router.include_router(exam_answers_router, tags=["Exam Answers"])
+api_router.include_router(exam_attempts_router, tags=["Exam Attempts"])
 api_router.include_router(teachers_router, tags=["Teachers"])

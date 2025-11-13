@@ -6,6 +6,7 @@ from sqlalchemy.orm import selectinload, joinedload
 from fastapi import HTTPException, status  # noqa
 from app.modules.teachers.models import Teacher
 from app.modules.users.models import User, UserStatus
+from app.modules.classes.models import Class
 
 
 class TeacherCRUD:
@@ -27,6 +28,11 @@ class TeacherCRUD:
         result = await db.execute(stmt)
         return result.scalars().first()
 
+    async def get_by_user_id(self, db: AsyncSession, user_id: int) -> Optional[Teacher]:
+        stmt = select(Teacher).where(Teacher.user_id == user_id)
+        result = await db.execute(stmt)
+        return result.scalars().first()
+
     async def create(self, db: AsyncSession, data: dict) -> Teacher:
         teacher = Teacher(**data)
         db.add(teacher)
@@ -43,7 +49,6 @@ class TeacherCRUD:
         return teacher
 
     async def delete(self, db: AsyncSession, teacher: Teacher) -> Teacher:
-        # soft-delete via User status
         user = await db.get(User, teacher.user_id)
         if user:
             user.status = UserStatus.deactive.value
@@ -51,6 +56,19 @@ class TeacherCRUD:
             await db.commit()
         await db.refresh(teacher)
         return teacher
+
+    async def update_teacher_classes(
+        self, db: AsyncSession, teacher: Teacher, class_ids: List[int]
+    ):
+        # Remove old links
+        await db.execute(f"DELETE FROM teacher_classes WHERE teacher_id = {teacher.id}")
+        for cid in class_ids:
+            cls = await db.get(Class, cid)
+            if cls:
+                teacher.classes.append(cls)
+        db.add(teacher)
+        await db.commit()
+        await db.refresh(teacher)
 
     async def approve(self, db: AsyncSession, teacher: Teacher) -> Teacher:
         user = await db.get(User, teacher.user_id)

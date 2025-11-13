@@ -1,28 +1,49 @@
 from datetime import datetime
-from typing import Optional, Dict
-from pydantic import BaseModel
+from typing import Optional
+from pydantic import BaseModel, field_validator, model_validator
+from .models import QuestionDifficulty, QuestionType
 
 
 class QuestionBankBase(BaseModel):
-    branch_id: Optional[int] = None
-    subject: Optional[str] = None
-    type: str = "mcq"
-    text: str
-    options: Optional[Dict] = None
-    correct_options: Optional[Dict] = None
-    created_by: Optional[int] = None
+    title: str
+    difficulty: QuestionDifficulty = QuestionDifficulty.MEDIUM
+    type: QuestionType = QuestionType.MCQ
+    options: Optional[dict[str, str]] = None
+    correct_answer: Optional[str] = None
+
+    @field_validator("correct_answer")
+    @classmethod
+    def validate_correct_answer(cls, v, values):
+        if v is not None:
+            # Validate that correct_answer exists in options
+            options = values.data.get("options", {})
+            if options and v not in options:
+                raise ValueError("correct_answer must exist in options")
+        return v
 
 
 class QuestionBankCreate(QuestionBankBase):
-    pass
+    @model_validator(mode="after")
+    def validate_mcq_questions(self):
+        # validate options for MCQ type questions
+        if self.type == QuestionType.MCQ:
+            if not self.options or len(self.options) < 2 or len(self.options) > 6:
+                raise ValueError("MCQ questions must have between 2 and 6 options.")
 
+            # Validate correct_option
+            if self.correct_answer is None:
+                raise ValueError("MCQ questions must have a correct answer.")
+        elif self.type in {QuestionType.SHORT_ANSWER, QuestionType.ESSAY}:
+            if self.options is not None:
+                raise ValueError(
+                    "Short answer and essay questions should not have options."
+                )
+            if self.correct_answer is not None:
+                raise ValueError(
+                    "Short answer and essay questions should not have a correct answer."
+                )
 
-class QuestionBankUpdate(BaseModel):
-    subject: Optional[str] = None
-    type: Optional[str] = None
-    text: Optional[str] = None
-    options: Optional[Dict] = None
-    correct_options: Optional[Dict] = None
+        return self
 
 
 class QuestionBankRead(QuestionBankBase):

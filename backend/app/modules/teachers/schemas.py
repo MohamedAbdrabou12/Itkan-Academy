@@ -1,9 +1,10 @@
 # backend/app/modules/teachers/schemas.py
-from datetime import date, datetime
+from datetime import date, datetime  # noqa
 from typing import List, Optional
 from pydantic import BaseModel, EmailStr, field_validator
-from app.modules.teachers.models import EmploymentType
 import re
+from app.modules.users.schemas import UserRead
+from app.modules.teachers.models import EmploymentType
 
 
 class TeacherBase(BaseModel):
@@ -24,11 +25,11 @@ class TeacherBase(BaseModel):
 
 
 class TeacherCreate(TeacherBase):
-    # user fields
     name: str
     email: EmailStr
     phone: Optional[str] = None
-    branch_id: int
+    branch_ids: Optional[list[int]] = None
+    role_id: Optional[int] = None
 
     @field_validator("phone")
     def validate_phone(cls, v):
@@ -46,6 +47,8 @@ class TeacherUpdate(BaseModel):
     hire_date: Optional[date] = None
     employment_type: Optional[EmploymentType] = None
     class_ids: Optional[List[int]] = None
+    branch_ids: Optional[list[int]] = None
+    role_id: Optional[int] = None
 
     @field_validator("hire_date")
     @classmethod
@@ -56,24 +59,20 @@ class TeacherUpdate(BaseModel):
             raise ValueError("Hire date cannot be in the future")
         return v
 
+    @field_validator("phone")
+    def validate_phone(cls, v):
+        if v and not re.match(r"^\+?\d{10,15}$", v):
+            raise ValueError("Invalid phone number format")
+        return v
 
-class TeacherRead(BaseModel):
-    id: int
-    # user fields
-    name: str
-    email: str
-    phone: Optional[str]
-    branch_id: Optional[int]
-    role_id: Optional[int]
-    status: str
-    # teacher-specific
-    qualification: Optional[str]
-    specialization: Optional[str]
-    hire_date: Optional[date]
-    employment_type: Optional[EmploymentType]
+
+class TeacherRead(UserRead):
+    qualification: Optional[str] = None
+    specialization: Optional[str] = None
+    hire_date: Optional[date] = None
+    employment_type: Optional[EmploymentType] = None
     class_ids: Optional[List[int]] = None
-    created_at: datetime
-    updated_at: datetime
+    branch_ids: Optional[list[int]] = None
 
     class Config:
         from_attributes = True
