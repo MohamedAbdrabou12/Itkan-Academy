@@ -63,7 +63,11 @@ class RoleCRUD:
         return result.scalars().first()
 
     async def create(self, db: AsyncSession, obj_in: RoleCreate) -> Role:
-        db_obj = Role(name=obj_in.name, description=obj_in.description)
+        db_obj = Role(
+            name=obj_in.name,
+            description=obj_in.description,
+            name_in_arabic=obj_in.name_in_arabic,
+        )
         db.add(db_obj)
         await db.flush()
         await db.commit()
