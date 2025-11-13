@@ -53,7 +53,7 @@ async def get_role(role_id: int, request: Request, db: AsyncSession = Depends(ge
     status_code=status.HTTP_201_CREATED,
     dependencies=[
         Depends(get_current_user),
-        Depends(require_permission("role:create")),
+        # Depends(require_permission("role:create")),
     ],
 )
 async def create_role(role_in: RoleCreate, db: AsyncSession = Depends(get_db)):

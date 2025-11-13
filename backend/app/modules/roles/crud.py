@@ -29,7 +29,6 @@ class RoleCRUD:
             )
             query = query.where(search_filter)
 
-
         # Apply sorting
         sort_column_name = sort_by or "id"
         sort_order_direction = sort_order or "asc"
@@ -41,9 +40,8 @@ class RoleCRUD:
         )
 
         result = await sqlalchemy_paginate(db, query)
-        
-        return result
 
+        return result
 
     async def get_by_id(
         self, db: AsyncSession, role_id: int, request: Optional[Request] = None
@@ -65,7 +63,11 @@ class RoleCRUD:
         return result.scalars().first()
 
     async def create(self, db: AsyncSession, obj_in: RoleCreate) -> Role:
-        db_obj = Role(name=obj_in.name, description=obj_in.description)
+        db_obj = Role(
+            name=obj_in.name,
+            description=obj_in.description,
+            name_in_arabic=obj_in.name_in_arabic,
+        )
         db.add(db_obj)
         await db.flush()
         await db.commit()
