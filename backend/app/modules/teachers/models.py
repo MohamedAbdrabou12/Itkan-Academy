@@ -77,5 +77,5 @@ class Teacher(Base):
     )
 
     def __repr__(self) -> str:
-        name = getattr(self.user, "name", None)
+        name = getattr(self.user, "full_name", None)
         return f"<Teacher(id={self.id}, user={name})>"

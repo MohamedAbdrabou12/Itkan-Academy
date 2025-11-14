@@ -1,13 +1,12 @@
 # backend/app/api/v1/auth/schemas.py
 from pydantic import BaseModel, EmailStr
 from app.modules.users.models import UserStatus
-from typing import Optional
+from typing import Optional  # noqa
 
 
 # Registration
 class RegisterRequest(BaseModel):
-    name: str
-    parent_name: str
+    full_name: str
     email: EmailStr
     password: str
     phone: str
@@ -16,11 +15,10 @@ class RegisterRequest(BaseModel):
 # User representation
 class UserRead(BaseModel):
     id: int
-    name: str
+    full_name: str
     email: str
     role_name: str
     status: UserStatus
-    branch_id: Optional[int] = None  # Add this line
 
     class Config:
         from_attributes = True

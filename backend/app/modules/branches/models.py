@@ -45,9 +45,6 @@ class Branch(Base):
         back_populates="branch", lazy="selectin", cascade="all, delete-orphan"
     )
 
-    # Legacy one-to-many (for backward compatibility)
-    users: Mapped[List[User]] = relationship(back_populates="branch", lazy="selectin")
-
     # Association mapped-class links (user_branches)
     user_links: Mapped[List[UserBranch]] = relationship(
         "UserBranch",

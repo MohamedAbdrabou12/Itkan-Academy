@@ -10,15 +10,13 @@ class StaffBase(BaseModel):
     position: Optional[str] = None
     salary_meta: Optional[Dict] = None
     branch_ids: Optional[List[int]] = None  # updated to many-to-many
+    role_id: Optional[int] = None
 
 
 class StaffCreate(StaffBase):
-    name: str
+    full_name: str
     email: EmailStr
     phone: Optional[str] = None
-    branch_ids: Optional[List[int]] = None
-    role_id: Optional[int] = None
-    permission_codes: Optional[List[str]] = None
 
     @field_validator("phone")
     def validate_phone(cls, v):
@@ -27,14 +25,10 @@ class StaffCreate(StaffBase):
         return v
 
 
-class StaffUpdate(BaseModel):
-    name: Optional[str] = None
+class StaffUpdate(StaffBase):
+    full_name: Optional[str] = None
     email: Optional[EmailStr] = None
     phone: Optional[str] = None
-    position: Optional[str] = None
-    salary_meta: Optional[Dict] = None
-    branch_ids: Optional[List[int]] = None
-    role_id: Optional[int] = None
 
     @field_validator("phone")
     def validate_phone(cls, v):

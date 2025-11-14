@@ -15,10 +15,9 @@ class BranchInfo(BaseModel):
 
 
 class UserBase(BaseModel):
-    name: str
+    full_name: str
     email: EmailStr
     phone: Optional[str] = None
-    # branch_id: Optional[int] = None
     branch_ids: Optional[List[int]] = None
 
     @field_validator("phone")
@@ -31,11 +30,10 @@ class UserBase(BaseModel):
 class UserCreate(UserBase):
     role_id: Optional[int] = None
     branch_ids: Optional[List[int]] = None
-    permission_code: Optional[list[int]] = None
 
 
 class UserUpdate(BaseModel):
-    name: Optional[str] = None
+    full_name: Optional[str] = None
     email: Optional[EmailStr] = None
     phone: Optional[str] = None
     password: Optional[str] = None
@@ -56,7 +54,6 @@ class UserRead(UserBase):
     role_id: Optional[int]
     role_name: Optional[str] = None
     branch_name: Optional[str] = None
-    permission_code: Optional[list[int]] | None
     last_login: Optional[datetime] | None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None

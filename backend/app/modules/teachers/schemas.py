@@ -25,7 +25,7 @@ class TeacherBase(BaseModel):
 
 
 class TeacherCreate(TeacherBase):
-    name: str
+    full_name: str
     email: EmailStr
     phone: Optional[str] = None
     branch_ids: Optional[list[int]] = None
@@ -39,7 +39,7 @@ class TeacherCreate(TeacherBase):
 
 
 class TeacherUpdate(BaseModel):
-    name: Optional[str] = None
+    full_name: Optional[str] = None
     email: Optional[EmailStr] = None
     phone: Optional[str] = None
     qualification: Optional[str] = None
@@ -72,7 +72,6 @@ class TeacherRead(UserRead):
     hire_date: Optional[date] = None
     employment_type: Optional[EmploymentType] = None
     class_ids: Optional[List[int]] = None
-    branch_ids: Optional[list[int]] = None
 
     class Config:
         from_attributes = True

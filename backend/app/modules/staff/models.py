@@ -33,4 +33,4 @@ class Staff(Base):
     )
 
     def __repr__(self):
-        return f"<Staff(id={self.id}, user={getattr(self.user, 'name', None)})>"
+        return f"<Staff(id={self.id}, user={getattr(self.user, 'full_name', None)})>"
