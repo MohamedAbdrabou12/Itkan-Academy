@@ -25,13 +25,12 @@ class StaffService:
         # Serialize user data like TeacherService
         user_data = UserRead(
             id=user.id,
-            name=user.name,
+            full_name=user.full_name,
             email=user.email,
             phone=user.phone,
             role_id=user.role_id,
             role_name=user.role_name,
             branch_name=user.branch_name,
-            permission_code=user.role.permission_links if user.role else None,
             status=user.status,
             last_login=user.last_login,
             created_at=user.created_at,
@@ -91,13 +90,12 @@ class StaffService:
         role_id = staff_in.role_id
 
         # create user
-        primary_branch_id = staff_in.branch_ids[0]
         user_payload = UserCreateSchema(
-            name=staff_in.name,
+            full_name=staff_in.full_name,
             email=staff_in.email,
             phone=staff_in.phone,
             role_id=role_id,
-            branch_id=primary_branch_id,
+            branch_ids=staff_in.branch_ids,  # many-to-many
             status=UserStatus.pending,
         )
         user = await user_crud.create(db, user_payload)
@@ -131,7 +129,7 @@ class StaffService:
         data = staff_in.dict(exclude_unset=True)
         user_fields = {
             f: data.pop(f)
-            for f in ("name", "email", "phone", "branch_ids")
+            for f in ("full_name", "email", "phone", "branch_ids")
             if f in data
         }
         if user_fields:
@@ -170,8 +168,8 @@ class StaffService:
 
         payload = {
             "staff_id": staff.id,
-            "staff_name": staff.user.name,
-            "approved_by": approver.name if approver else "System",
+            "staff_name": staff.user.full_name,
+            "approved_by": approver.full_name if approver else "System",
         }
         try:
             send_notification_task.delay(
@@ -195,8 +193,8 @@ class StaffService:
 
         payload = {
             "staff_id": staff.id,
-            "staff_name": staff.user.name,
-            "rejected_by": approver.name if approver else "System",
+            "staff_name": staff.user.full_name,
+            "rejected_by": approver.full_name if approver else "System",
         }
         try:
             send_notification_task.delay(
@@ -225,8 +223,8 @@ class StaffService:
 
         payload = {
             "staff_id": staff.id,
-            "staff_name": staff.user.name if staff.user else "Unknown",
-            "created_by": creator.name if creator else "System",
+            "staff_name": staff.user.full_name if staff.user else "Unknown",
+            "created_by": creator.full_name if creator else "System",
         }
         for admin in admins:
             try:

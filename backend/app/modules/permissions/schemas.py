@@ -1,28 +1,20 @@
-# app/modules/permissions/schemas.py
+
 from datetime import datetime
 from typing import Optional
-
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class PermissionBase(BaseModel):
     code: str
+    name: str
+    name_ar: str
     description: Optional[str] = None
+    description_ar: Optional[str] = None
 
 
-class PermissionCreate(PermissionBase):
-    pass
-
-
-class PermissionUpdate(BaseModel):
-    code: Optional[str] = None
-    description: Optional[str] = None
-
-
-class PermissionRead(PermissionBase):
+class Permission(PermissionBase):
     id: int
     created_at: datetime
     updated_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

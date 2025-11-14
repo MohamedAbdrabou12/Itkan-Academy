@@ -5,7 +5,6 @@ from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
-
 from app.modules.students.models import Student
 from app.modules.students.schemas import StudentCreate, StudentUpdate
 from app.modules.students.crud import student_crud
@@ -26,13 +25,12 @@ class StudentService:
 
         user_data = UserRead(
             id=user.id,
-            name=user.name,
+            full_name=user.full_name,
             email=user.email,
             phone=user.phone,
             role_id=user.role_id,
             role_name=user.role_name,
             branch_name=user.branch_name,
-            permission_code=user.role.permission_links if user.role else None,
             status=user.status,
             last_login=user.last_login,
             created_at=user.created_at,
@@ -53,7 +51,6 @@ class StudentService:
 
         return {
             **user_data.model_dump(),
-            "parent_name": student.parent_name,
             "class_ids": class_ids if class_ids else None,
             "admission_date": student.admission_date,
             "curriculum_progress": student.curriculum_progress,
@@ -115,7 +112,7 @@ class StudentService:
         role_id = student_role.id if student_role else None
 
         user_payload = UserCreateSchema(
-            name=student_in.name,
+            full_name=student_in.full_name,
             email=student_in.email,
             phone=student_in.phone,
             role_id=role_id,
@@ -126,7 +123,6 @@ class StudentService:
 
         student_payload = {
             "user_id": user.id,
-            "parent_name": student_in.parent_name,
             "admission_date": student_in.admission_date,
             "curriculum_progress": student_in.curriculum_progress,
         }
@@ -168,7 +164,7 @@ class StudentService:
         data = student_in.dict(exclude_unset=True)
         user_fields = {
             f: data.pop(f)
-            for f in ("name", "email", "phone", "branch_ids")
+            for f in ("full_name", "email", "phone", "branch_ids")
             if f in data
         }
 
@@ -251,8 +247,8 @@ class StudentService:
                 template_type="student_approved",
                 payload={
                     "student_id": student.id,
-                    "student_name": user.name,
-                    "approved_by": approver.name if approver else "System",
+                    "student_name": user.full_name,
+                    "approved_by": approver.full_name if approver else "System",
                 },
             )
         except Exception:
@@ -284,8 +280,8 @@ class StudentService:
                 template_type="student_rejected",
                 payload={
                     "student_id": student.id,
-                    "student_name": user.name,
-                    "rejected_by": approver.name if approver else "System",
+                    "student_name": user.full_name,
+                    "rejected_by": approver.full_name if approver else "System",
                 },
             )
         except Exception:
@@ -313,10 +309,12 @@ class StudentService:
 
         payload = {
             "student_id": student.id,
-            "student_name": creator.name
+            "student_name": creator.full_name
             if creator
-            else (student.user.name if getattr(student, "user", None) else "Unknown"),
-            "created_by": creator.name if creator else "System",
+            else (
+                student.user.full_name if getattr(student, "user", None) else "Unknown"
+            ),
+            "created_by": creator.full_name if creator else "System",
         }
 
         for hr in hr_users:

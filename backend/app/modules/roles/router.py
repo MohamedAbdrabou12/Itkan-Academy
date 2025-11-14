@@ -52,7 +52,7 @@ async def get_role(role_id: int, request: Request, db: AsyncSession = Depends(ge
     response_model=RoleRead,
     status_code=status.HTTP_201_CREATED,
     dependencies=[
-        Depends(get_current_user),
+        # Depends(get_current_user),
         # Depends(require_permission("role:create")),
     ],
 )
@@ -64,8 +64,8 @@ async def create_role(role_in: RoleCreate, db: AsyncSession = Depends(get_db)):
     "/{role_id}",
     response_model=RoleRead,
     dependencies=[
-        Depends(get_current_user),
-        Depends(require_permission("role:update")),
+        # Depends(get_current_user),
+        # Depends(require_permission("role:update")),
     ],
 )
 async def update_role(
@@ -79,12 +79,12 @@ async def update_role(
 
 @role_router.delete(
     "/{role_id}",
-    status_code=status.HTTP_204_NO_CONTENT,
+    status_code=status.HTTP_200_OK,
     dependencies=[
-        Depends(get_current_user),
-        Depends(require_permission("role:delete")),
+        # Depends(get_current_user),
+        # Depends(require_permission("role:delete")),
     ],
 )
 async def delete_role(role_id: int, db: AsyncSession = Depends(get_db)):
     await role_crud.delete(db, role_id)
-    return None
+    return {"detail": "Role deleted"}

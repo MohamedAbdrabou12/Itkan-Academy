@@ -8,6 +8,7 @@ from sqlalchemy import DateTime, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 if TYPE_CHECKING:
+    from app.modules.role_permissions.models import RolePermission
     from app.modules.roles.models import Role
 
 
@@ -27,10 +28,15 @@ class Permission(Base):
         DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow
     )
 
-    # Many-to-many with Role
-    roles: Mapped[List[Role]] = relationship(
-        "Role",
-        secondary="role_permissions",
-        back_populates="permissions",
+    # Relationship through RolePermission (many-to-many)
+    role_associations: Mapped[List[RolePermission]] = relationship(
+        "RolePermission",
+        back_populates="permission",
+        cascade="all, delete-orphan",
         lazy="selectin",
     )
+
+    # Convenience property to access roles directly
+    @property
+    def roles(self) -> List[Role]:
+        return [assoc.role for assoc in self.role_associations]

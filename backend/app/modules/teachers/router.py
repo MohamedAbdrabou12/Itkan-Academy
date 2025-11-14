@@ -15,7 +15,7 @@ teachers_router = APIRouter(prefix="/teachers", tags=["Teachers"])
 @teachers_router.get(
     "/",
     response_model=List[TeacherRead],
-    dependencies=[Depends(require_permission("teacher:view"))],
+    dependencies=[Depends(require_permission("teacher.management.manage"))],
 )
 async def list_teachers(db: AsyncSession = Depends(get_db)):
     return await TeacherService.list_teachers(db)
@@ -24,7 +24,7 @@ async def list_teachers(db: AsyncSession = Depends(get_db)):
 @teachers_router.get(
     "/{teacher_id}",
     response_model=TeacherRead,
-    dependencies=[Depends(require_permission("teacher:view"))],
+    dependencies=[Depends(require_permission("teacher.management.manage"))],
 )
 async def get_teacher(teacher_id: int, db: AsyncSession = Depends(get_db)):
     return await TeacherService.get_teacher(db, teacher_id)
@@ -34,7 +34,7 @@ async def get_teacher(teacher_id: int, db: AsyncSession = Depends(get_db)):
     "/",
     response_model=TeacherRead,
     status_code=status.HTTP_201_CREATED,
-    dependencies=[Depends(require_permission("teacher:create"))],
+    dependencies=[Depends(require_permission("teacher.management.manage"))],
 )
 async def create_teacher(
     teacher_in: TeacherCreate,
@@ -47,7 +47,7 @@ async def create_teacher(
 @teachers_router.put(
     "/{teacher_id}",
     response_model=TeacherRead,
-    dependencies=[Depends(require_permission("teacher:update"))],
+    dependencies=[Depends(require_permission("teacher.management.manage"))],
 )
 async def update_teacher(
     teacher_id: int,
@@ -61,7 +61,7 @@ async def update_teacher(
 @teachers_router.delete(
     "/{teacher_id}",
     response_model=TeacherRead,
-    dependencies=[Depends(require_permission("teacher:delete"))],
+    dependencies=[Depends(require_permission("teacher.management.manage"))],
 )
 async def delete_teacher(
     teacher_id: int,
@@ -74,7 +74,7 @@ async def delete_teacher(
 @teachers_router.post(
     "/{teacher_id}/approve",
     response_model=TeacherRead,
-    dependencies=[Depends(require_permission("teacher:update"))],
+    dependencies=[Depends(require_permission("teacher.management.manage"))],
 )
 async def approve_teacher(
     teacher_id: int,
@@ -87,7 +87,7 @@ async def approve_teacher(
 @teachers_router.post(
     "/{teacher_id}/reject",
     response_model=TeacherRead,
-    dependencies=[Depends(require_permission("teacher:update"))],
+    dependencies=[Depends(require_permission("teacher.management.manage"))],
 )
 async def reject_teacher(
     teacher_id: int,
