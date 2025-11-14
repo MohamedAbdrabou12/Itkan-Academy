@@ -55,7 +55,7 @@ class User(Base):
         ForeignKey("roles.id", ondelete="SET NULL"), nullable=True
     )
 
-    name: Mapped[str] = mapped_column(String(120), nullable=False)
+    full_name: Mapped[str] = mapped_column(String(120), nullable=False)
     email: Mapped[str] = mapped_column(
         String(120), unique=True, nullable=False, index=True
     )
@@ -89,7 +89,7 @@ class User(Base):
     branches: Mapped[List["Branch"]] = relationship(
         "Branch",
         secondary="user_branches",
-        back_populates="users",
+        back_populates="users_m2m",
         lazy="selectin",
     )
 
@@ -122,11 +122,8 @@ class User(Base):
 
     @property
     def branch_name(self) -> Optional[str]:
-        return self.branch.name if self.branch else None
-
-    @property
-    def permission_code(self) -> Optional[str]:
-        return self.role.permission_code if self.role else None
+        # return first branch name if available
+        return self.branches[0].name if self.branches else None
 
     def __repr__(self) -> str:
-        return f"<User(id={self.id}, name='{self.name}')>"
+        return f"<User(id={self.id}, name='{self.full_name}')>"

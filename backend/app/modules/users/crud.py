@@ -21,13 +21,12 @@ def map_user_to_read(user: User) -> UserRead:
     """
     return UserRead(
         id=user.id,
-        name=user.name,
+        full_name=user.full_name,
         email=user.email,
         phone=user.phone,
         role_id=user.role_id,
         role_name=user.role_name,
         branch_name=user.branch_name,
-        permission_code=user.role.permission_links if user.role else None,
         status=user.status,
         last_login=user.last_login,
         created_at=user.created_at,
@@ -117,7 +116,6 @@ class UserCRUD:
         for bid in branch_ids:
             db.add(UserBranch(user_id=user.id, branch_id=bid))
 
-        # user.branch_ids = branch_ids           # we no longer need this line since we don't have branch_ids field
         db.add(user)
         await db.commit()
         await db.refresh(user)
@@ -141,7 +139,7 @@ class UserCRUD:
             status_val = status_val.value
 
         db_obj = User(
-            name=data["name"],
+            full_name=data["full_name"],
             email=data["email"],
             phone=data.get("phone"),
             password_hash=data.get("password_hash", ""),
@@ -171,7 +169,8 @@ class UserCRUD:
         token = create_password_reset_token(db_obj.id)
         reset_link = f"https://www.google.com/search?q={token}"
         subject, body_html = render_template(
-            "reset_password.html", {"username": db_obj.name, "reset_link": reset_link}
+            "reset_password.html",
+            {"username": db_obj.full_name, "reset_link": reset_link},
         )
         send_email_task.delay(db_obj.email, subject, body_html)
 

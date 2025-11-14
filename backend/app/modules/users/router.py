@@ -16,7 +16,10 @@ user_router = APIRouter(prefix="/users", tags=["Users"])
 @user_router.get(
     "/",
     response_model=List[UserRead],
-    dependencies=[Depends(get_current_user), Depends(require_permission("user:view"))],
+    dependencies=[
+        Depends(get_current_user),
+        Depends(require_permission("staff.management.manage")),
+    ],
 )
 async def list_users(request: Request, db: AsyncSession = Depends(get_db)):
     """
@@ -29,7 +32,10 @@ async def list_users(request: Request, db: AsyncSession = Depends(get_db)):
 @user_router.get(
     "/{user_id}",
     response_model=UserRead,
-    dependencies=[Depends(get_current_user), Depends(require_permission("user:view"))],
+    dependencies=[
+        Depends(get_current_user),
+        Depends(require_permission("staff.management.manage")),
+    ],
 )
 async def get_user(user_id: int, request: Request, db: AsyncSession = Depends(get_db)):
     """
@@ -47,7 +53,7 @@ async def get_user(user_id: int, request: Request, db: AsyncSession = Depends(ge
     status_code=status.HTTP_201_CREATED,
     dependencies=[
         Depends(get_current_user),
-        Depends(require_permission("user:create")),
+        Depends(require_permission("staff.management.manage")),
     ],
 )
 async def create_user(
@@ -86,7 +92,7 @@ async def create_user(
     response_model=UserRead,
     dependencies=[
         Depends(get_current_user),
-        Depends(require_permission("user:update")),
+        Depends(require_permission("staff.management.manage")),
     ],
 )
 async def update_user(
@@ -124,7 +130,7 @@ async def update_user(
     response_model=UserRead,
     dependencies=[
         Depends(get_current_user),
-        Depends(require_permission("user:delete")),
+        Depends(require_permission("staff.management.manage")),
     ],
 )
 async def delete_user(user_id: int, db: AsyncSession = Depends(get_db)):
@@ -142,7 +148,7 @@ async def delete_user(user_id: int, db: AsyncSession = Depends(get_db)):
     response_model=UserRead,
     dependencies=[
         Depends(get_current_user),
-        Depends(require_permission("user:approve")),
+        Depends(require_permission("staff.management.manage")),
     ],
 )
 async def approve_user(user_id: int, db: AsyncSession = Depends(get_db)):

@@ -15,7 +15,7 @@ staff_router = APIRouter(prefix="/staff", tags=["Staff"])
 @staff_router.get(
     "/",
     response_model=List[StaffRead],
-    dependencies=[Depends(require_permission("staff:view"))],
+    dependencies=[Depends(require_permission("staff.management.manage"))],
 )
 async def list_staff(db: AsyncSession = Depends(get_db)):
     return await StaffService.list_staff(db)
@@ -24,7 +24,7 @@ async def list_staff(db: AsyncSession = Depends(get_db)):
 @staff_router.get(
     "/{staff_id}",
     response_model=StaffRead,
-    dependencies=[Depends(require_permission("staff:view"))],
+    dependencies=[Depends(require_permission("staff.management.manage"))],
 )
 async def get_staff(staff_id: int, db: AsyncSession = Depends(get_db)):
     return await StaffService.get_staff(db, staff_id)
@@ -34,7 +34,7 @@ async def get_staff(staff_id: int, db: AsyncSession = Depends(get_db)):
     "/",
     response_model=StaffRead,
     status_code=status.HTTP_201_CREATED,
-    dependencies=[Depends(require_permission("staff:create"))],
+    dependencies=[Depends(require_permission("staff.management.manage"))],
 )
 async def create_staff(
     staff_in: StaffCreate,
@@ -47,7 +47,7 @@ async def create_staff(
 @staff_router.put(
     "/{staff_id}",
     response_model=StaffRead,
-    dependencies=[Depends(require_permission("staff:update"))],
+    dependencies=[Depends(require_permission("staff.management.manage"))],
 )
 async def update_staff(
     staff_id: int, staff_in: StaffUpdate, db: AsyncSession = Depends(get_db)
@@ -58,7 +58,7 @@ async def update_staff(
 @staff_router.delete(
     "/{staff_id}",
     response_model=StaffRead,
-    dependencies=[Depends(require_permission("staff:delete"))],
+    dependencies=[Depends(require_permission("staff.management.manage"))],
 )
 async def delete_staff(staff_id: int, db: AsyncSession = Depends(get_db)):
     return await StaffService.delete_staff(db, staff_id)
@@ -67,7 +67,7 @@ async def delete_staff(staff_id: int, db: AsyncSession = Depends(get_db)):
 @staff_router.post(
     "/{staff_id}/approve",
     response_model=StaffRead,
-    dependencies=[Depends(require_permission("staff:update"))],
+    dependencies=[Depends(require_permission("staff.management.manage"))],
 )
 async def approve_staff(
     staff_id: int,
@@ -80,7 +80,7 @@ async def approve_staff(
 @staff_router.post(
     "/{staff_id}/reject",
     response_model=StaffRead,
-    dependencies=[Depends(require_permission("staff:update"))],
+    dependencies=[Depends(require_permission("staff.management.manage"))],
 )
 async def reject_staff(
     staff_id: int,

@@ -25,13 +25,12 @@ class TeacherService:
         user: User = getattr(teacher, "user", None)
         user_data = UserRead(
             id=user.id,
-            name=user.name,
+            full_name=user.full_name,
             email=user.email,
             phone=user.phone,
             role_id=user.role_id,
             role_name=user.role_name,
             branch_name=user.branch_name,
-            permission_code=user.role.permission_links if user.role else None,
             status=user.status,
             last_login=user.last_login,
             created_at=user.created_at,
@@ -118,16 +117,12 @@ class TeacherService:
         teacher_role = role_res.scalar_one_or_none()
         role_id = teacher_role.id if teacher_role else None
 
-        # For simplicity, assign the first branch as user's primary branch
-        # primary_branch_id = teacher_in.branch_ids[0]
-
         user_payload = UserCreateSchema(
-            name=teacher_in.name,
+            full_name=teacher_in.full_name,
             email=teacher_in.email,
             phone=teacher_in.phone,
             role_id=role_id,
             branch_ids=teacher_in.branch_ids,  # allow multiple branches
-            # branch_id=primary_branch_id,
             status=UserStatus.pending,
         )
         user = await user_crud.create(db, user_payload)
@@ -171,7 +166,7 @@ class TeacherService:
         data = teacher_in.dict(exclude_unset=True)
         user_fields = {
             f: data.pop(f)
-            for f in ("name", "email", "phone", "branch_ids")
+            for f in ("full_name", "email", "phone", "branch_ids")
             if f in data
         }
 
@@ -241,8 +236,8 @@ class TeacherService:
                 template_type="teacher_approved",
                 payload={
                     "teacher_id": teacher.id,
-                    "teacher_name": user.name,
-                    "approved_by": approver.name if approver else "System",
+                    "teacher_name": user.full_name,
+                    "approved_by": approver.full_name if approver else "System",
                 },
             )
         except Exception:
@@ -270,8 +265,8 @@ class TeacherService:
                 template_type="teacher_rejected",
                 payload={
                     "teacher_id": teacher.id,
-                    "teacher_name": user.name,
-                    "rejected_by": approver.name if approver else "System",
+                    "teacher_name": user.full_name,
+                    "rejected_by": approver.full_name if approver else "System",
                 },
             )
         except Exception:
@@ -296,8 +291,8 @@ class TeacherService:
 
         payload = {
             "teacher_id": teacher.id,
-            "teacher_name": teacher.user.name if teacher.user else "Unknown",
-            "created_by": creator.name if creator else "System",
+            "teacher_name": teacher.user.full_name if teacher.user else "Unknown",
+            "created_by": creator.full_name if creator else "System",
         }
         for admin in admins:
             try:

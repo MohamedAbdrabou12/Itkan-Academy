@@ -43,7 +43,6 @@ class Student(Base):
     __tablename__ = "students"
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
-    parent_name: Mapped[str] = mapped_column(String(120))
     admission_date: Mapped[Optional[date]] = mapped_column(Date)
     curriculum_progress: Mapped[Optional[Dict]] = mapped_column(
         JSON, default=None, nullable=True
@@ -93,5 +92,5 @@ class Student(Base):
         return []
 
     def __repr__(self):
-        name = getattr(self.user, "name", None)
+        name = getattr(self.user, "full_name", None)
         return f"<Student(id={self.id}, user={name})>"

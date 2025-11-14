@@ -7,7 +7,6 @@ from app.modules.users.schemas import UserRead
 
 
 class StudentBase(BaseModel):
-    parent_name: str
     class_ids: Optional[List[int]] = None
     admission_date: Optional[date] = None
     curriculum_progress: Optional[Dict] = None
@@ -23,7 +22,7 @@ class StudentBase(BaseModel):
 
 
 class StudentCreate(StudentBase):
-    name: str
+    full_name: str
     email: EmailStr
     phone: Optional[str] = None
     branch_ids: Optional[List[int]] = None
@@ -44,10 +43,9 @@ class StudentCreate(StudentBase):
 
 
 class StudentUpdate(BaseModel):
-    name: Optional[str] = None
+    full_name: Optional[str] = None
     email: Optional[EmailStr] = None
     phone: Optional[str] = None
-    parent_name: Optional[str] = None
     class_ids: Optional[List[int]] = None
     branch_ids: Optional[List[int]] = None
     admission_date: Optional[date] = None
@@ -70,11 +68,9 @@ class StudentUpdate(BaseModel):
 
 
 class StudentRead(UserRead):
-    parent_name: str
     class_ids: Optional[List[int]] = None
     admission_date: Optional[date]
     curriculum_progress: Optional[Dict]
-    branch_ids: Optional[List[int]] = []
 
     class Config:
         from_attributes = True

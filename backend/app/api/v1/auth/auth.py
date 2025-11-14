@@ -53,7 +53,7 @@ async def register_student(
             )
 
         user = User(
-            name=payload.name,
+            full_name=payload.full_name,
             email=payload.email,
             password_hash=get_password_hash(payload.password),
             role_id=role.id,
@@ -66,7 +66,6 @@ async def register_student(
         await db.refresh(user)
 
         student = Student(
-            parent_name=payload.parent_name,
             user_id=user.id,
         )
 
@@ -76,11 +75,10 @@ async def register_student(
 
         return UserRead(
             id=user.id,
-            name=user.name,
+            full_name=user.full_name,
             email=user.email,
             role_name=role.name,
             status=user.status,
-            branch_id=user.branch_id,  # add branch_id to response
         )
 
     except HTTPException:
@@ -111,7 +109,7 @@ async def login(payload: LoginRequest, db: AsyncSession = Depends(get_db)):
         access_token=token,
         user=UserRead(
             id=user.id,
-            name=user.name,
+            full_name=user.full_name,
             email=user.email,
             role_name=user.role.name,
             status=user.status,
@@ -124,7 +122,7 @@ async def login(payload: LoginRequest, db: AsyncSession = Depends(get_db)):
 async def get_me(current_user: User = Depends(get_current_user)):
     return UserRead(
         id=current_user.id,
-        name=current_user.name,
+        full_name=current_user.full_name,
         email=current_user.email,
         role_name=current_user.role.name,
         status=current_user.status,
