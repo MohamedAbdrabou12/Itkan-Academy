@@ -1,18 +1,19 @@
-# backend/app/modules/users/crud.py
 from typing import List, Optional
+
+from app.core.security import get_password_hash as hash_password
+from app.core.utils import create_password_reset_token
+from app.modules.branches.models import Branch
+from app.modules.users.models import User, UserBranch, UserStatus
+from app.modules.users.schemas import BranchInfo, UserCreate, UserRead, UserUpdate
+from app.services.notification_service.tasks.email import send_email_task
+from app.services.notification_service.utils.template_engine import render_template
+from fastapi import HTTPException, Request
+from fastapi_pagination.ext.sqlalchemy import paginate as sqlalchemy_paginate
+from sqlalchemy import asc, desc, or_
+from sqlalchemy import delete as sa_delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
-from sqlalchemy import delete as sa_delete
-from fastapi import Request, HTTPException
-from app.core.security import get_password_hash as hash_password
-from app.modules.users.models import User, UserBranch, UserStatus
-from app.modules.users.schemas import UserCreate, UserUpdate
-from app.core.utils import create_password_reset_token
-from app.services.notification_service.tasks.email import send_email_task
-from app.services.notification_service.utils.template_engine import render_template
-from app.modules.users.schemas import UserRead, BranchInfo
-from app.modules.branches.models import Branch
 
 
 def map_user_to_read(user: User) -> UserRead:
@@ -26,6 +27,7 @@ def map_user_to_read(user: User) -> UserRead:
         phone=user.phone,
         role_id=user.role_id,
         role_name=user.role_name,
+        role_name_ar=user.role_name_ar,
         branch_name=user.branch_name,
         status=user.status,
         last_login=user.last_login,
@@ -41,30 +43,51 @@ def map_user_to_read(user: User) -> UserRead:
 
 
 class UserCRUD:
-    """
-    CRUD operations for User entity using many-to-many branch relation.
-    """
-
     async def get_all(
-        self, db: AsyncSession, request: Optional[Request] = None
-    ) -> List[User]:
-        """
-        Get all users. Optionally filter by active branch from request context.
-        """
-        stmt = select(User).options(
+        self,
+        db: AsyncSession,
+        search: Optional[str] = None,
+        sort_by: Optional[str] = "id",
+        sort_order: Optional[str] = "asc",
+    ):
+        query = select(User).options(
             selectinload(User.role),
             selectinload(User.branch_links).joinedload(UserBranch.branch),
         )
 
-        if request:
-            active_branch = getattr(request.state, "active_branch_id", None)
-            if active_branch is not None:
-                stmt = stmt.join(User.branch_links).where(
-                    UserBranch.branch_id == active_branch
-                )
+        # Apply search filter
+        if search:
+            search_term = f"%{search}%"
+            query = query.where(
+                or_(User.full_name.ilike(search_term), User.email.ilike(search_term))
+            )
 
-        result = await db.execute(stmt)
-        return result.scalars().all()
+        # Define sortable columns
+        sort_columns = {
+            "id": User.id,
+            "full_name": User.full_name,
+            "email": User.email,
+            "phone": User.phone,
+            "role_name": User.role_name,
+            "status": User.status,
+            "last_login": User.last_login,
+            "created_at": User.created_at,
+            "updated_at": User.updated_at,
+        }
+
+        # Get sort column with fallback to id
+        safe_sort_by = sort_by or "id"
+        sort_column = sort_columns.get(safe_sort_by, User.id)
+
+        # Apply sorting
+        if sort_order and sort_order.lower() == "desc":
+            query = query.order_by(desc(sort_column))
+        else:
+            query = query.order_by(asc(sort_column))
+
+        result = await sqlalchemy_paginate(db, query)
+
+        return result
 
     async def get_by_id(
         self, db: AsyncSession, user_id: int, request: Optional[Request] = None
@@ -206,6 +229,19 @@ class UserCRUD:
             await db.refresh(db_obj)
 
         return db_obj
+
+    async def update_role(
+        self, db: AsyncSession, user: User, role_id: int
+    ) -> Optional[User]:
+        try:
+            user.role_id = role_id
+            await db.commit()
+            await db.refresh(user)
+            return user
+
+        except Exception as e:
+            await db.rollback()
+            raise e
 
     async def delete(self, db: AsyncSession, user_id: int) -> Optional[User]:
         """

@@ -49,10 +49,16 @@ class UserUpdate(BaseModel):
         return v
 
 
+class UserRoleUpdate(BaseModel):
+    user_id: int
+    role_id: int
+
+
 class UserRead(UserBase):
     id: int
     role_id: Optional[int]
     role_name: Optional[str] = None
+    role_name_ar: Optional[str] = None
     branch_name: Optional[str] = None
     last_login: Optional[datetime] | None
     created_at: Optional[datetime] = None
