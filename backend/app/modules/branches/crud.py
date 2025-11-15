@@ -3,10 +3,10 @@ from typing import Any, Dict, Optional
 from app.modules.branches.models import Branch, BranchStatus
 from app.modules.branches.schemas import BranchCreate, BranchUpdate
 from app.modules.classes.models import Class, ClassStatus
-from app.modules.users.models import User
+from app.modules.users.models import User, UserBranch
 from fastapi import HTTPException, Request
 from fastapi_pagination.ext.sqlalchemy import paginate as sqlalchemy_paginate
-from sqlalchemy import asc, desc, update
+from sqlalchemy import asc, desc, or_, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
@@ -20,11 +20,22 @@ class BranchCRUD:
         sort_by: Optional[str] = "id",
         sort_order: Optional[str] = "asc",
     ) -> Dict[str, Any]:
-        query = select(Branch).options(selectinload(Branch.users))
+        query = select(Branch).options(
+            selectinload(Branch.classes),
+            selectinload(Branch.user_links).selectinload(UserBranch.user),
+            selectinload(Branch.users_m2m),
+        )
 
         # Apply search filter
         if search:
-            query = query.where(Branch.name.ilike(f"%{search}%"))
+            search_term = f"%{search}%"
+            query = query.where(
+                or_(
+                    Branch.name.ilike(search_term),
+                    Branch.email.ilike(search_term),
+                    Branch.phone.ilike(search_term),
+                )
+            )
 
         sort_columns = {
             "id": Branch.id,
@@ -60,11 +71,16 @@ class BranchCRUD:
         result = await db.execute(
             select(Branch)
             .where(Branch.id == branch_id)
-            .options(selectinload(Branch.users))
+            .options(
+                selectinload(Branch.classes),
+                selectinload(Branch.user_links).selectinload(UserBranch.user),
+                selectinload(Branch.users_m2m),
+            )
         )
         branch = result.scalars().first()
         if branch:
-            branch.users_count = len(branch.users)  # type: ignore
+            # Calculate users count from the many-to-many relationship
+            branch.users_count = len(branch.users_m2m)  # type: ignore
         return branch
 
     async def create(self, db: AsyncSession, branch_in: BranchCreate) -> Branch:
@@ -112,13 +128,19 @@ class BranchCRUD:
         return branch
 
     async def deactivate_related_entities(self, db: AsyncSession, branch_id: int):
-        # Update users status to deactive
-        user_update_stmt = (
-            update(User)
-            .where(User.branch_id == branch_id)
-            .values(status=BranchStatus.deactive.value)
+        # Update users associated with this branch through user_branches
+        # First get all user_ids associated with this branch
+        user_branches_result = await db.execute(
+            select(UserBranch.user_id).where(UserBranch.branch_id == branch_id)
         )
-        await db.execute(user_update_stmt)
+        user_ids = user_branches_result.scalars().all()
+
+        if user_ids:
+            # Update users status to deactive
+            user_update_stmt = (
+                update(User).where(User.id.in_(user_ids)).values(status="deactive")
+            )
+            await db.execute(user_update_stmt)
 
         # Update classes status to deactive
         class_update_stmt = (
