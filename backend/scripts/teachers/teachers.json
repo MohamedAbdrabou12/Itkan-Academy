@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1001,
+    "user_id": 1012,
+    "hire_date": "2023-01-15",
+    "employment_type": "full_time"
+  },
+  {
+    "id": 1002,
+    "user_id": 1013,
+    "hire_date": "2023-02-20",
+    "employment_type": "full_time"
+  },
+  {
+    "id": 1003,
+    "user_id": 1014,
+    "hire_date": "2023-03-10",
+    "employment_type": "part_time"
+  },
+  {
+    "id": 1004,
+    "user_id": 1015,
+    "hire_date": "2023-01-25",
+    "employment_type": "full_time"
+  },
+  {
+    "id": 1005,
+    "user_id": 1016,
+    "hire_date": "2023-02-15",
+    "employment_type": "full_time"
+  },
+  {
+    "id": 1006,
+    "user_id": 1017,
+    "hire_date": "2023-03-05",
+    "employment_type": "part_time"
+  }
+]

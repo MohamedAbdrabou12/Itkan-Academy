@@ -1,0 +1,74 @@
+[
+  {
+    "student_id": 1001,
+    "class_id": 1001,
+    "enrollment_date": "2024-09-01",
+    "is_active": true
+  },
+  {
+    "student_id": 1002,
+    "class_id": 1001,
+    "enrollment_date": "2024-09-01",
+    "is_active": true
+  },
+  {
+    "student_id": 1003,
+    "class_id": 1003,
+    "enrollment_date": "2024-09-01",
+    "is_active": true
+  },
+  {
+    "student_id": 1004,
+    "class_id": 1003,
+    "enrollment_date": "2024-09-01",
+    "is_active": true
+  },
+  {
+    "student_id": 1005,
+    "class_id": 1005,
+    "enrollment_date": "2024-09-01",
+    "is_active": true
+  },
+  {
+    "student_id": 1006,
+    "class_id": 1005,
+    "enrollment_date": "2024-09-01",
+    "is_active": true
+  },
+  {
+    "student_id": 1007,
+    "class_id": 1006,
+    "enrollment_date": "2024-09-01",
+    "is_active": true
+  },
+  {
+    "student_id": 1008,
+    "class_id": 1006,
+    "enrollment_date": "2024-09-01",
+    "is_active": true
+  },
+  {
+    "student_id": 1009,
+    "class_id": 1007,
+    "enrollment_date": "2024-09-01",
+    "is_active": true
+  },
+  {
+    "student_id": 1010,
+    "class_id": 1007,
+    "enrollment_date": "2024-09-01",
+    "is_active": true
+  },
+  {
+    "student_id": 1011,
+    "class_id": 1008,
+    "enrollment_date": "2024-09-01",
+    "is_active": true
+  },
+  {
+    "student_id": 1012,
+    "class_id": 1008,
+    "enrollment_date": "2024-09-01",
+    "is_active": true
+  }
+]

@@ -27,11 +27,11 @@ async def add_role_permissions(db: AsyncSession):
         if not result.scalars().first():
             role_permissions_to_add.append(RolePermission(**role_permission_data))
             print(
-                f"  - Preparing to add RolePermissions data between role {role_permission_data['role_id']} and permission {role_permission_data['permission_id']}"
+                f"  - Preparing to add RolePermissions data between role: {role_permission_data['role_id']} and permission: {role_permission_data['permission_id']}"
             )
         else:
             print(
-                f"  - RolePermissions data between role {role_permission_data['role_id']} and permission {role_permission_data['permission_id']} already exists, skipping."
+                f"  - RolePermissions data between role: {role_permission_data['role_id']} and permission: {role_permission_data['permission_id']} already exists, skipping."
             )
 
     if role_permissions_to_add:

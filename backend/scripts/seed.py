@@ -9,6 +9,15 @@ from scripts.branches import add_branches
 from scripts.permissions import add_permissions
 from scripts.role_permissions import add_role_permissions
 from scripts.roles import add_roles
+from scripts.users import add_users
+from scripts.students import add_students
+from scripts.teachers import add_teachers
+from scripts.staff import add_staff
+from scripts.user_branch import add_user_branch
+from scripts.classes import add_classes
+from scripts.student_classes import add_students_classes
+from scripts.teacher_classes import add_teacher_classes
+
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
     async_sessionmaker,
@@ -33,6 +42,14 @@ async def seed_data():
         await add_roles(db)
         await add_permissions(db)
         await add_role_permissions(db)
+        await add_users(db)
+        await add_user_branch(db)
+        await add_students(db)
+        await add_teachers(db)
+        await add_staff(db)
+        await add_classes(db)
+        await add_students_classes(db)
+        await add_teacher_classes(db)
         await db.commit()
         print("\nAll data committed successfully!")
 

@@ -1,0 +1,49 @@
+[
+  { "user_id": 1004, "branch_id": 1001 },
+
+  { "user_id": 1005, "branch_id": 1002 },
+
+  { "user_id": 1006, "branch_id": 1003 },
+
+  { "user_id": 1012, "branch_id": 1001 },
+  { "user_id": 1012, "branch_id": 1002 },
+
+  { "user_id": 1013, "branch_id": 1001 },
+  { "user_id": 1013, "branch_id": 1003 },
+
+  { "user_id": 1014, "branch_id": 1002 },
+  { "user_id": 1014, "branch_id": 1004 },
+
+  { "user_id": 1015, "branch_id": 1003 },
+  { "user_id": 1015, "branch_id": 1005 },
+
+  { "user_id": 1016, "branch_id": 1004 },
+  { "user_id": 1016, "branch_id": 1006 },
+
+  { "user_id": 1017, "branch_id": 1005 },
+  { "user_id": 1017, "branch_id": 1006 },
+
+  { "user_id": 1018, "branch_id": 1001 },
+
+  { "user_id": 1019, "branch_id": 1001 },
+
+  { "user_id": 1020, "branch_id": 1002 },
+
+  { "user_id": 1021, "branch_id": 1002 },
+
+  { "user_id": 1022, "branch_id": 1003 },
+
+  { "user_id": 1023, "branch_id": 1003 },
+
+  { "user_id": 1024, "branch_id": 1004 },
+
+  { "user_id": 1025, "branch_id": 1004 },
+
+  { "user_id": 1026, "branch_id": 1005 },
+
+  { "user_id": 1027, "branch_id": 1005 },
+
+  { "user_id": 1028, "branch_id": 1006 },
+
+  { "user_id": 1029, "branch_id": 1006 }
+]

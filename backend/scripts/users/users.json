@@ -1,0 +1,263 @@
+[
+  {
+    "id": 1001,
+    "role_id": 1003,
+    "full_name": "أحمد محمود",
+    "email": "general_manager@test.com",
+    "phone": "+20 100 000 0001",
+    "password_hash": "general_manager",
+    "status": "active"
+  },
+  {
+    "id": 1002,
+    "role_id": 1004,
+    "full_name": "محمد السيد",
+    "email": "education_manager@test.com",
+    "phone": "+20 100 000 0002",
+    "password_hash": "education_manager",
+    "status": "active"
+  },
+  {
+    "id": 1003,
+    "role_id": 1005,
+    "full_name": "خالد عبدالله",
+    "email": "education_supervisor@test.com",
+    "phone": "+20 100 000 0003",
+    "password_hash": "education_supervisor",
+    "status": "active"
+  },
+  {
+    "id": 1004,
+    "role_id": 1006,
+    "full_name": "محمود حسن",
+    "email": "branch_supervisor1@test.com",
+    "phone": "+20 100 000 0004",
+    "password_hash": "branch_supervisor1",
+    "status": "active"
+  },
+  {
+    "id": 1005,
+    "role_id": 1006,
+    "full_name": "ياسر محمد",
+    "email": "branch_supervisor2@test.com",
+    "phone": "+20 100 000 0005",
+    "password_hash": "branch_supervisor2",
+    "status": "active"
+  },
+  {
+    "id": 1006,
+    "role_id": 1006,
+    "full_name": "طارق علي",
+    "email": "branch_supervisor3@test.com",
+    "phone": "+20 100 000 0006",
+    "password_hash": "branch_supervisor3",
+    "status": "active"
+  },
+  {
+    "id": 1007,
+    "role_id": 1007,
+    "full_name": "عمرو إبراهيم",
+    "email": "academic_manager@test.com",
+    "phone": "+20 100 000 0007",
+    "password_hash": "academic_manager",
+    "status": "active"
+  },
+  {
+    "id": 1008,
+    "role_id": 1008,
+    "full_name": "سامي عبدالرحمن",
+    "email": "administrative_manager@test.com",
+    "phone": "+20 100 000 0008",
+    "password_hash": "administrative_manager",
+    "status": "active"
+  },
+  {
+    "id": 1009,
+    "role_id": 1009,
+    "full_name": "ناصر أحمد",
+    "email": "staff_manager@test.com",
+    "phone": "+20 100 000 0009",
+    "password_hash": "staff_manager",
+    "status": "active"
+  },
+  {
+    "id": 1010,
+    "role_id": 1010,
+    "full_name": "وليد مصطفى",
+    "email": "student_manager@test.com",
+    "phone": "+20 100 000 0010",
+    "password_hash": "student_manager",
+    "status": "active"
+  },
+  {
+    "id": 1011,
+    "role_id": 1011,
+    "full_name": "حسام الدين",
+    "email": "financial_manager@test.com",
+    "phone": "+20 100 000 0011",
+    "password_hash": "financial_manager",
+    "status": "active"
+  },
+  {
+    "id": 1012,
+    "role_id": 1002,
+    "full_name": "فاطمة أحمد",
+    "email": "teacher1@test.com",
+    "phone": "+20 100 000 0012",
+    "password_hash": "teacher1",
+    "status": "active"
+  },
+  {
+    "id": 1013,
+    "role_id": 1002,
+    "full_name": "آية محمد",
+    "email": "teacher2@test.com",
+    "phone": "+20 100 000 0013",
+    "password_hash": "teacher2",
+    "status": "active"
+  },
+  {
+    "id": 1014,
+    "role_id": 1002,
+    "full_name": "سارة خالد",
+    "email": "teacher3@test.com",
+    "phone": "+20 100 000 0014",
+    "password_hash": "teacher3",
+    "status": "active"
+  },
+  {
+    "id": 1015,
+    "role_id": 1002,
+    "full_name": "مريم محمود",
+    "email": "teacher4@test.com",
+    "phone": "+20 100 000 0015",
+    "password_hash": "teacher4",
+    "status": "active"
+  },
+  {
+    "id": 1016,
+    "role_id": 1002,
+    "full_name": "هدى وليد",
+    "email": "teacher5@test.com",
+    "phone": "+20 100 000 0016",
+    "password_hash": "teacher5",
+    "status": "active"
+  },
+  {
+    "id": 1017,
+    "role_id": 1002,
+    "full_name": "نورا سعيد",
+    "email": "teacher6@test.com",
+    "phone": "+20 100 000 0017",
+    "password_hash": "teacher6",
+    "status": "active"
+  },
+  {
+    "id": 1018,
+    "role_id": 1001,
+    "full_name": "يوسف أحمد",
+    "email": "student1@test.com",
+    "phone": "+20 100 000 0018",
+    "password_hash": "student1",
+    "status": "active"
+  },
+  {
+    "id": 1019,
+    "role_id": 1001,
+    "full_name": "عمر محمد",
+    "email": "student2@test.com",
+    "phone": "+20 100 000 0019",
+    "password_hash": "student2",
+    "status": "active"
+  },
+  {
+    "id": 1020,
+    "role_id": 1001,
+    "full_name": "علي خالد",
+    "email": "student3@test.com",
+    "phone": "+20 100 000 0020",
+    "password_hash": "student3",
+    "status": "active"
+  },
+  {
+    "id": 1021,
+    "role_id": 1001,
+    "full_name": "حمزة محمود",
+    "email": "student4@test.com",
+    "phone": "+20 100 000 0021",
+    "password_hash": "student4",
+    "status": "active"
+  },
+  {
+    "id": 1022,
+    "role_id": 1001,
+    "full_name": "بسام وليد",
+    "email": "student5@test.com",
+    "phone": "+20 100 000 0022",
+    "password_hash": "student5",
+    "status": "active"
+  },
+  {
+    "id": 1023,
+    "role_id": 1001,
+    "full_name": "كريم سعيد",
+    "email": "student6@test.com",
+    "phone": "+20 100 000 0023",
+    "password_hash": "student6",
+    "status": "active"
+  },
+  {
+    "id": 1024,
+    "role_id": 1001,
+    "full_name": "مازن ناصر",
+    "email": "student7@test.com",
+    "phone": "+20 100 000 0024",
+    "password_hash": "student7",
+    "status": "active"
+  },
+  {
+    "id": 1025,
+    "role_id": 1001,
+    "full_name": "زياد إبراهيم",
+    "email": "student8@test.com",
+    "phone": "+20 100 000 0025",
+    "password_hash": "student8",
+    "status": "active"
+  },
+  {
+    "id": 1026,
+    "role_id": 1001,
+    "full_name": "فارس عبدالله",
+    "email": "student9@test.com",
+    "phone": "+20 100 000 0026",
+    "password_hash": "student9",
+    "status": "active"
+  },
+  {
+    "id": 1027,
+    "role_id": 1001,
+    "full_name": "رامي مصطفى",
+    "email": "student10@test.com",
+    "phone": "+20 100 000 0027",
+    "password_hash": "student10",
+    "status": "active"
+  },
+  {
+    "id": 1028,
+    "role_id": 1001,
+    "full_name": "سيف الدين",
+    "email": "student11@test.com",
+    "phone": "+20 100 000 0028",
+    "password_hash": "student11",
+    "status": "active"
+  },
+  {
+    "id": 1029,
+    "role_id": 1001,
+    "full_name": "ماهر حسام",
+    "email": "student12@test.com",
+    "phone": "+20 100 000 0029",
+    "password_hash": "student12",
+    "status": "active"
+  }
+]
