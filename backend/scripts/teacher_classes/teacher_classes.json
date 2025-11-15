@@ -1,0 +1,16 @@
+[
+  { "teacher_id": 1001, "class_id": 1001 },
+  { "teacher_id": 1001, "class_id": 1002 },
+  { "teacher_id": 1002, "class_id": 1001 },
+  { "teacher_id": 1002, "class_id": 1003 },
+  { "teacher_id": 1003, "class_id": 1002 },
+  { "teacher_id": 1003, "class_id": 1004 },
+  { "teacher_id": 1004, "class_id": 1003 },
+  { "teacher_id": 1004, "class_id": 1005 },
+  { "teacher_id": 1005, "class_id": 1004 },
+  { "teacher_id": 1005, "class_id": 1006 },
+  { "teacher_id": 1006, "class_id": 1005 },
+  { "teacher_id": 1006, "class_id": 1007 },
+  { "teacher_id": 1001, "class_id": 1008 },
+  { "teacher_id": 1006, "class_id": 1008 }
+]

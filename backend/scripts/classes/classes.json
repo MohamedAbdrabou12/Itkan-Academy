@@ -1,0 +1,90 @@
+[
+  {
+    "id": 1001,
+    "branch_id": 1001,
+    "name": "الصف الأول - الفرع الرئيسي",
+    "schedule": {
+      "sunday": ["08:00"],
+      "tuesday": ["08:00"],
+      "thursday": ["08:00"]
+    },
+    "status": "active"
+  },
+  {
+    "id": 1002,
+    "branch_id": 1001,
+    "name": "الصف الثاني - الفرع الرئيسي",
+    "schedule": {
+      "sunday": ["09:30"],
+      "tuesday": ["08:00"],
+      "thursday": ["09:30"]
+    },
+    "status": "active"
+  },
+  {
+    "id": 1003,
+    "branch_id": 1002,
+    "name": "الصف الأول - فرع حي غرب",
+    "schedule": {
+      "sunday": ["08:00"],
+      "tuesday": ["08:00"],
+      "thursday": ["08:00"]
+    },
+    "status": "active"
+  },
+  {
+    "id": 1004,
+    "branch_id": 1002,
+    "name": "الصف الثاني - فرع حي غرب",
+    "schedule": {
+      "sunday": ["09:30"],
+      "tuesday": ["08:00"],
+      "thursday": ["09:30"]
+    },
+    "status": "active"
+  },
+  {
+    "id": 1005,
+    "branch_id": 1003,
+    "name": "الصف الأول - فرع حي شرق",
+    "schedule": {
+      "saturday": ["08:00"],
+      "monday": ["08:00"],
+      "wednesday": ["08:00"]
+    },
+    "status": "active"
+  },
+  {
+    "id": 1006,
+    "branch_id": 1004,
+    "name": "الصف الأول - فرع مدينة ناصر",
+    "schedule": {
+      "saturday": ["08:00"],
+      "monday": ["08:00"],
+      "wednesday": ["08:00"]
+    },
+    "status": "active"
+  },
+  {
+    "id": 1007,
+    "branch_id": 1005,
+    "name": "الصف الأول - فرع حي الأربعين",
+    "schedule": {
+      "saturday": ["08:00"],
+      "monday": ["08:00"],
+      "wednesday": ["08:00"]
+    },
+    "status": "active"
+  },
+  {
+    "id": 1008,
+    "branch_id": 1006,
+    "name": "الصف الأول - فرع بني سويف الجديدة",
+    "schedule": {
+      "sunday": ["08:00"],
+      "monday": ["08:00"],
+      "wednesday": ["08:00"]
+    },
+    "status": "active"
+  }
+]

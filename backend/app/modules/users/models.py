@@ -119,6 +119,10 @@ class User(Base):
     @property
     def role_name(self) -> Optional[str]:
         return self.role.name if self.role else None
+    
+    @property
+    def role_name_ar(self) -> Optional[str]:
+        return self.role.name_ar if self.role else None
 
     @property
     def branch_name(self) -> Optional[str]:

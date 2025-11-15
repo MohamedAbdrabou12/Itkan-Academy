@@ -20,9 +20,9 @@ async def add_branches(db: AsyncSession):
 
         if not result.scalars().first():
             branches_to_add.append(Branch(**branch_data))
-            print(f"  - Preparing to add Branches data {branch_data['id']}")
+            print(f"  - Preparing to add Branches data {branch_data['name']}")
         else:
-            print(f"  - Branches data {branch_data['id']} already exists, skipping.")
+            print(f"  - Branches data {branch_data['name']} already exists, skipping.")
 
     if branches_to_add:
         db.add_all(branches_to_add)
