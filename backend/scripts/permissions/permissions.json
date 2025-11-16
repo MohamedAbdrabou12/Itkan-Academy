@@ -185,35 +185,19 @@
   },
   {
     "id": 1024,
-    "code": "reports.branch.*",
-    "name": "Full Branch Reports Management",
+    "code": "reports.branches.*",
+    "name": "Full Branches Reports Management",
     "name_ar": "إدارة تقارير الفروع الكاملة",
-    "description": "Complete control over branch reports",
+    "description": "Complete control over branches reports",
     "description_ar": "التحكم الكامل في تقارير الفروع"
   },
   {
     "id": 1025,
-    "code": "reports.branch.view",
-    "name": "View Branch Reports",
+    "code": "reports.branches.view",
+    "name": "View Branches Reports",
     "name_ar": "عرض تقارير الفروع",
-    "description": "Access to branch performance reports",
+    "description": "Access to branches performance reports",
     "description_ar": "الوصول لتقارير أداء الفروع"
-  },
-  {
-    "id": 1026,
-    "code": "system.permissions.*",
-    "name": "Full Permissions Management",
-    "name_ar": "إدارة الصلاحيات الكاملة",
-    "description": "Complete control over permissions management",
-    "description_ar": "التحكم الكامل في إدارة الصلاحيات"
-  },
-  {
-    "id": 1027,
-    "code": "system.permissions.manage",
-    "name": "Manage Permissions",
-    "name_ar": "إدارة الصلاحيات",
-    "description": "Giving permissions to supervisors",
-    "description_ar": "منح الصلاحيات للمشرفين"
   },
   {
     "id": 1028,
@@ -702,5 +686,37 @@
     "name_ar": "إنشاء التقارير المالية",
     "description": "Generate financial reports for students, teachers, school",
     "description_ar": "إنشاء تقارير مالية للطلاب والمعلمين والمدرسة"
+  },
+  {
+    "id": 1089,
+    "code": "system.roles.*",
+    "name": "Full Roles Management",
+    "name_ar": "إدارة الأدوار الكاملة",
+    "description": "Complete control over roles management",
+    "description_ar": "التحكم الكامل في إدارة الأدوار"
+  },
+  {
+    "id": 1090,
+    "code": "system.roles.manage",
+    "name": "Manage Roles",
+    "name_ar": "إدارة الأدوار",
+    "description": "Create, edit and delete system roles",
+    "description_ar": "إنشاء وتعديل وحذف أدوار النظام"
+  },
+  {
+    "id": 1091,
+    "code": "system.role_permissions.*",
+    "name": "Full Role Permissions Management",
+    "name_ar": "إدارة صلاحيات الأدوار الكاملة",
+    "description": "Complete control over role permissions",
+    "description_ar": "التحكم الكامل في صلاحيات الأدوار"
+  },
+  {
+    "id": 1092,
+    "code": "system.role_permissions.manage",
+    "name": "Manage Role Permissions",
+    "name_ar": "إدارة صلاحيات الأدوار",
+    "description": "Assign and manage permissions for roles",
+    "description_ar": "تعيين وإدارة الصلاحيات للأدوار"
   }
 ]
