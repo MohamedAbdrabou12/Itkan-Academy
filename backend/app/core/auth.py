@@ -137,7 +137,9 @@ class AuthService:
             "user_id": user.id,
             "email": user.email,
             "role_name": getattr(user.role, "name", None),
-            "branch_ids": [b.id for b in getattr(user, "branches", [])]
+            "branches": [
+                {"id": b.id, "name": b.name} for b in getattr(user, "branches", [])
+            ]
             if getattr(user, "branches", None)
             else [],
         }
