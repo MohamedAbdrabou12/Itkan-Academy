@@ -200,22 +200,6 @@
     "description_ar": "الوصول لتقارير أداء الفروع"
   },
   {
-    "id": 1028,
-    "code": "system.branches.*",
-    "name": "Full Branches Management",
-    "name_ar": "إدارة الفروع الكاملة",
-    "description": "Complete control over branches",
-    "description_ar": "التحكم الكامل في الفروع"
-  },
-  {
-    "id": 1029,
-    "code": "system.branches.manage",
-    "name": "Manage Branches",
-    "name_ar": "إدارة الفروع",
-    "description": "Full management of branches",
-    "description_ar": "الإدارة الكاملة للفروع"
-  },
-  {
     "id": 1030,
     "code": "communication.announcements.*",
     "name": "Full Announcements Management",
@@ -681,10 +665,10 @@
   },
   {
     "id": 1088,
-    "code": "reports.financial.generate",
-    "name": "Generate Financial Reports",
+    "code": "reports.financial.add",
+    "name": "Add Financial Reports",
     "name_ar": "إنشاء التقارير المالية",
-    "description": "Generate financial reports for students, teachers, school",
+    "description": "Add financial reports for students, teachers, school",
     "description_ar": "إنشاء تقارير مالية للطلاب والمعلمين والمدرسة"
   },
   {
@@ -697,14 +681,30 @@
   },
   {
     "id": 1090,
-    "code": "system.roles.manage",
-    "name": "Manage Roles",
-    "name_ar": "إدارة الأدوار",
-    "description": "Create, edit and delete system roles",
-    "description_ar": "إنشاء وتعديل وحذف أدوار النظام"
+    "code": "system.roles.add",
+    "name": "Add Roles",
+    "name_ar": "إضافة الأدوار",
+    "description": "Create new system roles",
+    "description_ar": "إنشاء أدوار نظام جديدة"
   },
   {
     "id": 1091,
+    "code": "system.roles.edit",
+    "name": "Edit Roles",
+    "name_ar": "تعديل الأدوار",
+    "description": "Modify existing system roles",
+    "description_ar": "تعديل أدوار النظام الموجودة"
+  },
+  {
+    "id": 1092,
+    "code": "system.roles.delete",
+    "name": "Delete Roles",
+    "name_ar": "حذف الأدوار",
+    "description": "Remove system roles",
+    "description_ar": "حذف أدوار النظام"
+  },
+  {
+    "id": 1093,
     "code": "system.role_permissions.*",
     "name": "Full Role Permissions Management",
     "name_ar": "إدارة صلاحيات الأدوار الكاملة",
@@ -712,11 +712,51 @@
     "description_ar": "التحكم الكامل في صلاحيات الأدوار"
   },
   {
-    "id": 1092,
+    "id": 1094,
     "code": "system.role_permissions.manage",
     "name": "Manage Role Permissions",
     "name_ar": "إدارة صلاحيات الأدوار",
     "description": "Assign and manage permissions for roles",
     "description_ar": "تعيين وإدارة الصلاحيات للأدوار"
+  },
+  {
+    "id": 1095,
+    "code": "system.branches.*",
+    "name": "Full Branches Management",
+    "name_ar": "إدارة الفروع الكاملة",
+    "description": "Complete control over branches",
+    "description_ar": "التحكم الكامل في الفروع"
+  },
+  {
+    "id": 1096,
+    "code": "system.branches.add",
+    "name": "Add Branches",
+    "name_ar": "إضافة الفروع",
+    "description": "Create new branches",
+    "description_ar": "إنشاء فروع جديدة"
+  },
+  {
+    "id": 1097,
+    "code": "system.branches.edit",
+    "name": "Edit Branches",
+    "name_ar": "تعديل الفروع",
+    "description": "Modify existing branches",
+    "description_ar": "تعديل الفروع الموجودة"
+  },
+  {
+    "id": 1098,
+    "code": "system.users.*",
+    "name": "Full Users Management",
+    "name_ar": "إدارة المستخدمين الكاملة",
+    "description": "Complete control over users",
+    "description_ar": "التحكم الكامل في المستخدمين"
+  },
+  {
+    "id": 1099,
+    "code": "system.users.edit",
+    "name": "Update Users",
+    "name_ar": "تعديل المستخدمين",
+    "description": "Modify user information",
+    "description_ar": "تعديل معلومات المستخدمين"
   }
 ]
