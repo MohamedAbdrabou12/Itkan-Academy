@@ -125,13 +125,17 @@ class AuthService:
 
     @staticmethod
     def generate_access_token_for_user(user: User) -> str:
-        """
-        Generate a JWT access token that includes:
-          - sub / user_id
-          - email
-          - role_name
-          - branch_ids (list of all allowed branches)
-        """
+        permission_codes = []
+        if user.role and user.role.permission_associations:
+            permission_codes = [
+                {
+                    "id": assoc.permission.id,
+                    "code": assoc.permission.code,
+                    "description": assoc.permission.description,
+                }
+                for assoc in user.role.permission_associations
+                if assoc.permission
+            ]
         token_data = {
             "sub": str(user.id),
             "user_id": user.id,
@@ -142,5 +146,6 @@ class AuthService:
             ]
             if getattr(user, "branches", None)
             else [],
+            "permissions": permission_codes,
         }
         return create_access_token(token_data)
