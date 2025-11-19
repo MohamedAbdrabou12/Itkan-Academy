@@ -1,14 +1,14 @@
-# backend/app/modules/students/models.py
 from __future__ import annotations
+
 from datetime import date, datetime
 from typing import TYPE_CHECKING, Dict, List, Optional
+
 from app.db.base import Base
-from sqlalchemy import JSON, Date, DateTime, ForeignKey, String, Boolean
+from sqlalchemy import JSON, Boolean, Date, DateTime, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 if TYPE_CHECKING:
     from app.modules.attendance.models import Attendance
-    from app.modules.branches.models import Branch  # noqa
     from app.modules.classes.models import Class
     from app.modules.evaluations.models import DailyEvaluation
     from app.modules.financial.models.invoice import Invoice

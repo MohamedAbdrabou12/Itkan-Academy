@@ -1,9 +1,8 @@
-# backend/app/core/utils.py
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Annotated, Optional
 
 from app.core.config import settings
-from fastapi import HTTPException, status
+from fastapi import Header, HTTPException, status
 from fastapi.security import HTTPBearer
 from jose import JWTError, jwt  # type: ignore
 
@@ -61,3 +60,21 @@ def verify_password_reset_token(token: str) -> int:
         return int(sub)
     except (TypeError, ValueError):
         raise credentials_exception
+
+
+async def get_active_branch(
+    x_branch_id: Annotated[Optional[str], Header(alias="X-Branch-ID")] = None,
+) -> int:
+    if not x_branch_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="X-Branch-ID header is required",
+        )
+
+    try:
+        return int(x_branch_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid branch ID format - must be an integer",
+        )

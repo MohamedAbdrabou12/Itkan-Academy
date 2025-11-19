@@ -1,9 +1,10 @@
 from __future__ import annotations
 from datetime import datetime
 from enum import Enum
-from typing import List, Optional, Dict, TYPE_CHECKING
+from typing import List, Dict, TYPE_CHECKING
 
-from sqlalchemy import ForeignKey, String, JSON, DateTime
+from sqlalchemy import ForeignKey, String, DateTime
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
@@ -30,10 +31,11 @@ class Class(Base):
         ForeignKey("branches.id", ondelete="CASCADE"), nullable=False
     )
     name: Mapped[str] = mapped_column(String(100), nullable=False)
-    schedule: Mapped[Optional[Dict]] = mapped_column(JSON)
+    schedule: Mapped[Dict] = mapped_column(JSONB)
     status: Mapped[ClassStatus] = mapped_column(
         String(10), default=ClassStatus.active, nullable=False
     )
+    evaluation_config: Mapped[List[Dict]] = mapped_column(JSONB)
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=datetime.utcnow
@@ -55,16 +57,16 @@ class Class(Base):
         back_populates="classes",
         lazy="selectin",
     )
-    branch: Mapped[Branch] = relationship(
+    branch: Mapped["Branch"] = relationship(
         "Branch", back_populates="classes", lazy="selectin"
     )
-    attendance_records: Mapped[List[Attendance]] = relationship(
+    attendance_records: Mapped[List["Attendance"]] = relationship(
         "Attendance", back_populates="class_", lazy="selectin"
     )
-    daily_evaluations: Mapped[List[DailyEvaluation]] = relationship(
+    daily_evaluations: Mapped[List["DailyEvaluation"]] = relationship(
         "DailyEvaluation", back_populates="class_", lazy="selectin"
     )
-    teachers: Mapped[List[Teacher]] = relationship(
+    teachers: Mapped[List["Teacher"]] = relationship(
         "Teacher",
         secondary="teacher_classes",
         back_populates="classes",
