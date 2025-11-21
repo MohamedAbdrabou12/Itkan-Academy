@@ -1,33 +1,30 @@
-from datetime import date, datetime
-from typing import Optional
+from datetime import date
+from .models import AttendanceStatus
+from typing import List, Dict
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 
-class DailyEvaluationBase(BaseModel):
-    student_id: int
+class EvaluationGradeCreate(BaseModel):
+    name: str
+    grade: int
+
+
+class StudentEvaluationCreate(BaseModel):
+    status: AttendanceStatus
+    notes: str = ""
+    evaluations: List[EvaluationGradeCreate] = []
+
+
+class BulkEvaluationCreate(BaseModel):
     class_id: int
-    date: date
-    memorization_percent: Optional[float] = None
-    behavior_score: Optional[int] = None
-    notes: Optional[str] = None
-    recorded_by: Optional[int] = None
+    date: str  # YYYY-MM-DD
+    records: Dict[int, StudentEvaluationCreate]  # student_id -> evaluation data
 
-
-class DailyEvaluationCreate(DailyEvaluationBase):
-    pass
-
-
-class DailyEvaluationUpdate(BaseModel):
-    memorization_percent: Optional[float] = None
-    behavior_score: Optional[int] = None
-    notes: Optional[str] = None
-    recorded_by: Optional[int] = None
-
-
-class DailyEvaluationRead(DailyEvaluationBase):
-    id: int
-    created_at: datetime
-
-    class Config:
-        from_attributes = True
+    @field_validator("date")
+    def validate_date_not_future(cls, v):
+        """Ensure date is not in the future"""
+        eval_date = date.fromisoformat(v)
+        if eval_date > date.today():
+            raise ValueError("Date cannot be in the future")
+        return v

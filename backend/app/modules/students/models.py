@@ -9,7 +9,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 if TYPE_CHECKING:
     from app.modules.classes.models import Class
-    from app.modules.evaluations.models import DailyEvaluation
+    from app.modules.evaluations.models import Evaluation
     from app.modules.financial.models.invoice import Invoice
     from app.modules.users.models import User
 
@@ -73,8 +73,8 @@ class Student(Base):
         back_populates="students",
         lazy="selectin",
     )
-    evaluations: Mapped[List["DailyEvaluation"]] = relationship(
-        "DailyEvaluation", back_populates="student", lazy="selectin"
+    daily_evaluations: Mapped[List["Evaluation"]] = relationship(
+        "Evaluation", back_populates="student", lazy="selectin"
     )
     invoices: Mapped[List["Invoice"]] = relationship(
         "Invoice", back_populates="student", lazy="selectin"

@@ -30,7 +30,7 @@ class AttendanceStatus(Enum):
     EXCUSED = "excused"
 
 
-class DailyEvaluation(Base):
+class Evaluation(Base):
     __tablename__ = "daily_evaluations"
     __table_args__ = (
         UniqueConstraint(
@@ -67,7 +67,7 @@ class DailyEvaluation(Base):
 
     # Relationships
     student: Mapped[Student] = relationship(
-        "Student", back_populates="evaluations", lazy="selectin"
+        "Student", back_populates="daily_evaluations", lazy="selectin"
     )
     class_: Mapped[Class] = relationship(
         "Class", back_populates="daily_evaluations", lazy="selectin"

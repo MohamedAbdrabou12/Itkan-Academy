@@ -3,7 +3,7 @@ from app.api.v1.auth.auth import auth_router
 from app.modules.audits.router import audit_log_router
 from app.modules.branches.router import branch_router
 from app.modules.classes.router import classes_router
-from app.modules.evaluations.router import daily_evaluation_router
+from app.modules.evaluations.router import evaluations_router
 from app.modules.exams.router.exam import exam_router
 from app.modules.exams.router.exam_answer import exam_answers_router
 from app.modules.exams.router.exam_attempt import exam_attempts_router
@@ -35,7 +35,7 @@ api_router.include_router(branch_router, tags=["Branches"])
 api_router.include_router(classes_router, tags=["Classes"])
 api_router.include_router(staff_router, tags=["Staff"])
 api_router.include_router(students_router, tags=["Students"])
-api_router.include_router(daily_evaluation_router, tags=["Daily Evaluations"])
+api_router.include_router(evaluations_router, tags=["Daily Evaluations"])
 api_router.include_router(audit_log_router, tags=["Audit Logs"])
 api_router.include_router(question_bank_router, tags=["Question Bank"])
 api_router.include_router(notification_router, tags=["Notifications"])

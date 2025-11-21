@@ -13,7 +13,7 @@ from app.db.base import Base
 if TYPE_CHECKING:
     from app.modules.branches.models import Branch  # noqa: F401
     from app.modules.students.models import Student, StudentClass  # noqa: F401
-    from app.modules.evaluations.models import DailyEvaluation  # noqa: F401
+    from app.modules.evaluations.models import Evaluation  # noqa: F401
     from app.modules.teachers.models import Teacher, TeacherClass  # noqa: F401
 
 
@@ -59,8 +59,8 @@ class Class(Base):
     branch: Mapped["Branch"] = relationship(
         "Branch", back_populates="classes", lazy="selectin"
     )
-    daily_evaluations: Mapped[List["DailyEvaluation"]] = relationship(
-        "DailyEvaluation", back_populates="class_", lazy="selectin"
+    daily_evaluations: Mapped[List["Evaluation"]] = relationship(
+        "Evaluation", back_populates="class_", lazy="selectin"
     )
     teachers: Mapped[List["Teacher"]] = relationship(
         "Teacher",
