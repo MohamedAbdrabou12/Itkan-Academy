@@ -1,6 +1,5 @@
 # backend/app/api/v1/__init__.py
 from app.api.v1.auth.auth import auth_router
-from app.modules.attendance.router import attendance_router
 from app.modules.audits.router import audit_log_router
 from app.modules.branches.router import branch_router
 from app.modules.classes.router import classes_router
@@ -36,7 +35,6 @@ api_router.include_router(branch_router, tags=["Branches"])
 api_router.include_router(classes_router, tags=["Classes"])
 api_router.include_router(staff_router, tags=["Staff"])
 api_router.include_router(students_router, tags=["Students"])
-api_router.include_router(attendance_router, tags=["Attendance"])
 api_router.include_router(daily_evaluation_router, tags=["Daily Evaluations"])
 api_router.include_router(audit_log_router, tags=["Audit Logs"])
 api_router.include_router(question_bank_router, tags=["Question Bank"])

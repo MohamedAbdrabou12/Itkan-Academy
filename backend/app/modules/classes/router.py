@@ -13,10 +13,12 @@ from app.modules.classes.schemas import (
     ClassUpdate,
 )
 from app.modules.students.models import Student, StudentClass
+from app.modules.teachers.models import Teacher
 from app.modules.users.models import User
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 classes_router = APIRouter(prefix="/classes", tags=["Classes"])
 
@@ -36,10 +38,6 @@ async def get_teachers_classes_with_header(
     active_branch_id: int = Depends(get_active_branch),
 ):
     try:
-        from app.modules.teachers.models import Teacher
-        from sqlalchemy import select
-        from sqlalchemy.orm import selectinload
-
         teacher_query = (
             select(Teacher)
             .where(Teacher.user_id == user.id)

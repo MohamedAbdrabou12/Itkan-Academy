@@ -2,17 +2,11 @@ from datetime import datetime
 from typing import List, Optional, Dict
 from pydantic import BaseModel
 
-
-class EvaluationCriteria(BaseModel):
-    name: str
-    max_grade: int
-
-
 class ClassBase(BaseModel):
     branch_id: int
     name: str
     schedule: Dict
-    evaluation_config: List[EvaluationCriteria]
+    evaluation_config: List[str]
 
 
 class ClassCreate(ClassBase):

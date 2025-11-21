@@ -9,11 +9,7 @@
       "thursday": ["08:00"]
     },
     "status": "active",
-    "evaluation_config": [
-      { "name": "حفظ", "max_grade": 10 },
-      { "name": "مراجعة", "max_grade": 10 },
-      { "name": "سلوك", "max_grade": 10 }
-    ]
+    "evaluation_config": ["حفظ", "مراجعة", "سلوك"]
   },
   {
     "id": 1002,
@@ -25,11 +21,7 @@
       "thursday": ["09:30"]
     },
     "status": "active",
-    "evaluation_config": [
-      { "name": "حفظ", "max_grade": 10 },
-      { "name": "مراجعة", "max_grade": 10 },
-      { "name": "سلوك", "max_grade": 10 }
-    ]
+    "evaluation_config": ["حفظ", "مراجعة", "سلوك"]
   },
   {
     "id": 1003,
@@ -41,11 +33,7 @@
       "thursday": ["08:00"]
     },
     "status": "active",
-    "evaluation_config": [
-      { "name": "حفظ", "max_grade": 10 },
-      { "name": "مراجعة", "max_grade": 10 },
-      { "name": "سلوك", "max_grade": 10 }
-    ]
+    "evaluation_config": ["حفظ", "مراجعة", "سلوك"]
   },
   {
     "id": 1004,
@@ -57,11 +45,7 @@
       "thursday": ["09:30"]
     },
     "status": "active",
-    "evaluation_config": [
-      { "name": "حفظ", "max_grade": 10 },
-      { "name": "مراجعة", "max_grade": 10 },
-      { "name": "سلوك", "max_grade": 10 }
-    ]
+    "evaluation_config": ["حفظ", "مراجعة", "سلوك"]
   },
   {
     "id": 1005,
@@ -73,11 +57,7 @@
       "wednesday": ["08:00"]
     },
     "status": "active",
-    "evaluation_config": [
-      { "name": "حفظ", "max_grade": 10 },
-      { "name": "مراجعة", "max_grade": 10 },
-      { "name": "سلوك", "max_grade": 10 }
-    ]
+    "evaluation_config": ["حفظ", "مراجعة", "سلوك"]
   },
   {
     "id": 1006,
@@ -89,11 +69,7 @@
       "wednesday": ["08:00"]
     },
     "status": "active",
-    "evaluation_config": [
-      { "name": "حفظ", "max_grade": 10 },
-      { "name": "مراجعة", "max_grade": 10 },
-      { "name": "سلوك", "max_grade": 10 }
-    ]
+    "evaluation_config": ["حفظ", "مراجعة", "سلوك"]
   },
   {
     "id": 1007,
@@ -105,11 +81,7 @@
       "wednesday": ["08:00"]
     },
     "status": "active",
-    "evaluation_config": [
-      { "name": "حفظ", "max_grade": 10 },
-      { "name": "مراجعة", "max_grade": 10 },
-      { "name": "سلوك", "max_grade": 10 }
-    ]
+    "evaluation_config": ["حفظ", "مراجعة", "سلوك"]
   },
   {
     "id": 1008,
@@ -121,10 +93,6 @@
       "wednesday": ["08:00"]
     },
     "status": "active",
-    "evaluation_config": [
-      { "name": "حفظ", "max_grade": 10 },
-      { "name": "مراجعة", "max_grade": 10 },
-      { "name": "سلوك", "max_grade": 10 }
-    ]
+    "evaluation_config": ["حفظ", "مراجعة", "سلوك"]
   }
 ]

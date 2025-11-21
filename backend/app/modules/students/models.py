@@ -8,7 +8,6 @@ from sqlalchemy import JSON, Boolean, Date, DateTime, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 if TYPE_CHECKING:
-    from app.modules.attendance.models import Attendance
     from app.modules.classes.models import Class
     from app.modules.evaluations.models import DailyEvaluation
     from app.modules.financial.models.invoice import Invoice
@@ -73,10 +72,6 @@ class Student(Base):
         secondary="student_classes",
         back_populates="students",
         lazy="selectin",
-    )
-
-    attendance_records: Mapped[List["Attendance"]] = relationship(
-        "Attendance", back_populates="student", lazy="selectin"
     )
     evaluations: Mapped[List["DailyEvaluation"]] = relationship(
         "DailyEvaluation", back_populates="student", lazy="selectin"
