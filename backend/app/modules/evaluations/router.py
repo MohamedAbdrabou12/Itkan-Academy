@@ -1,17 +1,18 @@
 from datetime import date
 from operator import and_
 
-from sqlalchemy import select
-
 from app.core.auth import get_current_user
 from app.db.session import get_db
 from app.modules.classes.models import Class
+from app.modules.evaluations.models import AttendanceStatus, Evaluation
 from app.modules.evaluations.schemas import BulkEvaluationCreate
 from app.modules.users.models import User
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
-from app.modules.evaluations.models import AttendanceStatus, Evaluation
+from .constants import MAX_GRADE, MIN_GRADE
 
 evaluations_router = APIRouter(prefix="/evaluations", tags=["Evaluations"])
 
@@ -44,43 +45,73 @@ async def create_bulk_evaluations(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    print(bulk_data.date, '🔥')
     eval_date = date.fromisoformat(bulk_data.date)
 
-    class_query = select(Class).where(Class.id == bulk_data.class_id)
+    # Get class with relationships
+    class_query = (
+        select(Class)
+        .where(Class.id == bulk_data.class_id)
+        .options(selectinload(Class.branch), selectinload(Class.students))
+    )
     class_result = await db.execute(class_query)
     class_obj = class_result.scalar_one_or_none()
 
-    permission_exception = HTTPException(
-        status_code=status.HTTP_403_FORBIDDEN,
-        detail="You don't have access to this class",
+    if not class_obj:
+        raise HTTPException(status_code=404, detail="Class not found")
+
+    # DEBUG
+    print(f"User branches: {[b.id for b in current_user.branches]}")
+    print(f"Class branch_id: {class_obj.branch_id}")
+
+    # Permission checks
+    role = current_user.role_name.lower() if current_user.role_name else None
+
+    # Check branch access for all roles - USING THE CONVENIENCE RELATIONSHIP
+    has_branch_access = any(
+        branch.id == class_obj.branch_id for branch in current_user.branches
     )
 
-    if not class_obj:
-        raise permission_exception
+    if not has_branch_access:
+        user_branch_ids = [branch.id for branch in current_user.branches]
+        raise HTTPException(
+            status_code=403,
+            detail=f"No access to this branch. User has access to branches: {user_branch_ids}, class requires branch: {class_obj.branch_id}",
+        )
+    
+    # TODO: ensure date is in class schedule
 
-    role = current_user.role_name.lower() if current_user.role_name else None
+    # For teachers, also check class access - USING THE CONVENIENCE RELATIONSHIP
     if role == "teacher" and current_user.teacher:
-        for class_ in current_user.teacher.classes:
-            if class_.id == class_obj.id:
-                break
-        else:
-            raise permission_exception
-    elif role != "branch supervisor":
-        raise permission_exception
+        has_class_access = any(
+            class_.id == class_obj.id for class_ in current_user.teacher.classes
+        )
 
-    for branch in current_user.branches:
-        if branch.id == class_obj.branch_id:
-            break
-    else:
-        raise permission_exception
-
-    for student in class_obj.students:
-        record = bulk_data.records.get(student.id)
-        if record is None:
+        if not has_class_access:
+            teacher_class_ids = [class_.id for class_ in current_user.teacher.classes]
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="Missing student(s)"
+                status_code=403,
+                detail=f"No access to this class. Teacher has access to classes: {teacher_class_ids}, requested class: {class_obj.id}",
             )
 
+    # For other non-supervisor roles, deny access
+    elif role != "branch supervisor":
+        raise HTTPException(status_code=403, detail="Insufficient permissions")
+
+    # Verify all students in the request belong to the class
+    student_ids_in_class = {student.id for student in class_obj.students}
+    missing_students = []
+    for student_id in bulk_data.records.keys():
+        if student_id not in student_ids_in_class:
+            missing_students.append(student_id)
+
+    if missing_students:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Students {missing_students} are not in this class",
+        )
+
+    # Check for existing evaluations for this class and date
     existing_eval_query = select(Evaluation).where(
         and_(
             Evaluation.class_id == bulk_data.class_id,
@@ -91,21 +122,36 @@ async def create_bulk_evaluations(
     existing_evals = existing_eval_result.scalars().all()
     existing_student_ids = {eval.student_id for eval in existing_evals}
 
+    # Check if any student already has evaluation for this date
+    already_evaluated_students = []
+    for student_id in bulk_data.records.keys():
+        if student_id in existing_student_ids:
+            already_evaluated_students.append(student_id)
+
+    if already_evaluated_students:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Students {already_evaluated_students} already evaluated for this date",
+        )
+
     evaluations_to_create = []
 
     for student_id, eval_data in bulk_data.records.items():
-        # Skip if evaluation already exists for this student/date
-        if student_id in existing_student_ids:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Already evaluated student",
-            )
+        # Handle evaluations - use empty list if None
+        evaluation_grades = []
+        if eval_data.evaluations is not None:
+            evaluation_grades = [
+                {"name": grade.name, "grade": grade.grade}
+                for grade in eval_data.evaluations
+            ]
 
-        # Prepare evaluation grades
-        evaluation_grades = [
-            {"name": grade.name, "grade": grade.grade}
-            for grade in eval_data.evaluations
-        ]
+            # Validate grades are within range (0-10)
+            for grade_data in evaluation_grades:
+                if not (MIN_GRADE <= grade_data["grade"] <= MAX_GRADE):
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail=f"Grade for {grade_data['name']} must be between 0 and 10",
+                    )
 
         # Create evaluation object
         evaluation = Evaluation(
@@ -119,14 +165,31 @@ async def create_bulk_evaluations(
         )
         evaluations_to_create.append(evaluation)
 
-    # 5. Bulk create evaluations
+    # Bulk create evaluations
     if evaluations_to_create:
-        db.add_all(evaluations_to_create)
-        await db.commit()
+        try:
+            db.add_all(evaluations_to_create)
+            await db.commit()
 
-        # Refresh to get the created objects with IDs
-        for evaluation in evaluations_to_create:
-            await db.refresh(evaluation)
+            # Refresh to get the created objects with IDs
+            for evaluation in evaluations_to_create:
+                await db.refresh(evaluation)
+
+        except Exception as e:
+            await db.rollback()
+            # Log the actual error for debugging
+            print(f"Error creating evaluations: {str(e)}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Error creating evaluations",
+            )
+
+    return {
+        "message": "Evaluations created successfully",
+        "count": len(evaluations_to_create),
+        "date": eval_date.isoformat(),
+        "class_id": bulk_data.class_id,
+    }
 
 
 # @evaluations_router.post(
