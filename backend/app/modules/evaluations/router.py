@@ -92,15 +92,14 @@ async def create_bulk_evaluations(
     existing_student_ids = {eval.student_id for eval in existing_evals}
 
     evaluations_to_create = []
-    errors = []
 
     for student_id, eval_data in bulk_data.records.items():
         # Skip if evaluation already exists for this student/date
         if student_id in existing_student_ids:
-            errors.append(
-                f"Evaluation already exists for student {student_id} on {bulk_data.date}"
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Already evaluated student",
             )
-            continue
 
         # Prepare evaluation grades
         evaluation_grades = [
