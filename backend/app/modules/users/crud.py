@@ -100,6 +100,7 @@ class UserCRUD:
             .where(User.id == user_id)
             .options(
                 selectinload(User.role),
+                selectinload(User.teacher),
                 selectinload(User.branch_links).joinedload(UserBranch.branch),
             )
         )
