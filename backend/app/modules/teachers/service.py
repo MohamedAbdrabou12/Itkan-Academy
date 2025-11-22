@@ -57,9 +57,14 @@ class TeacherService:
         }
 
     @staticmethod
-    async def list_teachers(db: AsyncSession) -> List[Dict]:
-        teachers = await teacher_crud.get_all(db)
-        return [await TeacherService._serialize_teacher(t) for t in teachers]
+    async def list_teachers(
+        db: AsyncSession,
+        search: Optional[str] = None,
+        sort_by: Optional[str] = None,
+        sort_order: Optional[str] = None,
+    ) -> List[Dict]:
+        teachers = await teacher_crud.get_all(db, search, sort_by, sort_order)
+        return teachers
 
     @staticmethod
     async def get_teacher(db: AsyncSession, teacher_id: int) -> Dict:
