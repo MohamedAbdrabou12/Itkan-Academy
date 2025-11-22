@@ -1,15 +1,18 @@
-# backend/app/modules/students/router.py
 from typing import Optional
-from fastapi import APIRouter, Depends, Query
-from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi_pagination import Page
 
-from app.db.session import get_db
-from app.modules.students.schemas import StudentRead, StudentCreate, StudentUpdate
-from app.modules.students.service import StudentService
-from app.core.authorization import require_permission
 from app.core.auth import get_current_user
+from app.core.authorization import require_permission
+from app.db.session import get_db
+from app.modules.students.schemas import (
+    StudentCreate,
+    StudentRead,
+    StudentUpdate,
+)
+from app.modules.students.service import StudentService
 from app.modules.users.models import User
+from fastapi import APIRouter, Depends, Query
+from fastapi_pagination import Page
+from sqlalchemy.ext.asyncio import AsyncSession
 
 students_router = APIRouter(prefix="/students", tags=["Students"])
 

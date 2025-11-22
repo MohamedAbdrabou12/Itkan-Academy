@@ -16,10 +16,9 @@ from app.modules.audits.models import AuditLog  # noqa
 from app.modules.classes import models  # noqa
 from app.modules.students import models  # noqa
 from app.modules.audits import models  # noqa
-from app.modules.attendance import models  # noqa
 from app.modules.notifications import models  # noqa
 from app.modules.question_bank import models  # noqa
-from app.modules.evaluations.models import DailyEvaluation  # noqa
+from app.modules.evaluations.models import Evaluation  # noqa
 from app.modules.staff import models  # noqa
 from app.modules.exams.models.exam_attempt import ExamAttempt  # noqa
 from app.modules.exams.models.exam_answer import ExamAnswer  # noqa

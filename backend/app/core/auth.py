@@ -104,7 +104,7 @@ async def get_current_user(
         raise credentials_exception
 
     # Attach branch_ids for middleware usage
-    user.branch_ids = payload.get("branch_ids", [])
+    user.branch_links = payload.get("branch_ids", [])
     return user
 
 

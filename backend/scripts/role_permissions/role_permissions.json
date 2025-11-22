@@ -33,10 +33,6 @@
   },
   {
     "role_id": 1002,
-    "permission_id": 1017
-  },
-  {
-    "role_id": 1002,
     "permission_id": 1010
   },
   {
@@ -46,6 +42,10 @@
   {
     "role_id": 1002,
     "permission_id": 1019
+  },
+  {
+    "role_id": 1002,
+    "permission_id": 1108
   },
   {
     "role_id": 1003,
@@ -61,27 +61,31 @@
   },
   {
     "role_id": 1003,
-    "permission_id": 1089
+    "permission_id": 1145
   },
   {
     "role_id": 1003,
-    "permission_id": 1090
+    "permission_id": 1146
   },
   {
     "role_id": 1003,
-    "permission_id": 1091
+    "permission_id": 1147
   },
   {
     "role_id": 1003,
-    "permission_id": 1092
+    "permission_id": 1148
   },
   {
     "role_id": 1003,
-    "permission_id": 1093
+    "permission_id": 1149
   },
   {
     "role_id": 1003,
-    "permission_id": 1095
+    "permission_id": 1151
+  },
+  {
+    "role_id": 1003,
+    "permission_id": 1154
   },
   {
     "role_id": 1004,
@@ -101,11 +105,7 @@
   },
   {
     "role_id": 1006,
-    "permission_id": 1033
-  },
-  {
-    "role_id": 1006,
-    "permission_id": 1035
+    "permission_id": 1032
   },
   {
     "role_id": 1006,
@@ -113,11 +113,15 @@
   },
   {
     "role_id": 1006,
-    "permission_id": 1039
+    "permission_id": 1042
   },
   {
     "role_id": 1006,
-    "permission_id": 1041
+    "permission_id": 1047
+  },
+  {
+    "role_id": 1006,
+    "permission_id": 1049
   },
   {
     "role_id": 1006,
@@ -125,99 +129,95 @@
   },
   {
     "role_id": 1006,
-    "permission_id": 1043
+    "permission_id": 1051
   },
   {
     "role_id": 1006,
-    "permission_id": 1045
+    "permission_id": 1056
   },
   {
     "role_id": 1006,
-    "permission_id": 1046
-  },
-  {
-    "role_id": 1007,
-    "permission_id": 1047
-  },
-  {
-    "role_id": 1007,
-    "permission_id": 1049
-  },
-  {
-    "role_id": 1007,
-    "permission_id": 1050
-  },
-  {
-    "role_id": 1008,
-    "permission_id": 1052
-  },
-  {
-    "role_id": 1008,
-    "permission_id": 1053
-  },
-  {
-    "role_id": 1008,
-    "permission_id": 1055
-  },
-  {
-    "role_id": 1008,
-    "permission_id": 1057
-  },
-  {
-    "role_id": 1009,
-    "permission_id": 1059
-  },
-  {
-    "role_id": 1009,
-    "permission_id": 1033
-  },
-  {
-    "role_id": 1009,
-    "permission_id": 1039
-  },
-  {
-    "role_id": 1009,
     "permission_id": 1061
   },
   {
-    "role_id": 1009,
-    "permission_id": 1063
+    "role_id": 1007,
+    "permission_id": 1001
   },
   {
-    "role_id": 1009,
+    "role_id": 1007,
     "permission_id": 1065
   },
   {
-    "role_id": 1009,
-    "permission_id": 1067
+    "role_id": 1007,
+    "permission_id": 1070
   },
   {
-    "role_id": 1010,
-    "permission_id": 1069
-  },
-  {
-    "role_id": 1010,
+    "role_id": 1008,
     "permission_id": 1071
   },
   {
-    "role_id": 1010,
-    "permission_id": 1073
+    "role_id": 1008,
+    "permission_id": 1074
+  },
+  {
+    "role_id": 1008,
+    "permission_id": 1076
+  },
+  {
+    "role_id": 1009,
+    "permission_id": 1078
+  },
+  {
+    "role_id": 1009,
+    "permission_id": 1032
+  },
+  {
+    "role_id": 1009,
+    "permission_id": 1047
+  },
+  {
+    "role_id": 1009,
+    "permission_id": 1083
+  },
+  {
+    "role_id": 1009,
+    "permission_id": 1088
+  },
+  {
+    "role_id": 1009,
+    "permission_id": 1093
+  },
+  {
+    "role_id": 1009,
+    "permission_id": 1098
   },
   {
     "role_id": 1010,
-    "permission_id": 1075
+    "permission_id": 1103
   },
   {
     "role_id": 1010,
-    "permission_id": 1077
+    "permission_id": 1108
   },
   {
     "role_id": 1010,
-    "permission_id": 1079
+    "permission_id": 1113
   },
   {
     "role_id": 1010,
-    "permission_id": 1081
+    "permission_id": 1118
+  },
+  {
+    "role_id": 1010,
+    "permission_id": 1120
+  },
+  {
+    "role_id": 1010,
+    "permission_id": 1122
+  },
+  {
+    "role_id": 1010,
+    "permission_id": 1127
   },
   {
     "role_id": 1011,
@@ -225,22 +225,22 @@
   },
   {
     "role_id": 1011,
-    "permission_id": 1083
+    "permission_id": 1132
   },
   {
     "role_id": 1011,
-    "permission_id": 1085
+    "permission_id": 1137
   },
   {
     "role_id": 1011,
-    "permission_id": 1086
+    "permission_id": 1142
   },
   {
     "role_id": 1011,
-    "permission_id": 1087
+    "permission_id": 1143
   },
   {
     "role_id": 1011,
-    "permission_id": 1088
+    "permission_id": 1144
   }
 ]
