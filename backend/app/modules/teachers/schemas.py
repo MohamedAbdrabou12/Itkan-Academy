@@ -1,10 +1,12 @@
 # backend/app/modules/teachers/schemas.py
 from datetime import date, datetime  # noqa
 from typing import List, Optional
-from pydantic import BaseModel, EmailStr, field_validator
+from pydantic import BaseModel, EmailStr, field_validator, computed_field
 import re
-from app.modules.users.schemas import UserRead
+from app.modules.users.schemas import BranchInfo, UserRead
 from app.modules.teachers.models import EmploymentType
+from app.modules.users.models import UserStatus
+from pydantic import BaseModel, field_validator, model_validator
 
 
 class TeacherBase(BaseModel):
@@ -66,12 +68,55 @@ class TeacherUpdate(BaseModel):
         return v
 
 
-class TeacherRead(UserRead):
+class TeacherRead(BaseModel):
     qualification: Optional[str] = None
     specialization: Optional[str] = None
     hire_date: Optional[date] = None
     employment_type: Optional[EmploymentType] = None
+    id: int
+    full_name: str
+    email: EmailStr
+    phone: Optional[str] = None
+    role_id: Optional[int] = None
+    role_name: Optional[str] = None
+    role_name_ar: Optional[str] = None
+    branch_name: Optional[str] = None
+    status: UserStatus
+    last_login: Optional[datetime] = None
+    created_at: datetime
+    updated_at: datetime
+    branch_ids: Optional[List[int]] = None
+    branches: Optional[List[BranchInfo]] = None
     class_ids: Optional[List[int]] = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def flatten_from_orm(cls, data):
+        if hasattr(data, "user"):
+            user_details = data.user
+            return {
+                "full_name": user_details.full_name,
+                "email": user_details.email,
+                "phone": user_details.phone,
+                "role_id": user_details.role_id,
+                "role_name": user_details.role_name,
+                "role_name_ar": user_details.role_name_ar,
+                "branch_name": user_details.branch_name,
+                "status": user_details.status,
+                "last_login": user_details.last_login,
+                "created_at": user_details.created_at,
+                "updated_at": user_details.updated_at,
+                "branch_ids": [link.branch_id for link in user_details.branch_links],
+                "branches": user_details.branches,
+                "class_ids": [c.id for c in data.classes] if data.classes else [],
+                "qualification": data.qualification,
+                "specialization": data.specialization,
+                "hire_date": data.hire_date,
+                "employment_type": data.employment_type,
+                "id": user_details.id,
+            }
+        return data
 
     class Config:
         from_attributes = True
+        orm_mode = True
