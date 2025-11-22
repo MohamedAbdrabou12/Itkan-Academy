@@ -1,9 +1,9 @@
 # backend/app/modules/students/schemas.py
-from datetime import date, datetime  # noqa F401
+from datetime import date
 from typing import Dict, Optional, List
 from pydantic import BaseModel, EmailStr, field_validator
 import re
-from app.modules.users.schemas import UserRead
+from app.modules.users.schemas import UserRead, UserStatus
 
 
 class StudentBase(BaseModel):
@@ -26,6 +26,7 @@ class StudentCreate(StudentBase):
     email: EmailStr
     phone: Optional[str] = None
     branch_ids: Optional[List[int]] = None
+    status: Optional[UserStatus] = None
 
     @field_validator("phone")
     def validate_phone(cls, v):
@@ -42,14 +43,12 @@ class StudentCreate(StudentBase):
         return v
 
 
-class StudentUpdate(BaseModel):
+class StudentUpdate(StudentBase):
     full_name: Optional[str] = None
     email: Optional[EmailStr] = None
     phone: Optional[str] = None
-    class_ids: Optional[List[int]] = None
     branch_ids: Optional[List[int]] = None
-    admission_date: Optional[date] = None
-    curriculum_progress: Optional[Dict] = None
+    status: Optional[UserStatus] = None
 
     @field_validator("admission_date")
     @classmethod

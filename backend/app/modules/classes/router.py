@@ -1,8 +1,7 @@
 # backend/app/modules/classes/router.py
-from fastapi import APIRouter, Depends, HTTPException, status, Request
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from typing import List
 from sqlalchemy.ext.asyncio import AsyncSession
-
 from app.db.session import get_db
 from app.core.auth import get_current_user
 from app.core.authorization import require_permission
@@ -13,18 +12,31 @@ class_router = APIRouter(prefix="/classes", tags=["Classes"])
 
 
 @class_router.get("/", response_model=List[ClassRead])
-async def list_classes(request: Request, db: AsyncSession = Depends(get_db)):
-    return await class_crud.get_all(db, request=request)
+async def list_classes(
+    branch_id: int | None = Query(None),
+    db: AsyncSession = Depends(get_db),
+):
+    classes = await class_crud.get_all(db, branch_id=branch_id)
+    return [ClassRead.from_orm(c) for c in classes]
+
+
+@class_router.get("/by-branch/{branch_id}", response_model=List[ClassRead])
+async def get_classes_by_branch(
+    branch_id: int,
+    db: AsyncSession = Depends(get_db),
+):
+    classes = await class_crud.get_all(db, branch_id=branch_id)
+    if not classes:
+        raise HTTPException(status_code=404, detail="No classes found for this branch")
+    return [ClassRead.from_orm(c) for c in classes]
 
 
 @class_router.get("/{class_id}", response_model=ClassRead)
-async def get_class(
-    class_id: int, request: Request, db: AsyncSession = Depends(get_db)
-):
-    class_ = await class_crud.get_by_id(db, class_id, request=request)
+async def get_class(class_id: int, db: AsyncSession = Depends(get_db)):
+    class_ = await class_crud.get_by_id(db, class_id)
     if not class_:
         raise HTTPException(status_code=404, detail="Class not found")
-    return class_
+    return ClassRead.from_orm(class_)
 
 
 @class_router.post(
@@ -37,7 +49,8 @@ async def get_class(
     ],
 )
 async def create_class(class_in: ClassCreate, db: AsyncSession = Depends(get_db)):
-    return await class_crud.create(db, class_in)
+    class_ = await class_crud.create(db, class_in)
+    return ClassRead.from_orm(class_)
 
 
 @class_router.put(
@@ -51,10 +64,11 @@ async def create_class(class_in: ClassCreate, db: AsyncSession = Depends(get_db)
 async def update_class(
     class_id: int, class_in: ClassUpdate, db: AsyncSession = Depends(get_db)
 ):
-    class_ = await class_crud.get_by_id(db, class_id, request=None)
+    class_ = await class_crud.get_by_id(db, class_id)
     if not class_:
         raise HTTPException(status_code=404, detail="Class not found")
-    return await class_crud.update(db, class_, class_in)
+    updated_class = await class_crud.update(db, class_, class_in)
+    return ClassRead.from_orm(updated_class)
 
 
 @class_router.delete(

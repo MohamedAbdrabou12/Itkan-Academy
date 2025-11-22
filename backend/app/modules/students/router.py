@@ -1,12 +1,14 @@
 # backend/app/modules/students/router.py
-from typing import List, Optional
-from fastapi import APIRouter, Depends, Query, status
+from typing import Optional
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.core.auth import get_current_user
-from app.core.authorization import require_permission
+from fastapi_pagination import Page
+
 from app.db.session import get_db
-from app.modules.students.schemas import StudentCreate, StudentRead, StudentUpdate
+from app.modules.students.schemas import StudentRead, StudentCreate, StudentUpdate
 from app.modules.students.service import StudentService
+from app.core.authorization import require_permission
+from app.core.auth import get_current_user
 from app.modules.users.models import User
 
 students_router = APIRouter(prefix="/students", tags=["Students"])
@@ -14,14 +16,20 @@ students_router = APIRouter(prefix="/students", tags=["Students"])
 
 @students_router.get(
     "/",
-    response_model=List[StudentRead],
+    response_model=Page[StudentRead],
     dependencies=[Depends(require_permission("student.management.manage"))],
 )
 async def list_students(
     db: AsyncSession = Depends(get_db),
-    status: Optional[str] = Query(None, description="Filter students by user status"),
+    search: Optional[str] = Query(None, description="Search by student name or email"),
+    status: Optional[str] = Query(None, description="Filter by user status"),
+    sort_by: Optional[str] = Query("id", description="Field to sort by"),
+    sort_order: Optional[str] = Query("asc", description="Sort order asc/desc"),
 ):
-    return await StudentService.list_students(db, status)
+    """
+    List students with pagination, search, sorting, and status filtering.
+    """
+    return await StudentService.list_students(db, search, status, sort_by, sort_order)
 
 
 @students_router.get(
@@ -36,7 +44,7 @@ async def get_student(student_id: int, db: AsyncSession = Depends(get_db)):
 @students_router.post(
     "/",
     response_model=StudentRead,
-    status_code=status.HTTP_201_CREATED,
+    status_code=201,
     dependencies=[Depends(require_permission("student.management.manage"))],
 )
 async def create_student(
