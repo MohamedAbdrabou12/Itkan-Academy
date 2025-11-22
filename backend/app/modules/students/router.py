@@ -11,6 +11,7 @@ from app.modules.students.schemas import (
 from app.modules.students.service import StudentService
 from app.modules.users.models import User
 from fastapi import APIRouter, Depends, Query, status
+from fastapi_pagination import Page
 from sqlalchemy.ext.asyncio import AsyncSession
 
 students_router = APIRouter(prefix="/students", tags=["Students"])
