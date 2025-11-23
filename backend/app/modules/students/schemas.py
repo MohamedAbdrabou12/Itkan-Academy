@@ -28,10 +28,19 @@ class StudentCreate(StudentBase):
     branch_ids: Optional[List[int]] = None
     status: Optional[UserStatus] = None
 
+    # @field_validator("phone")
+    # def validate_phone(cls, v):
+    #     if v and not re.match(r"^\+?\d{10,15}$", v):
+    #         raise ValueError("Invalid phone number format")
+    #     return v
+
     @field_validator("phone")
     def validate_phone(cls, v):
-        if v and not re.match(r"^\+?\d{10,15}$", v):
-            raise ValueError("Invalid phone number format")
+        if v:
+            cleaned = re.sub(r"[^\d+]", "", v)  # remove spaces, - , etc
+            if not re.match(r"^\+?\d{10,15}$", cleaned):
+                raise ValueError("Invalid phone number format")
+            return cleaned
         return v
 
     # validate that only one branch is assigned for student
@@ -59,11 +68,21 @@ class StudentUpdate(StudentBase):
             raise ValueError("Admission date cannot be in the future")
         return v
 
-    @field_validator("phone")
-    def validate_phone(cls, v):
-        if v and not re.match(r"^\+?\d{10,15}$", v):
+    # @field_validator("phone")
+    # def validate_phone(cls, v):
+    #     if v and not re.match(r"^\+?\d{10,15}$", v):
+    #         raise ValueError("Invalid phone number format")
+    #     return v
+
+
+@field_validator("phone")
+def validate_phone(cls, v):
+    if v:
+        cleaned = re.sub(r"[^\d+]", "", v)  # remove spaces, - , etc
+        if not re.match(r"^\+?\d{10,15}$", cleaned):
             raise ValueError("Invalid phone number format")
-        return v
+        return cleaned
+    return v
 
 
 class StudentRead(UserRead):
