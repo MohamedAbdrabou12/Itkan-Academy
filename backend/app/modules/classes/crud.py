@@ -21,6 +21,15 @@ class ClassCRUD:
         result = await db.execute(stmt)
         return result.scalars().all()
 
+    async def get_class_by_branch(
+        self,
+        db: AsyncSession,
+        branch_ids: list[int],
+    ):
+        stmt = select(Class).where(Class.branch_id.in_(branch_ids))
+        result = await db.execute(stmt)
+        return result.scalars().all()
+
     async def get_by_id(
         self, db: AsyncSession, class_id: int, request: Optional[Request] = None
     ) -> Optional[Class]:

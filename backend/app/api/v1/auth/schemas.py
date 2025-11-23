@@ -1,7 +1,7 @@
 # backend/app/api/v1/auth/schemas.py
 from pydantic import BaseModel, EmailStr
 from app.modules.users.models import UserStatus
-from typing import Optional  # noqa
+from typing import Optional
 
 
 # Registration
@@ -39,6 +39,15 @@ class TokenResponse(BaseModel):
 class ChangePasswordRequest(BaseModel):
     old_password: str
     new_password: str
+
+
+class ValidateResetTokenRequest(BaseModel):
+    token: str
+
+
+class ValidateResetTokenResponse(BaseModel):
+    valid: bool
+    user_id: Optional[int]
 
 
 # User activation / status update

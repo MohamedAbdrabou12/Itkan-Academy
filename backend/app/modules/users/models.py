@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from app.modules.staff.models import Staff
 
 
-class UserStatus(Enum):
+class UserStatus(str, Enum):
     pending = "pending"
     active = "active"
     rejected = "rejected"

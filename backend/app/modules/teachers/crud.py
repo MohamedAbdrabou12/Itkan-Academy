@@ -7,23 +7,50 @@ from fastapi import HTTPException, status  # noqa
 from app.modules.teachers.models import Teacher
 from app.modules.users.models import User, UserStatus
 from app.modules.classes.models import Class
+from fastapi_pagination.ext.sqlalchemy import paginate
+from sqlalchemy import or_
 
 
 class TeacherCRUD:
-    async def get_all(self, db: AsyncSession) -> List[Teacher]:
-        stmt = (
+    async def get_all(
+        self,
+        db: AsyncSession,
+        search: Optional[str] = None,
+        sort_by: Optional[str] = None,
+        sort_order: Optional[str] = None,
+    ):
+        query = (
             select(Teacher)
-            .options(joinedload(Teacher.user), selectinload(Teacher.classes))
-            .order_by(Teacher.id)
+            .options(
+                joinedload(Teacher.user).options(selectinload(User.branch_links)),
+                selectinload(Teacher.classes),
+            )
+            .where(Teacher.user.has(User.status != UserStatus.deactive.value))
         )
-        result = await db.execute(stmt)
-        return result.scalars().all()
+
+        # Apply search
+        if search:
+            search_filter = or_(
+                Teacher.user.has(User.full_name.ilike(f"%{search}%")),
+                Teacher.user.has(User.email.ilike(f"%{search}%")),
+            )
+            query = query.where(search_filter)
+        # Apply sorting
+        sort_column = getattr(Teacher, sort_by) if sort_by else Teacher.id
+        if sort_order and sort_order.lower() == "desc":
+            query = query.order_by(sort_column.desc())
+        else:
+            query = query.order_by(sort_column.asc())
+
+        result = await paginate(db, query)
+        return result
 
     async def get_by_id(self, db: AsyncSession, teacher_id: int) -> Optional[Teacher]:
         stmt = (
             select(Teacher)
             .where(Teacher.id == teacher_id)
             .options(joinedload(Teacher.user), selectinload(Teacher.classes))
+            .where(Teacher.user.has(User.status != UserStatus.deactive.value))
         )
         result = await db.execute(stmt)
         return result.scalars().first()
@@ -56,19 +83,6 @@ class TeacherCRUD:
             await db.commit()
         await db.refresh(teacher)
         return teacher
-
-    async def update_teacher_classes(
-        self, db: AsyncSession, teacher: Teacher, class_ids: List[int]
-    ):
-        # Remove old links
-        await db.execute(f"DELETE FROM teacher_classes WHERE teacher_id = {teacher.id}")
-        for cid in class_ids:
-            cls = await db.get(Class, cid)
-            if cls:
-                teacher.classes.append(cls)
-        db.add(teacher)
-        await db.commit()
-        await db.refresh(teacher)
 
     async def approve(self, db: AsyncSession, teacher: Teacher) -> Teacher:
         user = await db.get(User, teacher.user_id)

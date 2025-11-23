@@ -15,7 +15,7 @@ from app.modules.classes.schemas import (
 from app.modules.students.models import Student, StudentClass
 from app.modules.teachers.models import Teacher
 from app.modules.users.models import User
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status, Body
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -125,6 +125,17 @@ async def get_classes_by_branch(
     db: AsyncSession = Depends(get_db),
 ):
     classes = await class_crud.get_all(db, branch_id=branch_id)
+    if not classes:
+        raise HTTPException(status_code=404, detail="No classes found for this branch")
+    return [ClassRead.from_orm(c) for c in classes]
+
+
+@classes_router.post("/by-branchs", response_model=List[ClassRead])
+async def get_classes_by_branchs(
+    branch_ids: List[int] = Body(..., embed=True),
+    db: AsyncSession = Depends(get_db),
+):
+    classes = await class_crud.get_class_by_branch(db, branch_ids=branch_ids)
     if not classes:
         raise HTTPException(status_code=404, detail="No classes found for this branch")
     return [ClassRead.from_orm(c) for c in classes]
