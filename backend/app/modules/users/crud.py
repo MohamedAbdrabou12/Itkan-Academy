@@ -4,8 +4,7 @@ from app.core.utils import create_password_reset_token
 from app.modules.branches.models import Branch
 from app.modules.users.models import User, UserBranch, UserStatus
 from app.modules.users.schemas import BranchInfo, UserCreate, UserRead, UserUpdate
-from app.services.notification_service.tasks.email import send_email_task
-from app.services.notification_service.utils.template_engine import render_template
+from app.services.notification_service.workrs.worker import send_notification_task
 from fastapi import HTTPException, Request
 from fastapi_pagination.ext.sqlalchemy import paginate as sqlalchemy_paginate
 from sqlalchemy import asc, desc, or_
@@ -153,12 +152,19 @@ class UserCRUD:
                 )
             await self._sync_user_branches(db, db_obj, branch_ids)
         token = create_password_reset_token(db_obj.id)
-        reset_link = f"https://www.google.com/search?q={token}"
-        subject, body_html = render_template(
-            "reset_password.html",
-            {"username": db_obj.full_name, "reset_link": reset_link},
-        )
-        send_email_task.delay(db_obj.email, subject, body_html)
+        reset_link = f"http://localhost:5173/reset-password?token={token}"
+        payload = {
+            "username": db_obj.full_name,
+            "reset_link": reset_link,
+            "email": db_obj.email,
+        }
+        if db_obj and db_obj.email:
+            send_notification_task.delay(
+                user_id=db_obj.id,
+                channel="email",
+                template_type="reset_password",
+                payload=payload,
+            )
         await db.refresh(db_obj)
         return db_obj
 

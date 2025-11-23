@@ -1,4 +1,3 @@
-# backend/app/api/v1/auth/auth.py
 from app.api.v1.auth.schemas import (
     ActivateUserRequest,
     ChangePasswordRequest,
@@ -9,6 +8,8 @@ from app.api.v1.auth.schemas import (
     ForgotPasswordRequest,
     ResetPasswordRequest,
     PasswordResetResponse,
+    ValidateResetTokenRequest,
+    ValidateResetTokenResponse,
 )
 from app.core.auth import (
     AuthService,
@@ -25,6 +26,7 @@ from app.modules.users.models import User, UserStatus
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from app.services.notification_service.workrs.worker import send_notification_task
 
 auth_router = APIRouter(prefix="/auth")
 
@@ -199,20 +201,41 @@ async def update_user_status(
     return {"message": f"User status updated to {user.status}"}
 
 
-# Forgot password (generate reset token)
+# Forgot password - send reset link
 @auth_router.post("/forgot-password", response_model=PasswordResetResponse)
 async def forgot_password(
     payload: ForgotPasswordRequest, db: AsyncSession = Depends(get_db)
 ):
     user = await user_crud.get_by_email(db, payload.email)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="No account found with that email",
+
+    if user and user.email:
+        token = create_password_reset_token(user.id)
+        reset_link = f"http://localhost:5173/reset-password?token={token}"
+        payload = {
+            "username": user.full_name,
+            "reset_link": reset_link,
+            "email": user.email,
+        }
+        send_notification_task.delay(
+            user_id=user.id,
+            channel="email",
+            template_type="reset_password",
+            payload=payload,
         )
 
-    token = create_password_reset_token({"sub": str(user.id)})
-    return PasswordResetResponse(message=f"Password reset token generated: {token}")
+    return PasswordResetResponse(
+        message="If the email is registered, a password reset link has been sent."
+    )
+
+
+# Validate reset token (new endpoint)
+@auth_router.post("/validate-reset-token", response_model=ValidateResetTokenResponse)
+async def validate_reset_token(payload: ValidateResetTokenRequest):
+    try:
+        user_id = verify_password_reset_token(payload.token)
+        return ValidateResetTokenResponse(valid=True, user_id=user_id)
+    except HTTPException:
+        return ValidateResetTokenResponse(valid=False, user_id=None)
 
 
 # Reset password using token

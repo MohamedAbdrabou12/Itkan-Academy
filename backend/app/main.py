@@ -16,11 +16,14 @@ app = FastAPI(
 
 add_pagination(app)
 
-
+origins = [
+    "http://localhost:5173",  # Local development frontend
+    "http://127.0.0.1:5173",
+]
 # Add CORS middleware (if frontend will call this API)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
