@@ -14,9 +14,7 @@ def send_notification_task(
     try:
         if channel == "email":
             template_name = f"{template_type}.html"
-
             subject, body = render_template(template_name, payload)
-
             recipient_email = payload.get("email")
             if not recipient_email:
                 raise ValueError(f"No email in payload for user {user_id}")
