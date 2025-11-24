@@ -1,8 +1,9 @@
 from datetime import date
-from .models import AttendanceStatus
-from typing import List, Dict
+from typing import Dict, List, Optional
 
 from pydantic import BaseModel, field_validator
+
+from .models import AttendanceStatus
 
 
 class EvaluationGradeCreate(BaseModel):
@@ -13,7 +14,7 @@ class EvaluationGradeCreate(BaseModel):
 class StudentEvaluationCreate(BaseModel):
     status: AttendanceStatus
     notes: str = ""
-    evaluations: List[EvaluationGradeCreate] = []
+    evaluations: Optional[List[EvaluationGradeCreate]] = []
 
 
 class BulkEvaluationCreate(BaseModel):

@@ -1,30 +1,26 @@
 # backend/app/modules/students/service.py
-from typing import Optional, Dict
+from datetime import datetime  # noqa
+from typing import List, Optional, Dict
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, or_, asc, desc
+from sqlalchemy import select
 from sqlalchemy.orm import selectinload
-from fastapi_pagination import Page
-from fastapi_pagination.paginator import paginate
 from app.modules.students.models import Student
 from app.modules.students.schemas import StudentCreate, StudentUpdate
 from app.modules.students.crud import student_crud
 from app.modules.users.models import User, UserStatus
-from app.modules.users.schemas import (
-    UserCreate as UserCreateSchema,
-    UserUpdate,
-    UserRead,
-    BranchInfo,
-)
+from app.modules.users.schemas import UserCreate as UserCreateSchema, UserUpdate
 from app.modules.users.crud import user_crud
 from app.services.notification_service.workrs.worker import send_notification_task
 from app.modules.classes.models import Class
 from app.modules.roles.models import Role
+from app.modules.users.schemas import BranchInfo
+from app.modules.users.schemas import UserRead
 
 
 class StudentService:
     @staticmethod
-    async def _serialize_student(student: Student) -> Dict:
+    async def _serialize_student(student: "Student") -> Dict:
         user: User = getattr(student, "user", None)
 
         user_data = UserRead(
@@ -35,7 +31,6 @@ class StudentService:
             phone=user.phone,
             role_id=user.role_id,
             role_name=user.role_name,
-            role_name_ar=user.role_name_ar,
             branch_name=user.branch_name,
             status=user.status,
             last_login=user.last_login,
@@ -64,59 +59,20 @@ class StudentService:
 
     @staticmethod
     async def list_students(
-        db: AsyncSession,
-        search: Optional[str] = None,
-        status: Optional[str] = None,
-        sort_by: Optional[str] = "id",
-        sort_order: Optional[str] = "asc",
-    ) -> Page:
-        """
-        List students with pagination, search, sort, and filter by status.
-        """
-        stmt = select(Student).options(
-            selectinload(Student.classes),
-            selectinload(Student.user).selectinload(User.branches),
-        )
-
-        if search:
-            search_term = f"%{search}%"
-            stmt = stmt.join(Student.user).where(
-                or_(User.full_name.ilike(search_term), User.email.ilike(search_term))
-            )
-
-        if status:
-            stmt = stmt.join(Student.user).where(User.status == status)
-
-        sort_columns = {
-            "id": Student.id,
-            "admission_date": Student.admission_date,
-            "full_name": User.full_name,
-            "email": User.email,
-            "status": User.status,
-        }
-
-        sort_column = sort_columns.get(sort_by, Student.id)
-        if sort_order.lower() == "desc":
-            stmt = stmt.order_by(desc(sort_column))
-        else:
-            stmt = stmt.order_by(asc(sort_column))
-
-        result = await db.execute(stmt)
-        students = result.scalars().all()
-
-        # Convert to dicts first
-        items = [await StudentService._serialize_student(s) for s in students]
-
-        # Use list pagination to avoid ValidationError
-        return paginate(items)
+        db: AsyncSession, status: Optional[str] = None
+    ) -> List[Dict]:
+        students = await student_crud.get_all(db, status)
+        return [await StudentService._serialize_student(s) for s in students]
 
     @staticmethod
     async def get_student(db: AsyncSession, student_id: int) -> Dict:
         student = await student_crud.get_by_id(db, student_id)
         if not student:
             raise HTTPException(status_code=404, detail="Student not found")
+
         if not getattr(student, "user", None):
             student.user = await db.get(User, student.user_id)
+
         return await StudentService._serialize_student(student)
 
     @staticmethod
@@ -209,7 +165,7 @@ class StudentService:
         data = student_in.dict(exclude_unset=True)
         user_fields = {
             f: data.pop(f)
-            for f in ("full_name", "email", "phone", "branch_ids", "status")
+            for f in ("full_name", "email", "phone", "branch_ids")
             if f in data
         }
 
@@ -228,7 +184,7 @@ class StudentService:
 
         if class_ids is not None:
             await student_crud.update_student_classes(db, student, class_ids)
-            await db.refresh(student)
+
         # Reload updated record
         result = await db.execute(
             select(Student)
@@ -306,7 +262,7 @@ class StudentService:
     async def reject_student(
         db: AsyncSession, student_id: int, approver: Optional[User] = None
     ) -> Dict:
-        student = await student_crud.get_by_id(student_id)
+        student = await student_crud.get_by_id(db, student_id)
         if not student:
             raise HTTPException(status_code=404, detail="Student not found")
 

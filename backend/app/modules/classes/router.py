@@ -146,7 +146,7 @@ async def get_class(class_id: int, db: AsyncSession = Depends(get_db)):
     class_ = await class_crud.get_by_id(db, class_id)
     if not class_:
         raise HTTPException(status_code=404, detail="Class not found")
-    return ClassRead.from_orm(class_)
+    return class_
 
 
 @classes_router.post(
@@ -159,8 +159,7 @@ async def get_class(class_id: int, db: AsyncSession = Depends(get_db)):
     ],
 )
 async def create_class(class_in: ClassCreate, db: AsyncSession = Depends(get_db)):
-    class_ = await class_crud.create(db, class_in)
-    return ClassRead.from_orm(class_)
+    return await class_crud.create(db, class_in)
 
 
 @classes_router.put(
@@ -174,11 +173,10 @@ async def create_class(class_in: ClassCreate, db: AsyncSession = Depends(get_db)
 async def update_class(
     class_id: int, class_in: ClassUpdate, db: AsyncSession = Depends(get_db)
 ):
-    class_ = await class_crud.get_by_id(db, class_id)
+    class_ = await class_crud.get_by_id(db, class_id, request=None)
     if not class_:
         raise HTTPException(status_code=404, detail="Class not found")
-    updated_class = await class_crud.update(db, class_, class_in)
-    return ClassRead.from_orm(updated_class)
+    return await class_crud.update(db, class_, class_in)
 
 
 @classes_router.delete(

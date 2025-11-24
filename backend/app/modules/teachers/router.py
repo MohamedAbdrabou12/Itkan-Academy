@@ -17,7 +17,7 @@ teachers_router = APIRouter(prefix="/teachers", tags=["Teachers"])
 @teachers_router.get(
     "/",
     response_model=Page[TeacherRead],
-    dependencies=[Depends(require_permission("teacher.management.manage"))],
+    # dependencies=[Depends(require_permission("teacher.management.manage"))],
 )
 async def list_teachers(
     search: Optional[str] = Query(None, description="Search in name"),
@@ -55,7 +55,7 @@ async def create_teacher(
 @teachers_router.put(
     "/{teacher_id}",
     response_model=TeacherRead,
-    dependencies=[Depends(require_permission("teacher.management.manage"))],
+    # dependencies=[Depends(require_permission("teacher.management.manage"))],
 )
 async def update_teacher(
     teacher_id: int,
@@ -69,7 +69,7 @@ async def update_teacher(
 @teachers_router.delete(
     "/{teacher_id}",
     response_model=TeacherRead,
-    dependencies=[Depends(require_permission("teacher.management.manage"))],
+    # dependencies=[Depends(require_permission("teacher.management.manage"))],
 )
 async def delete_teacher(
     teacher_id: int,
@@ -82,7 +82,7 @@ async def delete_teacher(
 @teachers_router.post(
     "/{teacher_id}/approve",
     response_model=TeacherRead,
-    dependencies=[Depends(require_permission("teacher.management.manage"))],
+    # dependencies=[Depends(require_permission("teacher.management.manage"))],
 )
 async def approve_teacher(
     teacher_id: int,
@@ -95,7 +95,7 @@ async def approve_teacher(
 @teachers_router.post(
     "/{teacher_id}/reject",
     response_model=TeacherRead,
-    dependencies=[Depends(require_permission("teacher.management.manage"))],
+    # dependencies=[Depends(require_permission("teacher.management.manage"))],
 )
 async def reject_teacher(
     teacher_id: int,

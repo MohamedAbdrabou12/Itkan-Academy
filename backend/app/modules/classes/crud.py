@@ -1,20 +1,23 @@
 # backend/app/modules/classes/crud.py
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
 from typing import List, Optional
+from fastapi import Request
 from app.modules.classes.models import Class
 from app.modules.classes.schemas import ClassCreate, ClassUpdate
 
 
 class ClassCRUD:
     async def get_all(
-        self,
-        db: AsyncSession,
-        branch_id: int | None = None,
+        self, db: AsyncSession, request: Optional[Request] = None
     ) -> List[Class]:
-        stmt = select(Class).order_by(Class.id)
-        if branch_id is not None:
-            stmt = stmt.where(Class.branch_id == branch_id)
+        stmt = Class.__table__.select().order_by(Class.id)
+
+        # Branch scoping
+        if request:
+            branch_id = getattr(request.state, "branch_id", None)
+            if branch_id is not None:
+                stmt = stmt.where(Class.branch_id == branch_id)
+
         result = await db.execute(stmt)
         return result.scalars().all()
 
@@ -28,13 +31,21 @@ class ClassCRUD:
         return result.scalars().all()
 
     async def get_by_id(
-        self, db: AsyncSession, class_id: int, branch_id: int | None = None
+        self, db: AsyncSession, class_id: int, request: Optional[Request] = None
     ) -> Optional[Class]:
-        stmt = select(Class).where(Class.id == class_id)
-        if branch_id is not None:
-            stmt = stmt.where(Class.branch_id == branch_id)
-        result = await db.execute(stmt)
-        return result.scalars().first()
+        # Branch scoping
+        if request:
+            branch_id = getattr(request.state, "branch_id", None)
+            if branch_id is not None:
+                stmt = (
+                    Class.__table__.select()
+                    .where(Class.id == class_id)
+                    .where(Class.branch_id == branch_id)
+                )
+                result = await db.execute(stmt)
+                return result.scalars().first()
+
+        return await db.get(Class, class_id)
 
     async def create(self, db: AsyncSession, class_in: ClassCreate) -> Class:
         class_ = Class(**class_in.dict())
