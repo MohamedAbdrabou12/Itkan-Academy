@@ -34,7 +34,7 @@ class Class(Base):
     status: Mapped[ClassStatus] = mapped_column(
         String(10), default=ClassStatus.active, nullable=False
     )
-    evaluation_config: Mapped[List[Dict]] = mapped_column(JSONB)
+    evaluation_config: Mapped[List[str]] = mapped_column(JSONB)
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=datetime.utcnow
