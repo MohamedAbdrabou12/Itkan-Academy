@@ -70,7 +70,7 @@ class TeacherService:
     async def get_teacher(db: AsyncSession, teacher_id: int) -> Dict:
         teacher = await teacher_crud.get_by_id(db, teacher_id)
         if not teacher:
-            raise HTTPException(status_code=404, detail="Teacher not found")
+            raise HTTPException(status_code=404, detail="المعلم غير موجود")
         if not teacher.user:
             teacher.user = await db.get(User, teacher.user_id)
         return await TeacherService._serialize_teacher(teacher)
@@ -81,23 +81,23 @@ class TeacherService:
     ) -> Dict:
         existing = await user_crud.get_by_email(db, teacher_in.email)
         if existing:
-            raise HTTPException(status_code=400, detail="Email already registered")
+            raise HTTPException(status_code=400, detail="هذا البريد مستخدم بالفعل")
 
         # Validate branch_ids
         if not teacher_in.branch_ids or len(teacher_in.branch_ids) == 0:
             raise HTTPException(
-                status_code=400, detail="Teacher must belong to at least one branch"
+                status_code=400, detail="يجب ان تضيف المعلم على فرع واحد على الاقل"
             )
 
         # If creator is not admin, enforce branch restriction
         if creator and getattr(creator, "role_name", "").lower() != "admin":
-            if not all(
+            if getattr(creator, "branch_ids", []) and not all(
                 bid in getattr(creator, "branch_ids", [])
                 for bid in teacher_in.branch_ids
             ):
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Teacher branches must match creator's branches",
+                    detail="انت غير مسجل على الفرع الذى تحاول الاضافة فيه",
                 )
 
         # Validate classes
@@ -113,7 +113,7 @@ class TeacherService:
                 if cls.branch_id not in teacher_in.branch_ids:
                     raise HTTPException(
                         status_code=400,
-                        detail=f"Class {cid} does not belong to the teacher's branches",
+                        detail="لا يوجد فصل بهاذا الاسم على الفرع المحددة",
                     )
                 class_objs.append(cls)
 
@@ -162,11 +162,11 @@ class TeacherService:
     ) -> Dict:
         teacher = await teacher_crud.get_by_id(db, teacher_id)
         if not teacher:
-            raise HTTPException(status_code=404, detail="Teacher not found")
+            raise HTTPException(status_code=404, detail="المعلم غير موجود")
 
         user = await db.get(User, teacher.user_id)
         if not user:
-            raise HTTPException(status_code=404, detail="Linked user not found")
+            raise HTTPException(status_code=404, detail="المستخدم المرتبط غير موجود")
 
         data = teacher_in.dict(exclude_unset=True)
         user_fields = {
@@ -180,7 +180,7 @@ class TeacherService:
                 exist = await user_crud.get_by_email(db, user_fields["email"])
                 if exist:
                     raise HTTPException(
-                        status_code=400, detail="Email already registered"
+                        status_code=400, detail="هذا البريد مستخدم بالفعل"
                     )
             await user_crud.update(db, user, UserUpdate(**user_fields))
 
@@ -209,10 +209,10 @@ class TeacherService:
     async def delete_teacher(db: AsyncSession, teacher_id: int) -> Dict:
         teacher = await teacher_crud.get_by_id(db, teacher_id)
         if not teacher:
-            raise HTTPException(status_code=404, detail="Teacher not found")
+            raise HTTPException(status_code=404, detail="المعلم غير موجود")
         user = await db.get(User, teacher.user_id)
         if not user:
-            raise HTTPException(status_code=404, detail="Linked user not found")
+            raise HTTPException(status_code=404, detail="المستخدم المرتبط غير موجود")
 
         user.status = UserStatus.deactive.value
         db.add(user)
@@ -228,7 +228,7 @@ class TeacherService:
     ) -> Dict:
         teacher = await teacher_crud.get_by_id(db, teacher_id)
         if not teacher:
-            raise HTTPException(status_code=404, detail="Teacher not found")
+            raise HTTPException(status_code=404, detail="المعلم غير موجود")
         user = await db.get(User, teacher.user_id)
         user.status = UserStatus.active.value
         db.add(user)
@@ -257,7 +257,7 @@ class TeacherService:
     ) -> Dict:
         teacher = await teacher_crud.get_by_id(db, teacher_id)
         if not teacher:
-            raise HTTPException(status_code=404, detail="Teacher not found")
+            raise HTTPException(status_code=404, detail="المعلم غير موجود")
         user = await db.get(User, teacher.user_id)
         user.status = UserStatus.rejected.value
         db.add(user)
