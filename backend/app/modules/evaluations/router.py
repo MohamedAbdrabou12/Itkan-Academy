@@ -57,7 +57,7 @@ async def create_bulk_evaluations(
 
     if not class_obj:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Class not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="الفصل غير موجود"
         )
 
     role = current_user.role_name.lower() if current_user.role_name else None
@@ -71,7 +71,7 @@ async def create_bulk_evaluations(
         user_branch_names = [branch.name for branch in current_user.branches]
         raise HTTPException(
             status_code=403,
-            detail=f"No access to this branch. User has access to branches: {user_branch_names}, class requires branch: {class_obj.branch.name}",
+            detail=f"لا يوجد صلاحية لهذا الفرع. المستخدم لديه صلاحية للأفرع: {user_branch_names}، الفصل يتطلب الفرع: {class_obj.branch.name}",
         )
 
     # ensure date is in class schedule
@@ -89,7 +89,7 @@ async def create_bulk_evaluations(
     if weekday not in class_obj.schedule.keys():
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"{weekday.capitalize()} is not in the class' schedule.",
+            detail=f"{weekday.capitalize()} ليس ضمن جدول الفصل",
         )
 
     # ensure evaluation keys are the same as the class' evaluation config
@@ -98,7 +98,7 @@ async def create_bulk_evaluations(
             if record.status not in [AttendanceStatus.ABSENT, AttendanceStatus.EXCUSED]:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="No evaluations for student despite not being absent or excused.",
+                    detail="لا توجد تقييمات للطالب رغم عدم كونه غائب أو معذور",
                 )
             continue
 
@@ -107,7 +107,7 @@ async def create_bulk_evaluations(
             if evaluation not in evaluation_types:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail=f'Missing evaluation type "{evaluation}."',
+                    detail=f'نوع التقييم "{evaluation}" مفقود',
                 )
 
     # For teachers, also check class access
@@ -122,13 +122,13 @@ async def create_bulk_evaluations(
             ]
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"No access to this class. Teacher has access to classes: {teacher_class_names}, requested class: {class_obj.name}",
+                detail=f"لا يوجد صلاحية لهذا الفصل. المعلم لديه صلاحية للفصول: {teacher_class_names}، الفصل المطلوب: {class_obj.name}",
             )
 
     # For other non-supervisor roles, deny access
     elif role != "branch supervisor":
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient permissions"
+            status_code=status.HTTP_403_FORBIDDEN, detail="صلاحيات غير كافية"
         )
 
     # Verify all students in the request belong to the class
@@ -141,7 +141,7 @@ async def create_bulk_evaluations(
     if missing_students:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Students {missing_students} are not in this class",
+            detail=f"الطلاب {missing_students} غير مسجلين في هذا الفصل",
         )
 
     # Check for existing evaluations for this class and date
@@ -163,7 +163,7 @@ async def create_bulk_evaluations(
     if already_evaluated_students:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Class {class_obj.name} already evaluated for this date",
+            detail=f"تم تقييم ({class_obj.name}) في نفس التاريخ من قبل",
         )
 
     evaluations_to_create = []
@@ -181,7 +181,7 @@ async def create_bulk_evaluations(
                 if not (MIN_GRADE <= grade_data["grade"] <= MAX_GRADE):
                     raise HTTPException(
                         status_code=status.HTTP_400_BAD_REQUEST,
-                        detail=f"Grade for {grade_data['name']} must be between 0 and 10",
+                        detail=f"التقييم لـ {grade_data['name']} يجب أن يكون بين 0 و 10",
                     )
 
         evaluation = Evaluation(
@@ -208,11 +208,11 @@ async def create_bulk_evaluations(
             await db.rollback()
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Error creating evaluations",
+                detail="خطأ في إنشاء التقييمات",
             )
 
     return {
-        "message": "Evaluations created successfully",
+        "message": "تم تقييم الطلاب بنجاح",
         "count": len(evaluations_to_create),
         "date": eval_date.isoformat(),
         "class_id": bulk_data.class_id,
