@@ -32,7 +32,7 @@ class Class(Base):
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     schedule: Mapped[Dict] = mapped_column(JSONB)
     status: Mapped[ClassStatus] = mapped_column(
-        String(10), default=ClassStatus.active, nullable=False
+        String(10), default=ClassStatus.active.value, nullable=False
     )
     evaluation_config: Mapped[List[str]] = mapped_column(JSONB)
 
