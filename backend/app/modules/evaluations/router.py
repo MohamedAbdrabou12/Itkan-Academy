@@ -1,6 +1,6 @@
 from datetime import date
 from operator import and_
-from typing import Any, Union
+from typing import Any, List, Union
 
 from app.core.auth import get_current_user
 from app.db.session import get_db
@@ -22,7 +22,7 @@ from .constants import MAX_GRADE, MIN_GRADE
 evaluations_router = APIRouter(prefix="/evaluations", tags=["Evaluations"])
 
 
-@evaluations_router.get("/")
+@evaluations_router.get("/", response_model=List[ListEvaluationsResponseItem])
 async def list_evaluations(
     db: AsyncSession = Depends(get_db), current_user=Depends(get_current_user)
 ):
