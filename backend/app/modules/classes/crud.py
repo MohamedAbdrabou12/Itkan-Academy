@@ -5,22 +5,24 @@ from typing import List, Optional
 from fastapi import Request
 from app.modules.classes.models import Class
 from app.modules.classes.schemas import ClassCreate, ClassUpdate
+from fastapi_pagination.ext.sqlalchemy import paginate
 
 
 class ClassCRUD:
     async def get_all(
         self, db: AsyncSession, request: Optional[Request] = None
     ) -> List[Class]:
-        stmt = Class.__table__.select().order_by(Class.id)
+        stmt = select(Class).order_by(Class.id)
 
         # Branch scoping
         if request:
             branch_id = getattr(request.state, "branch_id", None)
+
             if branch_id is not None:
                 stmt = stmt.where(Class.branch_id == branch_id)
 
-        result = await db.execute(stmt)
-        return result.scalars().all()
+        result = await paginate(db, stmt)
+        return result
 
     async def get_class_by_branch(
         self,
@@ -49,7 +51,7 @@ class ClassCRUD:
         return await db.get(Class, class_id)
 
     async def create(self, db: AsyncSession, class_in: ClassCreate) -> Class:
-        class_ = Class(**class_in.dict())
+        class_ = Class(**class_in.model_dump())
         db.add(class_)
         await db.commit()
         await db.refresh(class_)
