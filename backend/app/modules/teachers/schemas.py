@@ -1,12 +1,11 @@
-# backend/app/modules/teachers/schemas.py
-from datetime import date, datetime  # noqa
-from typing import List, Optional
-from pydantic import BaseModel, EmailStr, field_validator, computed_field
 import re
-from app.modules.users.schemas import BranchInfo, UserRead
+from datetime import date, datetime
+from typing import List, Optional
+
 from app.modules.teachers.models import EmploymentType
 from app.modules.users.models import UserStatus
-from pydantic import BaseModel, field_validator, model_validator
+from app.modules.users.schemas import BranchInfo
+from pydantic import BaseModel, EmailStr, field_validator, model_validator
 
 
 class TeacherBase(BaseModel):
@@ -119,4 +118,3 @@ class TeacherRead(BaseModel):
 
     class Config:
         from_attributes = True
-        orm_mode = True

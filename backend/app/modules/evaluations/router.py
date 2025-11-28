@@ -13,7 +13,7 @@ from app.modules.evaluations.schemas import (
 )
 from app.modules.users.models import User, UserStatus
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import bindparam, select, update
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -42,6 +42,7 @@ async def list_evaluations(
             attendance_status=evaluation.attendance_status.value,
             evaluation_grades=evaluation.evaluation_grades,
             notes=evaluation.notes,
+            created_at=evaluation.created_at.isoformat(),
         )
         for evaluation in evaluations
     ]
@@ -102,7 +103,7 @@ def validate_evaluations(
     if not partial_evaluation_config:
         for record in bulk_data.records.values():
             if record.evaluations is None or len(record.evaluations) == 0:
-                if record.status not in [
+                if record.attendance_status not in [
                     AttendanceStatus.ABSENT,
                     AttendanceStatus.EXCUSED,
                 ]:
@@ -242,7 +243,7 @@ async def bulk_create_evaluations(
             class_id=bulk_data.class_id,
             date=eval_date,
             recorded_by_user_id=current_user.id,
-            attendance_status=AttendanceStatus(eval_data.status.value),
+            attendance_status=AttendanceStatus(eval_data.attendance_status.value),
             evaluation_grades=evaluation_grades,
             notes=eval_data.notes,
         )
@@ -303,8 +304,8 @@ async def bulk_update_evaluation(
     updated_evaluations = []
     for student_id, eval_data in bulk_data.records.items():
         update_dict: dict[str, Any] = {"student_id": student_id}
-        if eval_data.status is not None:
-            update_dict["status"] = eval_data.status
+        if eval_data.attendance_status is not None:
+            update_dict["attendance_status"] = eval_data.attendance_status
 
         if eval_data.notes is not None:
             update_dict["notes"] = eval_data.notes
@@ -329,17 +330,34 @@ async def bulk_update_evaluation(
 
     if updated_evaluations:
         try:
-            await db.execute(
-                update(Evaluation)
-                .where(Evaluation.student_id == bindparam("student_id"))
-                .values(
-                    {
-                        "status": bindparam("status"),
-                        "notes": bindparam("notes"),
-                        "evaluation_grades": bindparam("evaluation_grades"),
-                    }
-                )
-            )
+            for eval_update in updated_evaluations:
+                update_values = {}
+                if "attendance_status" in eval_update:
+                    update_values["attendance_status"] = eval_update[
+                        "attendance_status"
+                    ]
+
+                if "notes" in eval_update:
+                    update_values["notes"] = eval_update["notes"]
+                if "evaluation_grades" in eval_update:
+                    update_values["evaluation_grades"] = eval_update[
+                        "evaluation_grades"
+                    ]
+
+                if update_values:
+                    await db.execute(
+                        update(Evaluation)
+                        .where(
+                            and_(
+                                Evaluation.student_id == eval_update["student_id"],
+                                Evaluation.date == eval_date,
+                            )
+                        )
+                        .values(**update_values)
+                    )
+
+            await db.commit()
+
         except Exception:
             await db.rollback()
             raise HTTPException(

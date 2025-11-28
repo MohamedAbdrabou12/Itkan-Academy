@@ -15,13 +15,13 @@ type EvaluationGradeUpdate = EvaluationGradeCreate
 
 
 class StudentEvaluationCreate(BaseModel):
-    status: AttendanceStatus
+    attendance_status: AttendanceStatus
     notes: str = ""
     evaluations: Optional[List[EvaluationGradeCreate]] = []
 
 
 class StudentEvaluationUpdate(BaseModel):
-    status: Optional[AttendanceStatus]
+    attendance_status: Optional[AttendanceStatus]
     notes: Optional[str]
     evaluations: Optional[List[EvaluationGradeUpdate]]
 
@@ -62,3 +62,4 @@ class ListEvaluationsResponseItem(BaseModel):
     attendance_status: str
     evaluation_grades: List[Dict]
     notes: Optional[str]
+    created_at: str
