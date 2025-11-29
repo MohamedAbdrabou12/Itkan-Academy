@@ -768,46 +768,6 @@
     "description_ar": "حذف الرواتب الشهرية للمعلمين"
   },
   {
-    "id": 1103,
-    "code": "student.management.*",
-    "name": "Full Student Management",
-    "name_ar": "إدارة الطلاب الكاملة",
-    "description": "Complete control over student management",
-    "description_ar": "التحكم الكامل في إدارة الطلاب"
-  },
-  {
-    "id": 1104,
-    "code": "student.management.view",
-    "name": "View Students",
-    "name_ar": "عرض الطلاب",
-    "description": "View student information",
-    "description_ar": "عرض معلومات الطلاب"
-  },
-  {
-    "id": 1105,
-    "code": "student.management.add",
-    "name": "Add Students",
-    "name_ar": "إضافة الطلاب",
-    "description": "Add new students",
-    "description_ar": "إضافة طلاب جدد"
-  },
-  {
-    "id": 1106,
-    "code": "student.management.edit",
-    "name": "Edit Students",
-    "name_ar": "تعديل الطلاب",
-    "description": "Edit student information",
-    "description_ar": "تعديل معلومات الطلاب"
-  },
-  {
-    "id": 1107,
-    "code": "student.management.delete",
-    "name": "Delete Students",
-    "name_ar": "حذف الطلاب",
-    "description": "Delete students",
-    "description_ar": "حذف الطلاب"
-  },
-  {
     "id": 1108,
     "code": "evaluation.student.*",
     "name": "Full Student Evaluation Management",
@@ -838,14 +798,6 @@
     "name_ar": "تعديل تقييمات الطلاب",
     "description": "Edit student evaluation records",
     "description_ar": "تعديل سجلات تقييم الطلاب"
-  },
-  {
-    "id": 1112,
-    "code": "evaluation.student.delete",
-    "name": "Delete Student Evaluations",
-    "name_ar": "حذف تقييمات الطلاب",
-    "description": "Delete student evaluation records",
-    "description_ar": "حذف سجلات تقييم الطلاب"
   },
   {
     "id": 1113,

@@ -1,6 +1,8 @@
 from typing import List
 
+from app.core.authorization import require_permission
 from app.db.session import get_db
+from app.modules.permissions.permissions import PermissionCode
 from app.modules.roles.crud import role_crud
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -18,7 +20,11 @@ role_permissions_router = APIRouter(
 
 
 @role_permissions_router.get("", response_model=List[RolePermissionResponse])
-async def get_role_permissions(role_id: int, db: AsyncSession = Depends(get_db)):
+async def get_role_permissions(
+    role_id: int,
+    db: AsyncSession = Depends(get_db),
+    _=[Depends(require_permission(PermissionCode.SYSTEM_ROLE_PERMISSIONS_MANAGE))],
+):
     # Check if role exists
     role = await role_crud.get_by_id(db, role_id)
     if not role:
@@ -52,6 +58,7 @@ async def update_role_permissions(
     role_id: int,
     permission_request: PermissionUpdateRequest,
     db: AsyncSession = Depends(get_db),
+    _=[Depends(require_permission(PermissionCode.SYSTEM_ROLE_PERMISSIONS_MANAGE))],
 ):
     # Check if role exists
     role = await role_crud.get_by_id(db, role_id)
