@@ -2,6 +2,9 @@ from datetime import datetime
 from typing import List, Optional, Dict
 from pydantic import BaseModel
 
+from app.modules.classes.models import ClassStatus
+
+
 class ClassBase(BaseModel):
     branch_id: int
     name: str
@@ -17,13 +20,14 @@ class ClassUpdate(BaseModel):
     branch_id: Optional[int] = None
     name: Optional[str] = None
     schedule: Optional[Dict] = None
-    evaluation_config: Optional[Dict] = None
+    evaluation_config: Optional[List[str]] = None
 
 
 class ClassRead(ClassBase):
     id: int
     created_at: datetime
     updated_at: datetime
+    status: Optional[ClassStatus] = None
 
     class Config:
         from_attributes = True

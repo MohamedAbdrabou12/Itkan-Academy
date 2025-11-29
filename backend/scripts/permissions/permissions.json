@@ -1214,5 +1214,45 @@
     "name_ar": "عرض المستخدمين",
     "description": "View user information",
     "description_ar": "عرض معلومات المستخدمين"
+  },
+  {
+    "id": 1159,
+    "code": "system.students.*",
+    "name": "Full Students Management",
+    "name_ar": "إدارة الطلاب الكاملة",
+    "description": "Complete control over students management",
+    "description_ar": "التحكم الكامل في إدارة الطلاب"
+  },
+  {
+    "id": 1160,
+    "code": "system.students.view",
+    "name": "View Students",
+    "name_ar": "عرض الطلاب",
+    "description": "View students information",
+    "description_ar": "عرض معلومات الطلاب"
+  },
+  {
+    "id": 1161,
+    "code": "system.students.add",
+    "name": "Add Students",
+    "name_ar": "إضافة طلاب",
+    "description": "Add new students",
+    "description_ar": "إضافة طلاب جدد"
+  },
+  {
+    "id": 1162,
+    "code": "system.students.edit",
+    "name": "Edit Students",
+    "name_ar": "تعديل الطلاب",
+    "description": "Edit student information",
+    "description_ar": "تعديل معلومات الطالب"
+  },
+  {
+    "id": 1163,
+    "code": "system.students.delete",
+    "name": "Delete Students",
+    "name_ar": "حذف الطلاب",
+    "description": "Delete students",
+    "description_ar": "حذف الطلاب"
   }
 ]

@@ -1,4 +1,3 @@
-# backend/app/modules/users/models.py
 from __future__ import annotations
 from datetime import datetime
 from enum import Enum
@@ -77,20 +76,21 @@ class User(Base):
         "Role", back_populates="users", lazy="joined"
     )
 
-    # association mapped-class links (user_branches)
+    # Association relationship - NO CASCADE
     branch_links: Mapped[List["UserBranch"]] = relationship(
         "UserBranch",
         back_populates="user",
-        cascade="all, delete-orphan",
         lazy="selectin",
+        viewonly=True,
     )
 
-    # convenience many-to-many relationship to branches using the association table
+    # Convenience relationship
     branches: Mapped[List["Branch"]] = relationship(
         "Branch",
         secondary="user_branches",
         back_populates="users_m2m",
         lazy="selectin",
+        viewonly=True,
     )
 
     notifications: Mapped[List["Notification"]] = relationship(

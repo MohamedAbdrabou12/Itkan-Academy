@@ -15,10 +15,11 @@ from app.modules.classes.schemas import (
 from app.modules.students.models import Student, StudentClass
 from app.modules.teachers.models import Teacher
 from app.modules.users.models import User
-from fastapi import APIRouter, Depends, HTTPException, Query, status, Body
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status, Body
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
+from fastapi_pagination import Page
 
 classes_router = APIRouter(prefix="/classes", tags=["Classes"])
 
@@ -110,24 +111,26 @@ async def get_class_students_simple(
         )
 
 
-@classes_router.get("/", response_model=List[ClassRead])
+@classes_router.get("/", response_model=Page[ClassRead])
 async def list_classes(
+    request: Request,
     branch_id: int | None = Query(None),
     db: AsyncSession = Depends(get_db),
 ):
-    classes = await class_crud.get_all(db, branch_id=branch_id)
-    return [ClassRead.from_orm(c) for c in classes]
+    classes = await class_crud.get_all(db, request=request)
+    return classes
 
 
-@classes_router.get("/by-branch/{branch_id}", response_model=List[ClassRead])
-async def get_classes_by_branch(
-    branch_id: int,
-    db: AsyncSession = Depends(get_db),
-):
-    classes = await class_crud.get_all(db, branch_id=branch_id)
-    if not classes:
-        raise HTTPException(status_code=404, detail="No classes found for this branch")
-    return [ClassRead.from_orm(c) for c in classes]
+# @classes_router.get("/by-branch/{branch_id}", response_model=List[ClassRead])
+# async def get_classes_by_branch(
+#     branch_id: int,
+#     request: Request,
+#     db: AsyncSession = Depends(get_db),
+# ):
+#     classes = await class_crud.get_by_id(db, branch_id=branch_id)
+#     if not classes:
+#         raise HTTPException(status_code=404, detail="No classes found for this branch")
+#     return [ClassRead.from_orm(c) for c in classes]
 
 
 @classes_router.post("/by-branchs", response_model=List[ClassRead])
@@ -146,7 +149,7 @@ async def get_class(class_id: int, db: AsyncSession = Depends(get_db)):
     class_ = await class_crud.get_by_id(db, class_id)
     if not class_:
         raise HTTPException(status_code=404, detail="Class not found")
-    return ClassRead.from_orm(class_)
+    return class_
 
 
 @classes_router.post(
@@ -155,12 +158,11 @@ async def get_class(class_id: int, db: AsyncSession = Depends(get_db)):
     status_code=status.HTTP_201_CREATED,
     dependencies=[
         Depends(get_current_user),
-        Depends(require_permission("class:create")),
+        # Depends(require_permission("class:create")),
     ],
 )
 async def create_class(class_in: ClassCreate, db: AsyncSession = Depends(get_db)):
-    class_ = await class_crud.create(db, class_in)
-    return ClassRead.from_orm(class_)
+    return await class_crud.create(db, class_in)
 
 
 @classes_router.put(
@@ -168,25 +170,24 @@ async def create_class(class_in: ClassCreate, db: AsyncSession = Depends(get_db)
     response_model=ClassRead,
     dependencies=[
         Depends(get_current_user),
-        Depends(require_permission("class:update")),
+        # Depends(require_permission("class:update")),
     ],
 )
 async def update_class(
     class_id: int, class_in: ClassUpdate, db: AsyncSession = Depends(get_db)
 ):
-    class_ = await class_crud.get_by_id(db, class_id)
+    class_ = await class_crud.get_by_id(db, class_id, request=None)
     if not class_:
         raise HTTPException(status_code=404, detail="Class not found")
-    updated_class = await class_crud.update(db, class_, class_in)
-    return ClassRead.from_orm(updated_class)
+    return await class_crud.update(db, class_, class_in)
 
 
 @classes_router.delete(
     "/{class_id}",
-    status_code=status.HTTP_204_NO_CONTENT,
+    status_code=status.HTTP_202_ACCEPTED,
     dependencies=[
         Depends(get_current_user),
-        Depends(require_permission("class:delete")),
+        # Depends(require_permission("class:delete")),
     ],
 )
 async def delete_class(class_id: int, db: AsyncSession = Depends(get_db)):

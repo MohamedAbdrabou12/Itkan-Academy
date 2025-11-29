@@ -48,7 +48,7 @@ class TeacherCRUD:
     async def get_by_id(self, db: AsyncSession, teacher_id: int) -> Optional[Teacher]:
         stmt = (
             select(Teacher)
-            .where(Teacher.id == teacher_id)
+            .where(Teacher.user_id == teacher_id)
             .options(joinedload(Teacher.user), selectinload(Teacher.classes))
             .where(Teacher.user.has(User.status != UserStatus.deactive.value))
         )

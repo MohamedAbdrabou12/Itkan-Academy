@@ -88,6 +88,30 @@
     "permission_id": 1154
   },
   {
+    "role_id": 1003,
+    "permission_id": 1159
+  },
+  {
+    "role_id": 1003,
+    "permission_id": 1056
+  },
+  {
+    "role_id": 1003,
+    "permission_id": 1057
+  },
+  {
+    "role_id": 1003,
+    "permission_id": 1058
+  },
+  {
+    "role_id": 1003,
+    "permission_id": 1059
+  },
+  {
+    "role_id": 1003,
+    "permission_id": 1060
+  },
+  {
     "role_id": 1004,
     "permission_id": 1025
   },
