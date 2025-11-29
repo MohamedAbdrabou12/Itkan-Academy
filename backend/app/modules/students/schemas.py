@@ -87,6 +87,7 @@ def validate_phone(cls, v):
 
 
 class StudentRead(UserRead):
+    student_id: int
     class_ids: Optional[List[int]] = None
     admission_date: Optional[date]
     curriculum_progress: Optional[Dict]

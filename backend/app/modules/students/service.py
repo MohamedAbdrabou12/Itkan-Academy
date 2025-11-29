@@ -52,6 +52,7 @@ class StudentService:
 
         return {
             **user_data.model_dump(),
+            "student_id": student.id,
             "class_ids": class_ids if class_ids else None,
             "admission_date": student.admission_date,
             "curriculum_progress": student.curriculum_progress,
