@@ -20,7 +20,7 @@ students_router = APIRouter(prefix="/students", tags=["Students"])
 @students_router.get(
     "/",
     response_model=Page[StudentRead],
-    dependencies=[Depends(require_permission("student.management.manage"))],
+    dependencies=[Depends(require_permission("student.management.view"))],
 )
 async def list_students(
     db: AsyncSession = Depends(get_db),
@@ -38,7 +38,7 @@ async def list_students(
 @students_router.get(
     "/{student_id}",
     response_model=StudentRead,
-    dependencies=[Depends(require_permission("student.management.manage"))],
+    dependencies=[Depends(require_permission("student.management.view"))],
 )
 async def get_student(student_id: int, db: AsyncSession = Depends(get_db)):
     return await StudentService.get_student(db, student_id)
@@ -48,7 +48,7 @@ async def get_student(student_id: int, db: AsyncSession = Depends(get_db)):
     "/",
     response_model=StudentRead,
     status_code=201,
-    dependencies=[Depends(require_permission("student.management.manage"))],
+    dependencies=[Depends(require_permission("student.management.add"))],
 )
 async def create_student(
     student_in: StudentCreate,
@@ -61,7 +61,7 @@ async def create_student(
 @students_router.put(
     "/{student_id}",
     response_model=StudentRead,
-    dependencies=[Depends(require_permission("student.management.manage"))],
+    dependencies=[Depends(require_permission("student.management.edit"))],
 )
 async def update_student(
     student_id: int,
@@ -75,7 +75,7 @@ async def update_student(
 @students_router.delete(
     "/{student_id}",
     response_model=StudentRead,
-    dependencies=[Depends(require_permission("student.management.manage"))],
+    dependencies=[Depends(require_permission("student.management.delete"))],
 )
 async def delete_student(student_id: int, db: AsyncSession = Depends(get_db)):
     return await StudentService.delete_student(db, student_id)
