@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime, timedelta, timezone
 from typing import Dict, List, Optional
 
 from pydantic import BaseModel, field_validator
@@ -30,9 +30,12 @@ class BulkEvaluationCreate(BaseModel):
 
     @field_validator("date")
     def validate_date_not_future(cls, v):
-        """Ensure date is not in the future"""
         eval_date = date.fromisoformat(v)
-        if eval_date > date.today():
+
+        gmt2 = timezone(timedelta(hours=2))
+        today_gmt2 = datetime.now(gmt2).date()
+
+        if eval_date > today_gmt2:
             raise ValueError("Date cannot be in the future")
         return v
 
@@ -44,9 +47,12 @@ class BulkEvaluationUpdate(BaseModel):
 
     @field_validator("date")
     def validate_date_not_future(cls, v):
-        """Ensure date is not in the future"""
         eval_date = date.fromisoformat(v)
-        if eval_date > date.today():
+
+        gmt2 = timezone(timedelta(hours=2))
+        today_gmt2 = datetime.now(gmt2).date()
+
+        if eval_date > today_gmt2:
             raise ValueError("Date cannot be in the future")
         return v
 
