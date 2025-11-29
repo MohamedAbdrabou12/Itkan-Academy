@@ -1,50 +1,100 @@
-from typing import List, Optional
+from datetime import date
+from operator import and_
+from typing import Any, Dict, Optional, Sequence
 
-from app.modules.evaluations.models import Evaluation
-from app.modules.evaluations.schemas import EvaluationCreate, EvaluationUpdate
+from app.modules.evaluations.models import AttendanceStatus, Evaluation
+from app.modules.evaluations.schemas import (
+    BulkEvaluationCreate,
+    StudentEvaluationUpdate,
+)
+from app.modules.evaluations.services import check_evaluation_grades
+from app.modules.users.models import User
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class DailyEvaluationCRUD:
-    async def get_all(self, db: AsyncSession) -> List[Evaluation]:
-        result = await db.execute(
-            Evaluation.__table__.select().order_by(Evaluation.date)
+    async def get_all(
+        self, db: AsyncSession, recorded_by_user_id: int, date: Optional[date] = None
+    ) -> Sequence[Evaluation]:
+        query = select(Evaluation).where(
+            Evaluation.recorded_by_user_id == recorded_by_user_id
         )
+
+        if date is not None:
+            query = query.where(Evaluation.date == date)
+
+        query = query.order_by(Evaluation.date)
+
+        result = await db.execute(query)
         return result.scalars().all()
 
-    async def get_by_id(
-        self, db: AsyncSession, eval_id: int
-    ) -> Optional[Evaluation]:
-        result = await db.get(Evaluation, eval_id)
-        return result
-
-    async def create(
-        self, db: AsyncSession, eval_in: EvaluationCreate
-    ) -> Evaluation:
-        evaluation = Evaluation(**eval_in.dict())
-        db.add(evaluation)
-        await db.commit()
-        await db.refresh(evaluation)
-        return evaluation
-
-    async def update(
+    async def create_bulk(
         self,
         db: AsyncSession,
-        evaluation: Evaluation,
-        eval_in: EvaluationUpdate,
-    ) -> Evaluation:
-        for field, value in eval_in.dict(exclude_unset=True).items():
-            setattr(evaluation, field, value)
-        db.add(evaluation)
-        await db.commit()
-        await db.refresh(evaluation)
-        return evaluation
+        current_user: User,
+        eval_date: date,
+        bulk_data: BulkEvaluationCreate,
+    ) -> int:
+        evaluations_to_create = []
 
-    async def delete(self, db: AsyncSession, eval_id: int) -> None:
-        evaluation = await self.get_by_id(db, eval_id)
-        if evaluation:
-            await db.delete(evaluation)
-            await db.commit()
+        # Ensure grades are within range and create evaluation objects
+        for student_id, eval_data in bulk_data.records.items():
+            evaluation_grades = []
+            if eval_data.evaluations is not None:
+                evaluation_grades = check_evaluation_grades(eval_data.evaluations)
+
+            evaluation = Evaluation(
+                student_id=student_id,
+                class_id=bulk_data.class_id,
+                date=eval_date,
+                recorded_by_user_id=current_user.id,
+                attendance_status=AttendanceStatus(eval_data.attendance_status.value),
+                evaluation_grades=evaluation_grades,
+                notes=eval_data.notes,
+            )
+            evaluations_to_create.append(evaluation)
+
+        if evaluations_to_create:
+            db.add_all(evaluations_to_create)
+
+        return len(evaluations_to_create)
+
+    async def update_bulk(
+        self,
+        db: AsyncSession,
+        eval_date: date,
+        records: Dict[int, StudentEvaluationUpdate],
+    ) -> int:
+        updated_evaluations = []
+        for student_id, eval_data in records.items():
+            update_dict: dict[str, Any] = {"student_id": student_id}
+            if eval_data.attendance_status is not None:
+                update_dict["attendance_status"] = eval_data.attendance_status
+
+            if eval_data.notes is not None:
+                update_dict["notes"] = eval_data.notes
+
+            if eval_data.evaluations is not None:
+                evaluation_grades = check_evaluation_grades(eval_data.evaluations)
+                update_dict["evaluation_grades"] = evaluation_grades
+
+            updated_evaluations.append(update_dict)
+
+        if updated_evaluations:
+            for eval_update in updated_evaluations:
+                await db.execute(
+                    update(Evaluation)
+                    .where(
+                        and_(
+                            Evaluation.student_id == eval_update["student_id"],
+                            Evaluation.date == eval_date,
+                        )
+                    )
+                    .values(**eval_update)
+                )
+
+        return len(updated_evaluations)
 
 
-daily_evaluation_crud = DailyEvaluationCRUD()
+evaluations_crud = DailyEvaluationCRUD()

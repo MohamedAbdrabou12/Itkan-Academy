@@ -20,10 +20,7 @@ class StudentEvaluationCreate(BaseModel):
     evaluations: Optional[List[EvaluationGradeCreate]] = []
 
 
-class StudentEvaluationUpdate(BaseModel):
-    attendance_status: Optional[AttendanceStatus]
-    notes: Optional[str]
-    evaluations: Optional[List[EvaluationGradeUpdate]]
+type StudentEvaluationUpdate = StudentEvaluationCreate
 
 
 class BulkEvaluationCreate(BaseModel):
