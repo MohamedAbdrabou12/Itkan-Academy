@@ -1,19 +1,76 @@
-# backend/app/modules/staff/crud.py
-from typing import Optional, List
-from fastapi import HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
-from sqlalchemy.orm import joinedload
-from sqlalchemy import delete as sa_delete
+from typing import List, Optional
+
 from app.modules.staff.models import Staff
 from app.modules.users.models import User, UserBranch, UserStatus
+from fastapi import HTTPException
+from fastapi_pagination.ext.sqlalchemy import paginate as sqlalchemy_paginate
+from sqlalchemy import asc, desc, or_
+from sqlalchemy import delete as sa_delete
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
+from sqlalchemy.orm import joinedload, selectinload
 
 
 class StaffCRUD:
-    async def get_all(self, db: AsyncSession):
-        stmt = select(Staff).options(joinedload(Staff.user)).order_by(Staff.id)
-        result = await db.execute(stmt)
-        return result.scalars().all()
+    async def get_all(
+        self,
+        db: AsyncSession,
+        search: Optional[str] = None,
+        sort_by: Optional[str] = "id",
+        sort_order: Optional[str] = "asc",
+    ):
+        # Query User model and join with Staff to ensure we only get staff users
+        query = (
+            select(User)
+            .options(
+                selectinload(User.role),
+                selectinload(User.branch_links).joinedload(UserBranch.branch),
+                selectinload(User.staff),
+            )
+            .where(
+                User.staff.has()  # Only users that have staff records
+            )
+        )
+
+        # Apply search filter
+        if search:
+            search_term = f"%{search}%"
+            query = query.where(
+                or_(
+                    User.full_name.ilike(search_term),
+                    User.email.ilike(search_term),
+                    User.staff.has(
+                        Staff.position.ilike(search_term)
+                    ),  # Search in staff position
+                )
+            )
+
+        # Define sortable columns - now using User fields directly
+        sort_columns = {
+            "id": User.id,
+            "full_name": User.full_name,
+            "email": User.email,
+            "phone": User.phone,
+            "position": Staff.position,  # This will work with the join
+            "role_name": User.role_name,
+            "status": User.status,
+            "last_login": User.last_login,
+            "created_at": User.created_at,
+            "updated_at": User.updated_at,
+        }
+
+        # Get sort column with fallback to id
+        safe_sort_by = sort_by or "id"
+        sort_column = sort_columns.get(safe_sort_by, User.id)
+
+        # Apply sorting
+        if sort_order and sort_order.lower() == "desc":
+            query = query.order_by(desc(sort_column))
+        else:
+            query = query.order_by(asc(sort_column))
+
+        result = await sqlalchemy_paginate(db, query)
+        return result
 
     async def get_by_id(self, db: AsyncSession, staff_id: int) -> Optional[Staff]:
         stmt = select(Staff).where(Staff.id == staff_id).options(joinedload(Staff.user))

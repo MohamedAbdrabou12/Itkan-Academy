@@ -151,10 +151,10 @@ class PermissionCode(str, Enum):
     SYSTEM_BRANCHES_ADD = "system.branches.add"
     SYSTEM_BRANCHES_EDIT = "system.branches.edit"
 
-    # System Users
-    SYSTEM_USERS_ALL = "system.users.*"
-    SYSTEM_USERS_VIEW = "system.users.view"
-    SYSTEM_USERS_EDIT = "system.users.edit"
+    # System Staff
+    SYSTEM_STAFF_ALL = "system.staff.*"
+    SYSTEM_STAFF_VIEW = "system.staff.view"
+    SYSTEM_STAFF_EDIT = "system.staff.edit"
 
     # System Assignments
     SYSTEM_ASSIGNMENTS_ALL = "system.assignments.*"

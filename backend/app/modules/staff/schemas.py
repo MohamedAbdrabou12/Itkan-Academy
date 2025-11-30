@@ -41,5 +41,4 @@ class StaffRead(UserRead):
     position: Optional[str] = None
     salary_meta: Optional[Dict] = None
 
-    class Config:
-        from_attributes = True
+

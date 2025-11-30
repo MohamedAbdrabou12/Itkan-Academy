@@ -1127,22 +1127,7 @@
     "description": "Modify existing branches",
     "description_ar": "تعديل الفروع الموجودة"
   },
-  {
-    "id": 1154,
-    "code": "system.users.*",
-    "name": "Full Users Management",
-    "name_ar": "إدارة المستخدمين الكاملة",
-    "description": "Complete control over users",
-    "description_ar": "التحكم الكامل في المستخدمين"
-  },
-  {
-    "id": 1155,
-    "code": "system.users.edit",
-    "name": "Update Users",
-    "name_ar": "تعديل المستخدمين",
-    "description": "Modify user information",
-    "description_ar": "تعديل معلومات المستخدمين"
-  },
+
   {
     "id": 1156,
     "code": "system.branches.view",
@@ -1158,14 +1143,6 @@
     "name_ar": "عرض الأدوار",
     "description": "View system roles",
     "description_ar": "عرض أدوار نظام"
-  },
-  {
-    "id": 1158,
-    "code": "system.users.view",
-    "name": "View Users",
-    "name_ar": "عرض المستخدمين",
-    "description": "View user information",
-    "description_ar": "عرض معلومات المستخدمين"
   },
   {
     "id": 1159,
@@ -1206,5 +1183,29 @@
     "name_ar": "حذف الطلاب",
     "description": "Delete students",
     "description_ar": "حذف الطلاب"
+  },
+  {
+    "id": 1164,
+    "code": "system.staff.*",
+    "name": "Full Staff Management",
+    "name_ar": "إدارة الموظفين الكاملة",
+    "description": "Complete control over staff",
+    "description_ar": "التحكم الكامل في الموظفين"
+  },
+  {
+    "id": 1165,
+    "code": "system.staff.view",
+    "name": "View Staff",
+    "name_ar": "عرض الموظفين",
+    "description": "View user information",
+    "description_ar": "عرض معلومات الموظفين"
+  },
+  {
+    "id": 1166,
+    "code": "system.staff.edit",
+    "name": "Update Staff",
+    "name_ar": "تعديل الموظفين",
+    "description": "Modify user information",
+    "description_ar": "تعديل معلومات الموظفين"
   }
 ]
