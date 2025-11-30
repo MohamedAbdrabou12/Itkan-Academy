@@ -1,7 +1,5 @@
-# backend/app/modules/students/service.py
-from datetime import datetime  # noqa
-from typing import List, Optional, Dict
-from fastapi import HTTPException, status
+from typing import Optional, Dict, List
+from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
@@ -9,25 +7,27 @@ from app.modules.students.models import Student
 from app.modules.students.schemas import StudentCreate, StudentUpdate
 from app.modules.students.crud import student_crud
 from app.modules.users.models import User, UserStatus
-from app.modules.users.schemas import UserCreate as UserCreateSchema, UserUpdate
+from app.modules.users.schemas import (
+    UserCreate as UserCreateSchema,
+    UserUpdate,
+    BranchInfo,
+    UserRead,
+)
 from app.modules.users.crud import user_crud
 from app.services.notification_service.workrs.worker import send_notification_task
 from app.modules.classes.models import Class
 from app.modules.roles.models import Role
-from app.modules.users.schemas import BranchInfo
-from app.modules.users.schemas import UserRead
 
 
 class StudentService:
     @staticmethod
-    async def _serialize_student(student: "Student") -> Dict:
+    async def _serialize_student(student: Student) -> Dict:
         user: User = getattr(student, "user", None)
 
         user_data = UserRead(
             id=user.id,
             full_name=user.full_name,
             email=user.email,
-            # phone=user.phone if user.phone and user.phone.isdigit() else None,
             phone=user.phone,
             role_id=user.role_id,
             role_name=user.role_name,
@@ -38,10 +38,10 @@ class StudentService:
             updated_at=user.updated_at,
             branch_ids=[link.branch_id for link in user.branch_links]
             if user.branch_links
-            else None,
+            else [],
             branches=[BranchInfo.from_orm(link.branch) for link in user.branch_links]
             if user.branch_links
-            else None,
+            else [],
         )
 
         class_ids = (
@@ -52,27 +52,46 @@ class StudentService:
 
         return {
             **user_data.model_dump(),
-            "class_ids": class_ids if class_ids else None,
+            "student_id": student.id,
+            "class_ids": class_ids,
             "admission_date": student.admission_date,
             "curriculum_progress": student.curriculum_progress,
         }
 
     @staticmethod
     async def list_students(
-        db: AsyncSession, status: Optional[str] = None
-    ) -> List[Dict]:
-        students = await student_crud.get_all(db, status)
-        return [await StudentService._serialize_student(s) for s in students]
+        db: AsyncSession,
+        page: int = 1,
+        size: int = 10,
+        search: Optional[str] = None,
+        sort_by: Optional[str] = None,
+        sort_order: Optional[str] = "asc",
+        status: Optional[str] = None,
+    ) -> Dict:
+        students = await student_crud.get_all(
+            db, status=status, search=search, sort_by=sort_by, sort_order=sort_order
+        )
+        serialized = [await StudentService._serialize_student(s) for s in students]
+
+        total = len(serialized)
+        start = (page - 1) * size
+        end = start + size
+
+        return {
+            "items": serialized[start:end],
+            "page": page,
+            "size": size,
+            "total": total,
+            "pages": (total + size - 1) // size,
+        }
 
     @staticmethod
     async def get_student(db: AsyncSession, student_id: int) -> Dict:
         student = await student_crud.get_by_id(db, student_id)
         if not student:
             raise HTTPException(status_code=404, detail="Student not found")
-
         if not getattr(student, "user", None):
             student.user = await db.get(User, student.user_id)
-
         return await StudentService._serialize_student(student)
 
     @staticmethod
@@ -83,17 +102,18 @@ class StudentService:
         if existing:
             raise HTTPException(status_code=400, detail="Email already registered")
 
+        # Validate creator branch permissions
         if creator and getattr(creator, "role_name", "").lower() != "admin":
             creator_branches = getattr(creator, "branch_ids", []) or []
             student_branches = student_in.branch_ids or []
             if not any(b in creator_branches for b in student_branches):
                 raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
+                    status_code=400,
                     detail="Student branches must match creator's branches",
                 )
 
-        # Validate class-branch match
-        class_objs = []
+        # Validate class-branch relation
+        class_objs: List[Class] = []
         if student_in.class_ids:
             for cid in student_in.class_ids:
                 cls = await db.get(Class, cid)
@@ -103,11 +123,12 @@ class StudentService:
                     )
                 if cls.branch_id not in (student_in.branch_ids or []):
                     raise HTTPException(
-                        status_code=status.HTTP_400_BAD_REQUEST,
-                        detail=f"class {cid} does not belong to provided branches",
+                        status_code=400,
+                        detail=f"Class {cid} does not belong to provided branches",
                     )
                 class_objs.append(cls)
 
+        # Get student role
         role_res = await db.execute(select(Role).where(Role.name.ilike("student")))
         student_role = role_res.scalar_one_or_none()
         role_id = student_role.id if student_role else None
@@ -135,7 +156,7 @@ class StudentService:
             await db.commit()
             await db.refresh(student)
 
-        # 🔹 Reload full student with relations
+        # Reload with relations
         result = await db.execute(
             select(Student)
             .options(
@@ -147,7 +168,6 @@ class StudentService:
         student = result.scalar_one()
 
         await StudentService._notify_hr_new_student(db, student, creator)
-
         return await StudentService._serialize_student(student)
 
     @staticmethod
@@ -163,9 +183,11 @@ class StudentService:
             raise HTTPException(status_code=404, detail="Linked user not found")
 
         data = student_in.dict(exclude_unset=True)
+
+        # Extract user-related fields
         user_fields = {
             f: data.pop(f)
-            for f in ("full_name", "email", "phone", "branch_ids")
+            for f in ("full_name", "email", "phone", "branch_ids", "status")
             if f in data
         }
 
@@ -176,8 +198,10 @@ class StudentService:
                     raise HTTPException(
                         status_code=400, detail="Email already registered"
                     )
+            # Update user including status
             await user_crud.update(db, user, UserUpdate(**user_fields))
 
+        # Update student-specific fields
         class_ids = data.pop("class_ids", None)
         if data:
             student = await student_crud.update(db, student, data)
@@ -185,7 +209,7 @@ class StudentService:
         if class_ids is not None:
             await student_crud.update_student_classes(db, student, class_ids)
 
-        # Reload updated record
+        # Reload updated student with relations
         result = await db.execute(
             select(Student)
             .options(
@@ -199,7 +223,7 @@ class StudentService:
         return await StudentService._serialize_student(student)
 
     @staticmethod
-    async def delete_student(db: AsyncSession, student_id: int) -> dict:
+    async def delete_student(db: AsyncSession, student_id: int) -> Dict:
         student = await student_crud.get_by_id(db, student_id)
         if not student:
             raise HTTPException(status_code=404, detail="Student not found")
@@ -208,7 +232,7 @@ class StudentService:
         payment_exists = bool(getattr(student, "invoices", []))
         if attendance_exists or payment_exists:
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
+                status_code=400,
                 detail="Cannot delete student with attendance or payments",
             )
 
@@ -295,13 +319,12 @@ class StudentService:
     async def _notify_hr_new_student(
         db: AsyncSession, student: Student, creator: Optional[User] = None
     ):
-        from app.modules.roles.models import Role
-        from app.modules.users.models import User as UserModel
-
         role_res = await db.execute(select(Role).where(Role.name.ilike("admin")))
         hr_role = role_res.scalar_one_or_none()
         if not hr_role:
             return
+
+        from app.modules.users.models import User as UserModel
 
         res = await db.execute(select(UserModel).where(UserModel.role_id == hr_role.id))
         hr_users = res.scalars().all()

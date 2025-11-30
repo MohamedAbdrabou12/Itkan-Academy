@@ -1,4 +1,3 @@
-# backend/app/modules/users/schemas.py
 from datetime import datetime
 from typing import Optional, List
 from pydantic import BaseModel, EmailStr, field_validator
@@ -20,21 +19,14 @@ class UserBase(BaseModel):
     phone: Optional[str] = None
     branch_ids: Optional[List[int]] = None
 
-    # @field_validator("phone")
-    # def validate_phone(cls, v):
-    #     if v and not re.match(r"^\+?\d{10,15}$", v):
-    #         raise ValueError("Invalid phone number format")
-    #     return v
-
-
-@field_validator("phone")
-def validate_phone(cls, v):
-    if v:
-        cleaned = re.sub(r"[^\d+]", "", v)  # remove spaces, - , etc
-        if not re.match(r"^\+?\d{10,15}$", cleaned):
-            raise ValueError("Invalid phone number format")
-        return cleaned
-    return v
+    @field_validator("phone")
+    def validate_phone(cls, v):
+        if v:
+            cleaned = re.sub(r"[^\d+]", "", v)
+            if not re.match(r"^\+?\d{10,15}$", cleaned):
+                raise ValueError("Invalid phone number format")
+            return cleaned
+        return v
 
 
 class UserCreate(UserBase):
@@ -52,11 +44,6 @@ class UserUpdate(BaseModel):
     branches: Optional[List[BranchInfo]] = None
     status: Optional[UserStatus] = None
 
-    # @field_validator("phone")
-    # def validate_phone(cls, v):
-    #     if v and not re.match(r"^\+?\d{10,15}$", v):
-    #         raise ValueError("Invalid phone number format")
-    #     return v
     @field_validator("phone")
     def validate_phone(cls, v):
         if v:
