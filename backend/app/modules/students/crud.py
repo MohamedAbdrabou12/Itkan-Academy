@@ -1,7 +1,6 @@
-# backend/app/modules/students/crud.py
 from typing import List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
+from sqlalchemy import select, delete
 from sqlalchemy.orm import selectinload, joinedload
 from app.modules.students.models import Student, StudentClass
 from app.modules.users.models import User
@@ -9,17 +8,46 @@ from app.modules.users.models import User
 
 class StudentCRUD:
     async def get_all(
-        self, db: AsyncSession, status: Optional[str] = None
+        self,
+        db: AsyncSession,
+        status: Optional[str] = None,
+        search: Optional[str] = None,
+        sort_by: Optional[str] = None,
+        sort_order: Optional[str] = "asc",
     ) -> List[Student]:
-        stmt = (
-            select(Student)
-            .options(selectinload(Student.classes), joinedload(Student.user))
-            .order_by(Student.id)
+        stmt = select(Student).options(
+            selectinload(Student.classes), joinedload(Student.user)
         )
+
         if status:
             stmt = stmt.join(Student.user).where(User.status == status)
+
         result = await db.execute(stmt)
-        return result.scalars().all()
+        students = result.scalars().all()
+
+        # Filter by search
+        if search:
+            search_lower = search.lower()
+            students = [
+                s
+                for s in students
+                if search_lower in s.user.full_name.lower()
+                or search_lower in s.user.email.lower()
+            ]
+
+        # Sort manually
+        if sort_by:
+            reverse = sort_order.lower() == "desc"
+            if sort_by in {"full_name", "email", "status"}:
+                students.sort(key=lambda s: getattr(s.user, sort_by), reverse=reverse)
+            elif sort_by in {"admission_date", "curriculum_progress"}:
+                students.sort(key=lambda s: getattr(s, sort_by), reverse=reverse)
+            else:
+                students.sort(key=lambda s: s.id, reverse=reverse)
+        else:
+            students.sort(key=lambda s: s.id)
+
+        return students
 
     async def get_by_id(self, db: AsyncSession, student_id: int) -> Optional[Student]:
         stmt = (
@@ -57,7 +85,11 @@ class StudentCRUD:
     async def update_student_classes(
         self, db: AsyncSession, student: Student, class_ids: List[int]
     ):
-        await db.execute(f"DELETE FROM student_classes WHERE student_id = {student.id}")
+        # Delete existing
+        await db.execute(
+            delete(StudentClass).where(StudentClass.student_id == student.id)
+        )
+        # Add new
         for cid in class_ids:
             db.add(StudentClass(student_id=student.id, class_id=cid))
         await db.commit()

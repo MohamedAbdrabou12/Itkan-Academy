@@ -1,9 +1,9 @@
-# backend/app/modules/students/schemas.py
-from datetime import date, datetime  # noqa F401
+from datetime import date
 from typing import Dict, Optional, List
 from pydantic import BaseModel, EmailStr, field_validator
 import re
 from app.modules.users.schemas import UserRead
+from app.modules.users.models import UserStatus
 
 
 class StudentBase(BaseModel):
@@ -26,12 +26,6 @@ class StudentCreate(StudentBase):
     email: EmailStr
     phone: Optional[str] = None
     branch_ids: Optional[List[int]] = None
-
-    # @field_validator("phone")
-    # def validate_phone(cls, v):
-    #     if v and not re.match(r"^\+?\d{10,15}$", v):
-    #         raise ValueError("Invalid phone number format")
-    #     return v
 
     @field_validator("phone")
     def validate_phone(cls, v):
@@ -59,6 +53,7 @@ class StudentUpdate(BaseModel):
     branch_ids: Optional[List[int]] = None
     admission_date: Optional[date] = None
     curriculum_progress: Optional[Dict] = None
+    status: Optional[UserStatus] = None
 
     @field_validator("admission_date")
     @classmethod
@@ -68,12 +63,6 @@ class StudentUpdate(BaseModel):
         if v and v > d.today():
             raise ValueError("Admission date cannot be in the future")
         return v
-
-    # @field_validator("phone")
-    # def validate_phone(cls, v):
-    #     if v and not re.match(r"^\+?\d{10,15}$", v):
-    #         raise ValueError("Invalid phone number format")
-    #     return v
 
 
 @field_validator("phone")

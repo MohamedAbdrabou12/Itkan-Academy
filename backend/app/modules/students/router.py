@@ -1,32 +1,47 @@
-from typing import List, Optional
-
+from typing import Optional
+from fastapi import APIRouter, Depends, Query
+from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.auth import get_current_user
 from app.core.authorization import require_permission
 from app.db.session import get_db
-from app.modules.students.schemas import (
-    StudentCreate,
-    StudentRead,
-    StudentUpdate,
-)
+from app.modules.students.schemas import StudentCreate, StudentRead, StudentUpdate
 from app.modules.students.service import StudentService
 from app.modules.users.models import User
-from fastapi import APIRouter, Depends, Query, status
-from fastapi_pagination import Page
-from sqlalchemy.ext.asyncio import AsyncSession
 
 students_router = APIRouter(prefix="/students", tags=["Students"])
 
 
 @students_router.get(
     "/",
-    response_model=Page[StudentRead],
+    response_model=dict,
     dependencies=[Depends(require_permission("student.management.view"))],
 )
 async def list_students(
     db: AsyncSession = Depends(get_db),
-    status: Optional[str] = Query(None, description="Filter students by user status"),
+    page: int = Query(1, ge=1),
+    size: int = Query(10, ge=1),
+    search: Optional[str] = Query(None),
+    sort_by: Optional[str] = Query(None),
+    sort_order: Optional[str] = Query("asc"),
+    status: Optional[str] = Query(None),
 ):
-    return await StudentService.list_students(db, status)
+    students_page = await StudentService.list_students(
+        db,
+        page=page,
+        size=size,
+        search=search,
+        sort_by=sort_by,
+        sort_order=sort_order,
+        status=status,
+    )
+
+    return {
+        "items": students_page["items"],
+        "page": students_page["page"],
+        "size": students_page["size"],
+        "total": students_page["total"],
+        "pages": students_page["pages"],
+    }
 
 
 @students_router.get(
@@ -78,7 +93,7 @@ async def delete_student(student_id: int, db: AsyncSession = Depends(get_db)):
 @students_router.post(
     "/{student_id}/approve",
     response_model=StudentRead,
-    # dependencies=[Depends(require_permission("student.management.manage"))],
+    dependencies=[Depends(require_permission("student.management.manage"))],
 )
 async def approve_student(
     student_id: int,
@@ -91,7 +106,7 @@ async def approve_student(
 @students_router.post(
     "/{student_id}/reject",
     response_model=StudentRead,
-    # dependencies=[Depends(require_permission("student.management.manage"))],
+    dependencies=[Depends(require_permission("student.management.manage"))],
 )
 async def reject_student(
     student_id: int,
