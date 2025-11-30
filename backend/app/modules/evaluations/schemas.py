@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime, timedelta, timezone
 from typing import Dict, List, Optional
 
 from pydantic import BaseModel, field_validator
@@ -11,10 +11,16 @@ class EvaluationGradeCreate(BaseModel):
     grade: int
 
 
+type EvaluationGradeUpdate = EvaluationGradeCreate
+
+
 class StudentEvaluationCreate(BaseModel):
-    status: AttendanceStatus
+    attendance_status: AttendanceStatus
     notes: str = ""
     evaluations: Optional[List[EvaluationGradeCreate]] = []
+
+
+type StudentEvaluationUpdate = StudentEvaluationCreate
 
 
 class BulkEvaluationCreate(BaseModel):
@@ -24,8 +30,39 @@ class BulkEvaluationCreate(BaseModel):
 
     @field_validator("date")
     def validate_date_not_future(cls, v):
-        """Ensure date is not in the future"""
         eval_date = date.fromisoformat(v)
-        if eval_date > date.today():
+
+        gmt2 = timezone(timedelta(hours=2))
+        today_gmt2 = datetime.now(gmt2).date()
+
+        if eval_date > today_gmt2:
             raise ValueError("Date cannot be in the future")
         return v
+
+
+class BulkEvaluationUpdate(BaseModel):
+    class_id: int
+    date: str
+    records: Dict[int, StudentEvaluationUpdate]
+
+    @field_validator("date")
+    def validate_date_not_future(cls, v):
+        eval_date = date.fromisoformat(v)
+
+        gmt2 = timezone(timedelta(hours=2))
+        today_gmt2 = datetime.now(gmt2).date()
+
+        if eval_date > today_gmt2:
+            raise ValueError("Date cannot be in the future")
+        return v
+
+
+class ListEvaluationsResponseItem(BaseModel):
+    id: int
+    student_id: int
+    class_id: int
+    date: str
+    attendance_status: str
+    evaluation_grades: List[Dict]
+    notes: Optional[str]
+    created_at: str

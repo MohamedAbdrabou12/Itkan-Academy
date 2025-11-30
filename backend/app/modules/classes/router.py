@@ -12,14 +12,15 @@ from app.modules.classes.schemas import (
     ClassStudentsResponse,
     ClassUpdate,
 )
+from app.modules.permissions.permissions import PermissionCode
 from app.modules.students.models import Student, StudentClass
 from app.modules.teachers.models import Teacher
 from app.modules.users.models import User
-from fastapi import APIRouter, Depends, HTTPException, Query, Request, status, Body
+from fastapi import APIRouter, Body, Depends, HTTPException, Query, Request, status
+from fastapi_pagination import Page
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
-from fastapi_pagination import Page
 
 classes_router = APIRouter(prefix="/classes", tags=["Classes"])
 
@@ -32,6 +33,7 @@ async def get_teachers_classes_with_header(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
     active_branch_id: int = Depends(get_active_branch),
+    _=[Depends(require_permission(PermissionCode.ACADEMIC_CLASSES_VIEW))],
 ):
     try:
         teacher_query = (
@@ -72,6 +74,7 @@ async def get_class_students_simple(
     class_id: int,
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
+    _=[Depends(require_permission(PermissionCode.ACADEMIC_CLASSES_VIEW))],
 ):
     try:
         # Verify teacher access to this class

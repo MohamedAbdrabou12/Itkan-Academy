@@ -19,6 +19,24 @@
   },
   {
     "student_id": 1004,
+    "class_id": 1002,
+    "enrollment_date": "2024-09-01",
+    "is_active": true
+  },
+  {
+    "student_id": 1005,
+    "class_id": 1002,
+    "enrollment_date": "2024-09-01",
+    "is_active": true
+  },
+  {
+    "student_id": 1006,
+    "class_id": 1002,
+    "enrollment_date": "2024-09-01",
+    "is_active": true
+  },
+  {
+    "student_id": 1004,
     "class_id": 1003,
     "enrollment_date": "2024-09-01",
     "is_active": true

@@ -792,46 +792,6 @@
     "description_ar": "حذف الرواتب الشهرية للمعلمين"
   },
   {
-    "id": 1103,
-    "code": "student.management.*",
-    "name": "Full Student Management",
-    "name_ar": "إدارة الطلاب الكاملة",
-    "description": "Complete control over student management",
-    "description_ar": "التحكم الكامل في إدارة الطلاب"
-  },
-  {
-    "id": 1104,
-    "code": "student.management.view",
-    "name": "View Students",
-    "name_ar": "عرض الطلاب",
-    "description": "View student information",
-    "description_ar": "عرض معلومات الطلاب"
-  },
-  {
-    "id": 1105,
-    "code": "student.management.add",
-    "name": "Add Students",
-    "name_ar": "إضافة الطلاب",
-    "description": "Add new students",
-    "description_ar": "إضافة طلاب جدد"
-  },
-  {
-    "id": 1106,
-    "code": "student.management.edit",
-    "name": "Edit Students",
-    "name_ar": "تعديل الطلاب",
-    "description": "Edit student information",
-    "description_ar": "تعديل معلومات الطلاب"
-  },
-  {
-    "id": 1107,
-    "code": "student.management.delete",
-    "name": "Delete Students",
-    "name_ar": "حذف الطلاب",
-    "description": "Delete students",
-    "description_ar": "حذف الطلاب"
-  },
-  {
     "id": 1108,
     "code": "evaluation.student.*",
     "name": "Full Student Evaluation Management",
@@ -862,14 +822,6 @@
     "name_ar": "تعديل تقييمات الطلاب",
     "description": "Edit student evaluation records",
     "description_ar": "تعديل سجلات تقييم الطلاب"
-  },
-  {
-    "id": 1112,
-    "code": "evaluation.student.delete",
-    "name": "Delete Student Evaluations",
-    "name_ar": "حذف تقييمات الطلاب",
-    "description": "Delete student evaluation records",
-    "description_ar": "حذف سجلات تقييم الطلاب"
   },
   {
     "id": 1113,
@@ -1199,22 +1151,7 @@
     "description": "Modify existing branches",
     "description_ar": "تعديل الفروع الموجودة"
   },
-  {
-    "id": 1154,
-    "code": "system.users.*",
-    "name": "Full Users Management",
-    "name_ar": "إدارة المستخدمين الكاملة",
-    "description": "Complete control over users",
-    "description_ar": "التحكم الكامل في المستخدمين"
-  },
-  {
-    "id": 1155,
-    "code": "system.users.edit",
-    "name": "Update Users",
-    "name_ar": "تعديل المستخدمين",
-    "description": "Modify user information",
-    "description_ar": "تعديل معلومات المستخدمين"
-  },
+
   {
     "id": 1156,
     "code": "system.branches.view",
@@ -1230,14 +1167,6 @@
     "name_ar": "عرض الأدوار",
     "description": "View system roles",
     "description_ar": "عرض أدوار نظام"
-  },
-  {
-    "id": 1158,
-    "code": "system.users.view",
-    "name": "View Users",
-    "name_ar": "عرض المستخدمين",
-    "description": "View user information",
-    "description_ar": "عرض معلومات المستخدمين"
   },
   {
     "id": 1159,
@@ -1278,5 +1207,29 @@
     "name_ar": "حذف الطلاب",
     "description": "Delete students",
     "description_ar": "حذف الطلاب"
+  },
+  {
+    "id": 1164,
+    "code": "system.staff.*",
+    "name": "Full Staff Management",
+    "name_ar": "إدارة الموظفين الكاملة",
+    "description": "Complete control over staff",
+    "description_ar": "التحكم الكامل في الموظفين"
+  },
+  {
+    "id": 1165,
+    "code": "system.staff.view",
+    "name": "View Staff",
+    "name_ar": "عرض الموظفين",
+    "description": "View user information",
+    "description_ar": "عرض معلومات الموظفين"
+  },
+  {
+    "id": 1166,
+    "code": "system.staff.edit",
+    "name": "Update Staff",
+    "name_ar": "تعديل الموظفين",
+    "description": "Modify user information",
+    "description_ar": "تعديل معلومات الموظفين"
   }
 ]

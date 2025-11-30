@@ -1,24 +1,38 @@
-# backend/app/modules/staff/router.py
-from typing import List
-from fastapi import APIRouter, Depends, status
-from sqlalchemy.ext.asyncio import AsyncSession
-from app.db.session import get_db
+from typing import Optional
+
 from app.core.auth import get_current_user
 from app.core.authorization import require_permission
+from app.db.session import get_db
+from app.modules.permissions.permissions import PermissionCode
+from app.modules.staff.crud import staff_crud
 from app.modules.staff.schemas import StaffCreate, StaffRead, StaffUpdate
 from app.modules.staff.service import StaffService
 from app.modules.users.models import User
+from app.modules.users.schemas import UserRead
+from fastapi import APIRouter, Depends, Query, status
+from fastapi_pagination import Page
+from sqlalchemy.ext.asyncio import AsyncSession
 
 staff_router = APIRouter(prefix="/staff", tags=["Staff"])
 
 
 @staff_router.get(
     "/",
-    response_model=List[StaffRead],
-    dependencies=[Depends(require_permission("staff.management.manage"))],
+    response_model=Page[UserRead],
 )
-async def list_staff(db: AsyncSession = Depends(get_db)):
-    return await StaffService.list_staff(db)
+async def list_staff(
+    db: AsyncSession = Depends(get_db),
+    search: Optional[str] = Query(None),
+    sort_by: Optional[str] = Query("id"),
+    sort_order: Optional[str] = Query("asc"),
+    _=[Depends(require_permission(PermissionCode.SYSTEM_STAFF_VIEW))],
+):
+    return await staff_crud.get_all(
+        db,
+        search=search,
+        sort_by=sort_by,
+        sort_order=sort_order,
+    )
 
 
 @staff_router.get(
