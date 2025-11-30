@@ -100,6 +100,10 @@
     "permission_id": 1060
   },
   {
+    "role_id": 1003,
+    "permission_id": 1014
+  },
+  {
     "role_id": 1004,
     "permission_id": 1025
   },
