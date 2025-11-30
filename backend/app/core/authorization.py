@@ -47,6 +47,16 @@ def ensure_branch_access(request: Request, current_user: User):
         )
 
 
+# generate generic permission
+def generate_generic_permission(permission_code: str):
+    last_dot_index = permission_code.rfind(".")
+    if last_dot_index != -1:
+        module_name = permission_code[:last_dot_index]
+        return f"{module_name}.*"
+    else:
+        return permission_code
+
+
 # PERMISSION CHECK DECORATOR
 def require_permission(permission_code: str):
     """
@@ -68,7 +78,13 @@ def require_permission(permission_code: str):
 
         # Check if user has the required permission
         user_permissions = await get_user_permissions(db, current_user)
-        if permission_code not in user_permissions:
+
+        # generic permission code
+        generic_permission_code = generate_generic_permission(permission_code)
+        if (
+            permission_code not in user_permissions
+            and generic_permission_code not in user_permissions
+        ):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail=f"User lacks required permission: {permission_code}",
