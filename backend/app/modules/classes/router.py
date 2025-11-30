@@ -66,6 +66,7 @@ async def get_teachers_classes_with_header(
 @classes_router.get(
     "/{class_id}/students/",
     response_model=List[ClassStudentsResponse],
+    dependencies=[Depends(require_permission("academic.classes.view"))],
 )
 async def get_class_students_simple(
     class_id: int,
@@ -111,7 +112,10 @@ async def get_class_students_simple(
         )
 
 
-@classes_router.get("/", response_model=Page[ClassRead])
+@classes_router.get(
+    "/",
+    response_model=Page[ClassRead],
+)
 async def list_classes(
     request: Request,
     branch_id: int | None = Query(None),
@@ -158,7 +162,7 @@ async def get_class(class_id: int, db: AsyncSession = Depends(get_db)):
     status_code=status.HTTP_201_CREATED,
     dependencies=[
         Depends(get_current_user),
-        # Depends(require_permission("class:create")),
+        Depends(require_permission("academic.classes.add")),
     ],
 )
 async def create_class(class_in: ClassCreate, db: AsyncSession = Depends(get_db)):
@@ -170,7 +174,7 @@ async def create_class(class_in: ClassCreate, db: AsyncSession = Depends(get_db)
     response_model=ClassRead,
     dependencies=[
         Depends(get_current_user),
-        # Depends(require_permission("class:update")),
+        Depends(require_permission("academic.classes.edit")),
     ],
 )
 async def update_class(
@@ -187,7 +191,7 @@ async def update_class(
     status_code=status.HTTP_202_ACCEPTED,
     dependencies=[
         Depends(get_current_user),
-        # Depends(require_permission("class:delete")),
+        Depends(require_permission("academic.classes.delete")),
     ],
 )
 async def delete_class(class_id: int, db: AsyncSession = Depends(get_db)):

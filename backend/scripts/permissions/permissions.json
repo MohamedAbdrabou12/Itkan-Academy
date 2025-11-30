@@ -120,6 +120,30 @@
     "description_ar": "الوصول لعرض معلومات الفصول"
   },
   {
+    "id": 1016,
+    "code": "academic.classes.add",
+    "name": "Add Classes",
+    "name_ar": "اضافة فصل",
+    "description": "Add new class",
+    "description_ar": "اضافة فصل جديد"
+  },
+  {
+    "id": 1017,
+    "code": "academic.classes.edit",
+    "name": "Edit Classes",
+    "name_ar": "تعديل فصل",
+    "description": "Edit class information",
+    "description_ar": "تعديل بيانات الفصل"
+  },
+  {
+    "id": 2000,
+    "code": "academic.classes.delete",
+    "name": "Delete Classes",
+    "name_ar": "ازالة فصل",
+    "description": "Delete class information",
+    "description_ar": "حذف بيانات الفصل"
+  },
+  {
     "id": 1018,
     "code": "communication.supervisor.*",
     "name": "Full Supervisor Communication",
