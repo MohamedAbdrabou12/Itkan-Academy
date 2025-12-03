@@ -32,6 +32,7 @@ class UserBase(BaseModel):
 class UserCreate(UserBase):
     role_id: Optional[int] = None
     branch_ids: Optional[List[int]] = None
+    status: Optional[UserStatus]
 
 
 class UserUpdate(BaseModel):

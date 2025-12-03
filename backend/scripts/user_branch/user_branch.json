@@ -1,5 +1,6 @@
 [
   { "user_id": 1004, "branch_id": 1001 },
+  { "user_id": 1004, "branch_id": 1002 },
 
   { "user_id": 1005, "branch_id": 1002 },
 

@@ -154,6 +154,7 @@ class PermissionCode(str, Enum):
     # System Staff
     SYSTEM_STAFF_ALL = "system.staff.*"
     SYSTEM_STAFF_VIEW = "system.staff.view"
+    SYSTEM_STAFF_ADD = "system.staff.add"
     SYSTEM_STAFF_EDIT = "system.staff.edit"
 
     # System Assignments
@@ -176,13 +177,6 @@ class PermissionCode(str, Enum):
     SYSTEM_STUDENTS_ADD = "system.students.add"
     SYSTEM_STUDENTS_EDIT = "system.students.edit"
     SYSTEM_STUDENTS_DELETE = "system.students.delete"
-
-    # Staff Management
-    STAFF_MANAGEMENT_ALL = "staff.management.*"
-    STAFF_MANAGEMENT_VIEW = "staff.management.view"
-    STAFF_MANAGEMENT_ADD = "staff.management.add"
-    STAFF_MANAGEMENT_EDIT = "staff.management.edit"
-    STAFF_MANAGEMENT_DELETE = "staff.management.delete"
 
     # Penalty Staff
     PENALTY_STAFF_ALL = "penalty.staff.*"

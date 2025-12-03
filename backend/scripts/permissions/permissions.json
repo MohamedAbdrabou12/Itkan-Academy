@@ -592,46 +592,6 @@
     "description_ar": "مراجعة واعتماد أنشطة الطلاب"
   },
   {
-    "id": 1078,
-    "code": "staff.management.*",
-    "name": "Full Staff Management",
-    "name_ar": "إدارة الموظفين الكاملة",
-    "description": "Complete control over staff management",
-    "description_ar": "التحكم الكامل في إدارة الموظفين"
-  },
-  {
-    "id": 1079,
-    "code": "staff.management.view",
-    "name": "View Staff",
-    "name_ar": "عرض الموظفين",
-    "description": "View staff information",
-    "description_ar": "عرض معلومات الموظفين"
-  },
-  {
-    "id": 1080,
-    "code": "staff.management.add",
-    "name": "Add Staff",
-    "name_ar": "إضافة الموظفين",
-    "description": "Add new staff members",
-    "description_ar": "إضافة موظفين جدد"
-  },
-  {
-    "id": 1081,
-    "code": "staff.management.edit",
-    "name": "Edit Staff",
-    "name_ar": "تعديل الموظفين",
-    "description": "Edit staff information",
-    "description_ar": "تعديل معلومات الموظفين"
-  },
-  {
-    "id": 1082,
-    "code": "staff.management.delete",
-    "name": "Delete Staff",
-    "name_ar": "حذف الموظفين",
-    "description": "Delete staff members",
-    "description_ar": "حذف الموظفين"
-  },
-  {
     "id": 1083,
     "code": "penalty.staff.*",
     "name": "Full Staff Penalty Management",
@@ -1231,5 +1191,13 @@
     "name_ar": "تعديل الموظفين",
     "description": "Modify user information",
     "description_ar": "تعديل معلومات الموظفين"
+  },
+  {
+    "id": 1167,
+    "code": "system.staff.add",
+    "name": "Add Staff",
+    "name_ar": "إضافة الموظفين",
+    "description": "Add new staff members",
+    "description_ar": "إضافة موظفين جدد"
   }
 ]

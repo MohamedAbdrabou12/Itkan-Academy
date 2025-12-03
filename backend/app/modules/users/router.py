@@ -3,11 +3,12 @@ from typing import Optional
 from app.core.auth import get_current_user
 from app.core.authorization import require_permission
 from app.db.session import get_db
+from app.modules.permissions.permissions import PermissionCode
 from app.modules.roles.crud import role_crud
 from app.modules.users.crud import map_user_to_read, user_crud
 from app.modules.users.models import UserStatus
 from app.modules.users.schemas import UserCreate, UserRead, UserRoleUpdate, UserUpdate
-from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from fastapi_pagination import Page
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -15,20 +16,19 @@ user_router = APIRouter(prefix="/users", tags=["Users"])
 
 
 @user_router.get(
-    "/",
+    "/staff",
     response_model=Page[UserRead],
     dependencies=[
-        # Depends(get_current_user),
-        # Depends(require_permission("staff.management.manage")),
+        Depends(require_permission(PermissionCode.SYSTEM_STAFF_VIEW)),
     ],
 )
-async def list_users(
+async def list_all_staff(
     db: AsyncSession = Depends(get_db),
     search: Optional[str] = Query(None),
     sort_by: Optional[str] = Query("id"),
     sort_order: Optional[str] = Query("asc"),
 ):
-    return await user_crud.get_all(
+    return await user_crud.get_all_staff(
         db,
         search=search,
         sort_by=sort_by,
@@ -36,62 +36,19 @@ async def list_users(
     )
 
 
-@user_router.get(
-    "/{user_id}",
-    response_model=UserRead,
-    dependencies=[
-        Depends(get_current_user),
-        Depends(require_permission("staff.management.manage")),
-    ],
-)
-async def get_user(user_id: int, request: Request, db: AsyncSession = Depends(get_db)):
-    """
-    Get single user, applying branch filter for non-admins.
-    """
-    user = await user_crud.get_by_id(db, user_id, request)
-    if not user:
-        return None
-    return map_user_to_read(user)
-
-
 @user_router.post(
-    "/",
+    "/staff",
     response_model=UserRead,
     status_code=status.HTTP_201_CREATED,
     dependencies=[
-        Depends(get_current_user),
-        Depends(require_permission("staff.management.manage")),
+        Depends(require_permission(PermissionCode.SYSTEM_STAFF_ADD)),
     ],
 )
-async def create_user(
-    user_in: UserCreate, request: Request, db: AsyncSession = Depends(get_db)
+async def create_staff(
+    user: UserCreate,
+    db: AsyncSession = Depends(get_db),
 ):
-    """
-    Create a new user.
-    - Prevent normal users from assigning unauthorized branch_ids.
-    - Admins can assign any branch.
-    """
-    current_user = request.state.current_user  # assuming middleware sets current user
-    is_admin = current_user.role_name == "admin"
-
-    # Verify branch_ids for non-admin users
-    if not is_admin and user_in.branch_ids:
-        allowed_branches = getattr(request.state, "branch_ids", [])
-        invalid_ids = [bid for bid in user_in.branch_ids if bid not in allowed_branches]
-        if invalid_ids:
-            raise HTTPException(
-                status_code=403, detail=f"You cannot assign branches: {invalid_ids}"
-            )
-
-    existing = await user_crud.get_by_email(db, user_in.email)
-    if existing:
-        return map_user_to_read(existing)
-
-    # pass request if needed inside crud for future branch filtering
-    user = await user_crud.create(db, user_in)
-    if not user:
-        return None
-    return map_user_to_read(user)
+    return await user_crud.create(db, user)
 
 
 @user_router.patch(
@@ -132,41 +89,25 @@ async def update_user_role(
 
 
 @user_router.put(
-    "/{user_id}",
+    "/staff/{user_id}",
     response_model=UserRead,
     dependencies=[
         Depends(get_current_user),
-        Depends(require_permission("staff.management.manage")),
+        Depends(require_permission(PermissionCode.SYSTEM_STAFF_EDIT)),
     ],
 )
 async def update_user(
     user_id: int,
-    user_in: UserUpdate,
-    request: Request,
+    user_update: UserUpdate,
     db: AsyncSession = Depends(get_db),
 ):
-    """
-    Update existing user.
-    - Verify branch_ids for non-admin users.
-    """
-    current_user = request.state.current_user
-    is_admin = current_user.role_name == "admin"
-
     user = await user_crud.get_by_id(db, user_id)
     if not user:
-        return None
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
 
-    # Verify branch_ids if updating them
-    if not is_admin and user_in.branch_ids:
-        allowed_branches = getattr(request.state, "branch_ids", [])
-        invalid_ids = [bid for bid in user_in.branch_ids if bid not in allowed_branches]
-        if invalid_ids:
-            raise HTTPException(
-                status_code=403, detail=f"You cannot assign branches: {invalid_ids}"
-            )
-
-    user = await user_crud.update(db, user, user_in)
-    return map_user_to_read(user)
+    return await user_crud.update(db, user, user_update)
 
 
 @user_router.delete(
