@@ -25,7 +25,6 @@ async def list_branches(
     search: Optional[str] = Query(None),
     sort_by: Optional[str] = Query("id"),
     sort_order: Optional[str] = Query("asc"),
-    _=[Depends(require_permission(PermissionCode.SYSTEM_BRANCHES_VIEW))],
 ):
     return await branch_crud.get_all(
         db,

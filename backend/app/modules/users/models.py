@@ -1,19 +1,20 @@
 from __future__ import annotations
+
 from datetime import datetime
 from enum import Enum
-from typing import TYPE_CHECKING, Optional, List
+from typing import TYPE_CHECKING, List, Optional
+
 from app.db.base import Base
 from sqlalchemy import DateTime, ForeignKey, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 if TYPE_CHECKING:
+    from app.modules.branches.models import Branch
+    from app.modules.exams.models.exam_attempt import ExamAttempt
     from app.modules.notifications.models import Notification
     from app.modules.roles.models import Role
-    from app.modules.branches.models import Branch
     from app.modules.students.models import Student
     from app.modules.teachers.models import Teacher
-    from app.modules.exams.models.exam_attempt import ExamAttempt
-    from app.modules.staff.models import Staff
 
 
 class UserStatus(str, Enum):
@@ -104,12 +105,6 @@ class User(Base):
     )
     teacher: Mapped[Optional["Teacher"]] = relationship(
         "Teacher", back_populates="user", uselist=False
-    )
-    staff: Mapped[Optional["Staff"]] = relationship(
-        "Staff",
-        back_populates="user",
-        uselist=False,
-        lazy="joined",
     )
     exam_attempts: Mapped[List[ExamAttempt]] = relationship(
         "ExamAttempt", back_populates="student", lazy="selectin"

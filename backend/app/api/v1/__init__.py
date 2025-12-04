@@ -16,7 +16,6 @@ from app.modules.question_bank.router import question_bank_router
 from app.modules.reports.router import report_job_router
 from app.modules.role_permissions.router import role_permissions_router
 from app.modules.roles.router import role_router
-from app.modules.staff.router import staff_router
 from app.modules.students.router import students_router
 from app.modules.users.router import user_router
 from app.modules.teachers.router import teachers_router
@@ -33,7 +32,6 @@ api_router.include_router(permissions_router, tags=["Permissions"])
 api_router.include_router(role_permissions_router, tags=["Role Permissions"])
 api_router.include_router(branch_router, tags=["Branches"])
 api_router.include_router(classes_router, tags=["Classes"])
-api_router.include_router(staff_router, tags=["Staff"])
 api_router.include_router(students_router, tags=["Students"])
 api_router.include_router(evaluations_router, tags=["Daily Evaluations"])
 api_router.include_router(audit_log_router, tags=["Audit Logs"])

@@ -12,7 +12,6 @@ from scripts.roles import add_roles
 from scripts.users import add_users
 from scripts.students import add_students
 from scripts.teachers import add_teachers
-from scripts.staff import add_staff
 from scripts.user_branch import add_user_branch
 from scripts.classes import add_classes
 from scripts.student_classes import add_students_classes
@@ -46,7 +45,6 @@ async def seed_data():
         await add_user_branch(db)
         await add_students(db)
         await add_teachers(db)
-        await add_staff(db)
         await add_classes(db)
         await add_students_classes(db)
         await add_teacher_classes(db)

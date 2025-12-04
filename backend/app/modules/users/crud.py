@@ -7,7 +7,7 @@ from app.modules.users.schemas import BranchInfo, UserCreate, UserRead, UserUpda
 from app.services.notification_service.workrs.worker import send_notification_task
 from fastapi import HTTPException, Request
 from fastapi_pagination.ext.sqlalchemy import paginate as sqlalchemy_paginate
-from sqlalchemy import asc, desc, or_
+from sqlalchemy import asc, desc, not_, and_, or_
 from sqlalchemy import delete as sa_delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -41,16 +41,20 @@ def map_user_to_read(user: User) -> UserRead:
 
 
 class UserCRUD:
-    async def get_all(
+    async def get_all_staff(
         self,
         db: AsyncSession,
         search: Optional[str] = None,
         sort_by: Optional[str] = "id",
         sort_order: Optional[str] = "asc",
     ):
-        query = select(User).options(
-            selectinload(User.role),
-            selectinload(User.branch_links).joinedload(UserBranch.branch),
+        query = (
+            select(User)
+            .options(
+                selectinload(User.role),
+                selectinload(User.branch_links).joinedload(UserBranch.branch),
+            )
+            .where(and_(not_(User.teacher.has()), not_(User.student.has())))
         )
 
         # Apply search filter
@@ -145,9 +149,6 @@ class UserCRUD:
     async def create(
         self, db: AsyncSession, obj_in: dict | UserCreate
     ) -> Optional[User]:
-        """
-        Create a new user, sync branches, and send initial password reset email.
-        """
         data = (
             obj_in.dict(exclude_unset=True)
             if not isinstance(obj_in, dict)
