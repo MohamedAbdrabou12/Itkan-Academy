@@ -1,8 +1,6 @@
 from __future__ import annotations
-
 from datetime import date, datetime
 from typing import TYPE_CHECKING, Dict, List, Optional
-
 from app.db.base import Base
 from sqlalchemy import JSON, Boolean, Date, DateTime, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -12,6 +10,8 @@ if TYPE_CHECKING:
     from app.modules.evaluations.models import Evaluation
     from app.modules.financial.models.invoice import Invoice
     from app.modules.users.models import User
+    from app.modules.parents.models import Parent
+    from app.modules.parents.models import ParentStudent
 
 
 class StudentClass(Base):
@@ -60,6 +60,20 @@ class Student(Base):
 
     # Relationships
     user: Mapped["User"] = relationship("User", back_populates="student", lazy="joined")
+
+    parent_links: Mapped[List["ParentStudent"]] = relationship(
+        "ParentStudent",
+        back_populates="student",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+    )
+    parents: Mapped[List["Parent"]] = relationship(
+        "Parent",
+        secondary="parent_students",
+        back_populates="children",
+        lazy="selectin",
+        viewonly=False,
+    )
 
     class_links: Mapped[List["StudentClass"]] = relationship(
         "StudentClass",

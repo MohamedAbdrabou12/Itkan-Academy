@@ -1,9 +1,7 @@
 from __future__ import annotations
-
 from datetime import datetime
 from enum import Enum
 from typing import TYPE_CHECKING, List, Optional
-
 from app.db.base import Base
 from sqlalchemy import DateTime, ForeignKey, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -15,6 +13,7 @@ if TYPE_CHECKING:
     from app.modules.roles.models import Role
     from app.modules.students.models import Student
     from app.modules.teachers.models import Teacher
+    from app.modules.parents.models import Parent
 
 
 class UserStatus(str, Enum):
@@ -108,6 +107,10 @@ class User(Base):
     )
     exam_attempts: Mapped[List[ExamAttempt]] = relationship(
         "ExamAttempt", back_populates="student", lazy="selectin"
+    )
+
+    parent: Mapped[Optional["Parent"]] = relationship(
+        "Parent", back_populates="user", uselist=False
     )
 
     # Computed attributes (not stored in DB)

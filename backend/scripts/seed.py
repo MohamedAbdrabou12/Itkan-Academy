@@ -16,6 +16,8 @@ from scripts.user_branch import add_user_branch
 from scripts.classes import add_classes
 from scripts.student_classes import add_students_classes
 from scripts.teacher_classes import add_teacher_classes
+from scripts.parents import add_parents
+from scripts.parent_students import add_parent_students
 
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
@@ -48,6 +50,8 @@ async def seed_data():
         await add_classes(db)
         await add_students_classes(db)
         await add_teacher_classes(db)
+        await add_parents(db)
+        await add_parent_students(db)
         await db.commit()
         print("\nAll data committed successfully!")
 

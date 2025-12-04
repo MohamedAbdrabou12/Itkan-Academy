@@ -1,3 +1,4 @@
+# backend/app/modules/permissions/permissions.py
 from enum import Enum
 
 
@@ -229,3 +230,33 @@ class PermissionCode(str, Enum):
     ACTIVITIES_PARTIES_ADD = "activities.parties.add"
     ACTIVITIES_PARTIES_EDIT = "activities.parties.edit"
     ACTIVITIES_PARTIES_DELETE = "activities.parties.delete"
+
+    # Parent Permissions
+
+    # Parent Management
+    PARENTS_ALL = "parent.management.*"
+    PARENTS_LIST = "parent.management.list"
+    PARENTS_VIEW = "parent.management.view"
+    PARENTS_ADD = "parent.management.add"
+    PARENTS_EDIT = "parent.management.edit"
+    PARENTS_DELETE = "parent.management.delete"
+    PARENTS_LINK_CHILD = "parent.link_child"
+    PARENTS_UNLINK_CHILD = "parent.unlink_child"
+
+    # Parent Evaluation Access
+    EVALUATION_STUDENT_VIEW_FOR_PARENT = "evaluation.student.view_for_parent"
+    EVALUATION_STUDENT_REPORTS_VIEW = "evaluation.student.reports.view"
+
+    # Parent Dashboard
+    PARENT_DASHBOARD_VIEW = "parent_dashboard:view"
+    STUDENT_REPORTS_VIEW = "student_reports:view"
+    ATTENDANCE_VIEW = "attendance:view"
+    EXAM_RESULTS_VIEW = "exam_results:view"
+    COMMUNICATION_SEND_MESSAGE = "communication:send_message"
+
+    # Financial Subscriptions for Parent
+    FINANCIAL_SUBSCRIPTIONS_VIEW_FOR_PARENT = "financial.subscriptions.view_for_parent"
+    FINANCIAL_SUBSCRIPTIONS_PAY_FOR_PARENT = "financial.subscriptions.pay_for_parent"
+
+    # Communication Receive Messages
+    COMMUNICATION_RECEIVE_MESSAGES = "communication.receive_messages"
