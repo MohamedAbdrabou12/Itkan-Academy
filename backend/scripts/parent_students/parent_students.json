@@ -1,0 +1,14 @@
+[
+  {
+    "parent_id": 1001,
+    "student_id": 1001
+  },
+  {
+    "parent_id": 1002,
+    "student_id": 1003
+  },
+  {
+    "parent_id": 1001,
+    "student_id": 1002
+  }
+]

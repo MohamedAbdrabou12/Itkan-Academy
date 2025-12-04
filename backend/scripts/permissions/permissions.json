@@ -1199,5 +1199,61 @@
     "name_ar": "إضافة الموظفين",
     "description": "Add new staff members",
     "description_ar": "إضافة موظفين جدد"
-  }
+  },
+  {
+  "id": 1200,
+  "code": "parent.management.*",
+  "name": "Full Parent Management",
+  "name_ar": "إدارة أولياء الأمور الكاملة",
+  "description": "Complete control over all parent operations",
+  "description_ar": "التحكم الكامل في جميع عمليات أولياء الأمور"
+},
+{
+  "id": 1201,
+  "code": "parent.management.view",
+  "name": "View Parents",
+  "name_ar": "عرض أولياء الأمور",
+  "description": "Access to view parent information",
+  "description_ar": "الوصول لعرض بيانات أولياء الأمور"
+},
+{
+  "id": 1202,
+  "code": "parent.management.add",
+  "name": "Add Parents",
+  "name_ar": "إضافة أولياء الأمور",
+  "description": "Add new parents",
+  "description_ar": "إضافة أولياء أمور جدد"
+},
+{
+  "id": 1203,
+  "code": "parent.management.edit",
+  "name": "Edit Parents",
+  "name_ar": "تعديل أولياء الأمور",
+  "description": "Edit parent information",
+  "description_ar": "تعديل بيانات أولياء الأمور"
+},
+{
+  "id": 1204,
+  "code": "parent.management.delete",
+  "name": "Delete Parents",
+  "name_ar": "حذف أولياء الأمور",
+  "description": "Delete parent information",
+  "description_ar": "حذف بيانات أولياء الأمور"
+},
+{
+  "id": 1205,
+  "code": "parent.link_child",
+  "name": "Link Child to Parent",
+  "name_ar": "ربط طالب بولي أمر",
+  "description": "Link a student to a parent",
+  "description_ar": "ربط طالب بولي أمر"
+},
+{
+  "id": 1206,
+  "code": "parent.unlink_child",
+  "name": "Unlink Child from Parent",
+  "name_ar": "فصل طالب عن ولي أمر",
+  "description": "Unlink a student from a parent",
+  "description_ar": "فصل طالب عن ولي أمر"
+}
 ]

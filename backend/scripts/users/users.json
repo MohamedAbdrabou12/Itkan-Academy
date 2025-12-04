@@ -259,5 +259,23 @@
     "phone": "+201000000029",
     "password_hash": "student12",
     "status": "active"
+  },
+  {
+    "id": 1030,
+    "role_id": 1012,  
+    "full_name": "أحمد محمود", 
+    "email": "parent1@test.com",
+    "phone": "+201000000030",
+    "password_hash": "parent1",
+    "status": "active"
+  },
+  {
+    "id": 1031,
+    "role_id": 1012,  
+    "full_name": "سارة علي",
+    "email": "parent2@test.com",
+    "phone": "+201000000031",
+    "password_hash": "parent2",
+    "status": "active"
   }
 ]

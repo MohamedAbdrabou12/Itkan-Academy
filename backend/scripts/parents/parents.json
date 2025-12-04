@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1001,
+    "user_id": 1030,
+    "occupation": "Engineer",
+    "address": "123 Main St",
+    "relationship_type": "Father"
+  },
+  {
+    "id": 1002,
+    "user_id": 1031,
+    "occupation": "Teacher",
+    "address": "456 Park Ave",
+    "relationship_type": "Mother"
+  }
+]

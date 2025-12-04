@@ -1,5 +1,4 @@
 from typing import List, Optional
-
 from app.modules.permissions.models import Permission
 from app.modules.role_permissions.models import RolePermission
 from app.modules.roles.models import Role

@@ -75,5 +75,13 @@
     "name_ar": "مدير الشؤون المالية",
     "description": "Following up financial data (incoming and outgoing)",
     "description_ar": "متابعة البيانات المالية (الداخلة والخارجة)"
+  },
+
+  {
+    "id": 1012,
+    "name": "Parent",
+    "name_ar": "ولي أمر",
+    "description": "Following up child's academic performance, communication with school and payments",
+    "description_ar": "متابعة الأداء الأكاديمي للطفل، التواصل مع المدرسة والدفع"
   }
 ]
