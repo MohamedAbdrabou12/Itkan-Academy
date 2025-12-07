@@ -80,3 +80,6 @@ class StudentRead(UserRead):
     class_ids: Optional[List[int]] = None
     admission_date: Optional[date]
     curriculum_progress: Optional[Dict]
+
+    class Config:
+        from_attributes = True
