@@ -1,3 +1,4 @@
+# app/modules/users/router.py
 from typing import Optional
 from app.core.auth import get_current_user
 from app.core.authorization import require_permission

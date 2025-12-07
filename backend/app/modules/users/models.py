@@ -1,7 +1,10 @@
+# app/modules/users/models.py
 from __future__ import annotations
+
 from datetime import datetime
 from enum import Enum
 from typing import TYPE_CHECKING, List, Optional
+
 from app.db.base import Base
 from sqlalchemy import DateTime, ForeignKey, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -24,11 +27,6 @@ class UserStatus(str, Enum):
 
 
 class UserBranch(Base):
-    """
-    Association table mapping users <-> branches (many-to-many).
-    Using a mapped-class allows adding extra fields later (role_in_branch, joined_at, etc.)
-    """
-
     __tablename__ = "user_branches"
 
     user_id: Mapped[int] = mapped_column(
@@ -41,7 +39,6 @@ class UserBranch(Base):
         DateTime(timezone=True), default=datetime.utcnow
     )
 
-    # relationships (optional convenience backrefs)
     user = relationship("User", back_populates="branch_links", lazy="selectin")
     branch = relationship("Branch", back_populates="user_links", lazy="selectin")
 
@@ -55,8 +52,8 @@ class User(Base):
     )
 
     full_name: Mapped[str] = mapped_column(String(120), nullable=False)
-    email: Mapped[str] = mapped_column(
-        String(120), unique=True, nullable=False, index=True
+    email: Mapped[Optional[str]] = mapped_column(
+        String(120), unique=True, nullable=True, index=True
     )
     phone: Mapped[Optional[str]] = mapped_column(String(20))
     password_hash: Mapped[str] = mapped_column(Text, nullable=False)
@@ -71,12 +68,15 @@ class User(Base):
         DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow
     )
 
-    # Relationships
+    login_identifier: Mapped[str] = mapped_column(
+        String(100), unique=True, nullable=False
+    )
+    login_type: Mapped[str] = mapped_column(String(20), nullable=False)
+
     role: Mapped[Optional["Role"]] = relationship(
         "Role", back_populates="users", lazy="joined"
     )
 
-    # Association relationship - NO CASCADE
     branch_links: Mapped[List["UserBranch"]] = relationship(
         "UserBranch",
         back_populates="user",
@@ -84,7 +84,6 @@ class User(Base):
         viewonly=True,
     )
 
-    # Convenience relationship
     branches: Mapped[List["Branch"]] = relationship(
         "Branch",
         secondary="user_branches",
@@ -108,12 +107,10 @@ class User(Base):
     exam_attempts: Mapped[List[ExamAttempt]] = relationship(
         "ExamAttempt", back_populates="student", lazy="selectin"
     )
-
     parent: Mapped[Optional["Parent"]] = relationship(
         "Parent", back_populates="user", uselist=False
     )
 
-    # Computed attributes (not stored in DB)
     @property
     def role_name(self) -> Optional[str]:
         return self.role.name if self.role else None
@@ -124,8 +121,140 @@ class User(Base):
 
     @property
     def branch_name(self) -> Optional[str]:
-        # return first branch name if available
         return self.branches[0].name if self.branches else None
 
     def __repr__(self) -> str:
         return f"<User(id={self.id}, name='{self.full_name}')>"
+
+
+# from __future__ import annotations
+# from datetime import datetime
+# from enum import Enum
+# from typing import TYPE_CHECKING, List, Optional
+# from app.db.base import Base
+# from sqlalchemy import DateTime, ForeignKey, String, Text
+# from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+# if TYPE_CHECKING:
+#     from app.modules.branches.models import Branch
+#     from app.modules.exams.models.exam_attempt import ExamAttempt
+#     from app.modules.notifications.models import Notification
+#     from app.modules.roles.models import Role
+#     from app.modules.students.models import Student
+#     from app.modules.teachers.models import Teacher
+#     from app.modules.parents.models import Parent
+
+
+# class UserStatus(str, Enum):
+#     pending = "pending"
+#     active = "active"
+#     rejected = "rejected"
+#     deactive = "deactive"
+
+
+# class UserBranch(Base):
+#     """
+#     Association table mapping users <-> branches (many-to-many).
+#     Using a mapped-class allows adding extra fields later (role_in_branch, joined_at, etc.)
+#     """
+
+#     __tablename__ = "user_branches"
+
+#     user_id: Mapped[int] = mapped_column(
+#         ForeignKey("users.id", ondelete="CASCADE"), primary_key=True
+#     )
+#     branch_id: Mapped[int] = mapped_column(
+#         ForeignKey("branches.id", ondelete="CASCADE"), primary_key=True
+#     )
+#     created_at: Mapped[datetime] = mapped_column(
+#         DateTime(timezone=True), default=datetime.utcnow
+#     )
+
+#     # relationships (optional convenience backrefs)
+#     user = relationship("User", back_populates="branch_links", lazy="selectin")
+#     branch = relationship("Branch", back_populates="user_links", lazy="selectin")
+
+
+# class User(Base):
+#     __tablename__ = "users"
+
+#     id: Mapped[int] = mapped_column(primary_key=True, index=True)
+#     role_id: Mapped[Optional[int]] = mapped_column(
+#         ForeignKey("roles.id", ondelete="SET NULL"), nullable=True
+#     )
+
+#     full_name: Mapped[str] = mapped_column(String(120), nullable=False)
+#     email: Mapped[str] = mapped_column(
+#         String(120), unique=True, nullable=False, index=True
+#     )
+#     phone: Mapped[Optional[str]] = mapped_column(String(20))
+#     password_hash: Mapped[str] = mapped_column(Text, nullable=False)
+#     status: Mapped[str] = mapped_column(
+#         String(20), default=UserStatus.pending.value, nullable=False
+#     )
+#     last_login: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
+#     created_at: Mapped[datetime] = mapped_column(
+#         DateTime(timezone=True), default=datetime.utcnow
+#     )
+#     updated_at: Mapped[datetime] = mapped_column(
+#         DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow
+#     )
+
+#     # Relationships
+#     role: Mapped[Optional["Role"]] = relationship(
+#         "Role", back_populates="users", lazy="joined"
+#     )
+
+#     # Association relationship - NO CASCADE
+#     branch_links: Mapped[List["UserBranch"]] = relationship(
+#         "UserBranch",
+#         back_populates="user",
+#         lazy="selectin",
+#         viewonly=True,
+#     )
+
+#     # Convenience relationship
+#     branches: Mapped[List["Branch"]] = relationship(
+#         "Branch",
+#         secondary="user_branches",
+#         back_populates="users_m2m",
+#         lazy="selectin",
+#         viewonly=True,
+#     )
+
+#     notifications: Mapped[List["Notification"]] = relationship(
+#         "Notification",
+#         back_populates="user",
+#         lazy="selectin",
+#         cascade="all, delete-orphan",
+#     )
+#     student: Mapped[Optional["Student"]] = relationship(
+#         "Student", back_populates="user", uselist=False
+#     )
+#     teacher: Mapped[Optional["Teacher"]] = relationship(
+#         "Teacher", back_populates="user", uselist=False
+#     )
+#     exam_attempts: Mapped[List[ExamAttempt]] = relationship(
+#         "ExamAttempt", back_populates="student", lazy="selectin"
+#     )
+
+#     parent: Mapped[Optional["Parent"]] = relationship(
+#         "Parent", back_populates="user", uselist=False
+#     )
+
+#     # Computed attributes (not stored in DB)
+#     @property
+#     def role_name(self) -> Optional[str]:
+#         return self.role.name if self.role else None
+
+#     @property
+#     def role_name_ar(self) -> Optional[str]:
+#         return self.role.name_ar if self.role else None
+
+#     @property
+#     def branch_name(self) -> Optional[str]:
+#         # return first branch name if available
+#         return self.branches[0].name if self.branches else None
+
+#     def __repr__(self) -> str:
+#         return f"<User(id={self.id}, name='{self.full_name}')>"
