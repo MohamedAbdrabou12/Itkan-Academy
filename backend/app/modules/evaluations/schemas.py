@@ -61,6 +61,7 @@ class ListEvaluationsResponseItem(BaseModel):
     id: int
     student_id: int
     class_id: int
+    branch_id: int
     date: str
     attendance_status: str
     evaluation_grades: List[Dict]

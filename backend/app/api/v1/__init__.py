@@ -13,7 +13,8 @@ from app.modules.financial.router.payment import payment_router
 from app.modules.notifications.router import notification_router
 from app.modules.permissions.router import permissions_router
 from app.modules.question_bank.router import question_bank_router
-from app.modules.reports.router import report_job_router
+
+from app.modules.reports.router.base import reports_router
 from app.modules.role_permissions.router import role_permissions_router
 from app.modules.roles.router import role_router
 from app.modules.students.router import students_router
@@ -41,7 +42,7 @@ api_router.include_router(question_bank_router, tags=["Question Bank"])
 api_router.include_router(notification_router, tags=["Notifications"])
 api_router.include_router(invoice_router, tags=["Invoices"])
 api_router.include_router(payment_router, tags=["Payments"])
-api_router.include_router(report_job_router, tags=["Report Jobs"])
+api_router.include_router(reports_router, tags=["Reports"])
 api_router.include_router(exam_router, tags=["Exams"])
 api_router.include_router(exam_question_router, tags=["Exam Questions"])
 api_router.include_router(exam_answers_router, tags=["Exam Answers"])

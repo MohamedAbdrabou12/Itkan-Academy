@@ -1,5 +1,5 @@
-from typing import Optional
-from fastapi import APIRouter, Depends, Query
+from typing import Dict, List, Optional
+from fastapi import APIRouter, Body, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.auth import get_current_user
 from app.core.authorization import require_permission
@@ -42,6 +42,19 @@ async def list_students(
         "total": students_page["total"],
         "pages": students_page["pages"],
     }
+
+
+@students_router.post("/by-classes", response_model=List[Dict])
+async def get_students_by_classes(
+    db: AsyncSession = Depends(get_db),
+    class_ids: List[int] = Body(..., embed=True),
+):
+    students = await StudentService.get_students_by_classes(db, class_ids)
+    if not students:
+        raise HTTPException(
+            status_code=404, detail="No students found for these branches"
+        )
+    return students
 
 
 @students_router.get(

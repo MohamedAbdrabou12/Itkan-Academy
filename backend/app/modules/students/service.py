@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 from app.modules.students.models import Student
-from app.modules.students.schemas import StudentCreate, StudentUpdate
+from app.modules.students.schemas import StudentCreate, StudentRead, StudentUpdate
 from app.modules.students.crud import student_crud
 from app.modules.users.models import User, UserStatus
 from app.modules.users.schemas import (
@@ -84,6 +84,15 @@ class StudentService:
             "total": total,
             "pages": (total + size - 1) // size,
         }
+
+    @staticmethod
+    async def get_students_by_classes(
+        db: AsyncSession, class_ids: List[int]
+    ) -> List[Dict]:
+        students = await student_crud.get_by_class_ids(db, class_ids)
+        return [
+            {"id": student.id, "name": student.user.full_name} for student in students
+        ]
 
     @staticmethod
     async def get_student(db: AsyncSession, student_id: int) -> Dict:

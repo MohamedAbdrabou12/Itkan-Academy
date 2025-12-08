@@ -40,6 +40,7 @@ async def list_evaluations(
             id=evaluation.id,
             student_id=evaluation.student_id,
             class_id=evaluation.class_id,
+            branch_id=evaluation.branch_id,
             date=evaluation.date.isoformat(),
             attendance_status=evaluation.attendance_status.value,
             evaluation_grades=evaluation.evaluation_grades,
@@ -80,7 +81,11 @@ async def bulk_create_evaluations(
 
     try:
         count = await evaluations_crud.create_bulk(
-            db, current_user, eval_date, bulk_data
+            db,
+            current_user=current_user,
+            eval_date=eval_date,
+            branch_id=class_obj.branch_id,
+            bulk_data=bulk_data,
         )
         await db.commit()
     except Exception:
