@@ -1,6 +1,6 @@
 from typing import List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import Sequence, select, delete
+from sqlalchemy import select, delete
 from sqlalchemy.orm import selectinload, joinedload
 from app.modules.students.models import Student, StudentClass
 from app.modules.users.models import User
@@ -58,6 +58,7 @@ class StudentCRUD:
             .where(
                 StudentClass.class_id.in_(class_ids),
             )
+            .distinct(Student.id)
         )
         result = await db.execute(stmt)
         return list(result.scalars().all())

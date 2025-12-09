@@ -4,7 +4,7 @@ from sqlalchemy import asc, select
 from app.db.session import get_db
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.modules.evaluations.models import Evaluation
+from app.modules.evaluations.models import AttendanceStatus, Evaluation
 from app.modules.reports.models.students import (
     StudentAttendanceReportData,
     StudentEvaluationReportData,
@@ -20,6 +20,7 @@ async def query_evaluation_data(
     branch_ids: List[int] | None,
     class_ids: List[int] | None,
     student_ids: List[int] | None,
+    attendance_status: List[AttendanceStatus] | None = None,
 ):
     query = (
         select(Evaluation)
@@ -42,6 +43,9 @@ async def query_evaluation_data(
     if student_ids is not None and len(student_ids) != 0:
         query = query.filter(Evaluation.student_id.in_(student_ids))
 
+    if attendance_status is not None and len(attendance_status) != 0:
+        query = query.filter(Evaluation.attendance_status.in_(attendance_status))
+
     qresult = await db.execute(query)
     return qresult.scalars().all()
 
@@ -54,9 +58,10 @@ async def generate_attendance_report(
     branch_ids: Annotated[List[int] | None, Query()] = None,
     class_ids: Annotated[List[int] | None, Query()] = None,
     student_ids: Annotated[List[int] | None, Query()] = None,
+    attendance_status: Annotated[List[AttendanceStatus] | None, Query()] = None,
 ):
     evaluations = await query_evaluation_data(
-        db, date_from, date_to, branch_ids, class_ids, student_ids
+        db, date_from, date_to, branch_ids, class_ids, student_ids, attendance_status
     )
     return [
         StudentAttendanceReportData(
