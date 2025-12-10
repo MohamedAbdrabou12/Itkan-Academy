@@ -1,16 +1,15 @@
 from typing import Dict, List
 
-from pydantic import BaseModel
+from app.db.base import Base
+from app.modules.evaluations.models import AttendanceStatus
 from app.modules.reports.models.base import BaseReport
+from pydantic import BaseModel, field_serializer
 from sqlalchemy import (
     JSON,
     ForeignKey,
 )
-from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.ext.declarative import declared_attr
-
-from app.db.base import Base
-from app.modules.evaluations.models import AttendanceStatus
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
 class StudentReport(BaseReport):
@@ -36,6 +35,16 @@ class StudentReportData(BaseModel):
 class StudentAttendanceReportData(StudentReportData):
     type: str = "attendance"
     status: AttendanceStatus
+
+    @field_serializer("status")
+    def serialize_status(self, status: AttendanceStatus):
+        arabic_mapping = {
+            AttendanceStatus.PRESENT: "حاضر",
+            AttendanceStatus.ABSENT: "غائب",
+            AttendanceStatus.LATE: "متأخر",
+            AttendanceStatus.EXCUSED: "معتذر",
+        }
+        return arabic_mapping.get(status, str(status))
 
 
 class StudentAttendanceReport(StudentReport, Base):

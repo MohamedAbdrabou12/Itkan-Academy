@@ -1,4 +1,5 @@
 from typing import List, Optional
+
 from app.modules.reports.schemas.base import ReportGenerateBase
 
 
