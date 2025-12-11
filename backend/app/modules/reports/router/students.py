@@ -8,7 +8,7 @@ from app.modules.reports.models.students import (
     StudentEvaluationReportData,
 )
 from app.modules.reports.schemas.base import ExportType
-from app.modules.reports.utils.export import export_csv_or_excel_file
+from app.modules.reports.utils.export import export_csv, export_excel, export_pdf
 from app.modules.reports.utils.flatten_data import (
     flatten_evaluation_data_for_export,
 )
@@ -49,23 +49,29 @@ async def generate_attendance_report(
     ]
 
     if export_type:
+        report_dicts = [item.model_dump() for item in report_data]
+
         if export_type == ExportType.PDF:
-            pass
-        elif export_type == ExportType.CSV:
-            return export_csv_or_excel_file(
-                report_data=report_data,
+            return export_pdf(
+                report_data=report_dicts,
                 file_name="attendance",
                 date_from=date_from,
                 date_to=date_to,
-                export_format="csv",
+                title="تقرير الحضور",
+            )
+        elif export_type == ExportType.CSV:
+            return export_csv(
+                report_data=report_dicts,
+                file_name="attendance",
+                date_from=date_from,
+                date_to=date_to,
             )
         elif export_type == ExportType.EXCEL:
-            return export_csv_or_excel_file(
-                report_data=report_data,
+            return export_excel(
+                report_data=report_dicts,
                 file_name="attendance",
                 date_from=date_from,
                 date_to=date_to,
-                export_format="excel",
             )
 
     return report_data
@@ -144,22 +150,26 @@ async def generate_evaluations_report(
         pivoted_data = flatten_evaluation_data_for_export(export_rows)
 
         if export_type == ExportType.PDF:
-            pass
-        elif export_type == ExportType.CSV:
-            return export_csv_or_excel_file(
+            return export_pdf(
                 report_data=pivoted_data,
                 file_name="evaluations",
                 date_from=date_from,
                 date_to=date_to,
-                export_format="csv",
+                title="تقرير التقييمات",
+            )
+        elif export_type == ExportType.CSV:
+            return export_csv(
+                report_data=pivoted_data,
+                file_name="evaluations",
+                date_from=date_from,
+                date_to=date_to,
             )
         elif export_type == ExportType.EXCEL:
-            return export_csv_or_excel_file(
+            return export_excel(
                 report_data=pivoted_data,
                 file_name="evaluations",
                 date_from=date_from,
                 date_to=date_to,
-                export_format="excel",
             )
 
     return report_data

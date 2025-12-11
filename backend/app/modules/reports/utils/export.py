@@ -1,97 +1,241 @@
+import csv
 from datetime import datetime
-from io import BytesIO
-from typing import Any, List, Literal
+from io import BytesIO, StringIO
+from pathlib import Path
+from typing import Any, Dict, List, cast
 
 import openpyxl
-import pandas as pd
 from fastapi import Response
+from jinja2 import Environment, FileSystemLoader, select_autoescape
+from openpyxl import Workbook
+from openpyxl.styles import Alignment, Font, PatternFill
+from openpyxl.utils import get_column_letter
+from openpyxl.worksheet.worksheet import Worksheet
+from weasyprint import HTML
+
+TEMPLATES_DIR = Path(__file__).parent.parent / "templates"
+env = Environment(
+    loader=FileSystemLoader(TEMPLATES_DIR),
+    autoescape=select_autoescape(["html"]),
+    trim_blocks=True,
+    lstrip_blocks=True,
+)
 
 
-def export_csv_or_excel_file(
-    report_data: List[Any],
+def export_pdf(
+    report_data: List[Dict[str, Any]],
     file_name: str,
     date_from: str,
     date_to: str,
-    export_format: Literal["csv", "excel"],
+    title: str = "Report",
 ):
-    data_dicts = []
-
     if not report_data:
-        df = pd.DataFrame()
+        template = env.get_template("empty_report.html")
+        buffer = BytesIO()
+        html_content = template.render(
+            title=title,
+            date_from=date_from,
+            date_to=date_to,
+        )
+        HTML(string=html_content).write_pdf(buffer)
+        pdf_content = buffer.getvalue()
+        buffer.close()
     else:
-        first_item = report_data[0]
+        headers = get_unique_headers(report_data)
 
-        if hasattr(first_item, "model_dump"):
-            # It's a Pydantic model
-            data_dicts = [item.model_dump() for item in report_data]
-        elif isinstance(first_item, dict):
-            # Already dictionaries
-            data_dicts = report_data
-        else:
-            # Try to convert to dict
-            data_dicts = [dict(item) for item in report_data]
-        
-        df = pd.DataFrame(data_dicts)
-        df = df.fillna("")
+        rows = []
+        for record in report_data:
+            row = []
+            for header in headers:
+                value = record.get(header, "")
+                row.append(str(value))
+            rows.append(row)
 
-    # Create filename
+        template = env.get_template("report_table.html")
+
+        generated_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        current_year = datetime.now().strftime("%Y")
+
+        html_content = template.render(
+            title=title,
+            date_from=date_from,
+            date_to=date_to,
+            generated_date=generated_date,
+            headers=headers,
+            rows=rows,
+            total_records=len(rows),
+            current_year=current_year,
+        )
+
+        buffer = BytesIO()
+        HTML(string=html_content).write_pdf(buffer)
+        pdf_content = buffer.getvalue()
+        buffer.close()
+
     start_date = datetime.fromisoformat(date_from).strftime("%Y-%m-%d")
     end_date = datetime.fromisoformat(date_to).strftime("%Y-%m-%d")
     today = datetime.now().strftime("%Y-%m-%d")
 
-    if export_format == "csv":
-        # Export as CSV
-        csv_content = df.to_csv(index=False, encoding="utf-8-sig")
-        filename = (
-            f"Itkan_{file_name}_{start_date}_to_{end_date}_generated_at_{today}.csv"
-        )
+    filename = f"Itkan_{file_name}_{start_date}_to_{end_date}_generated_at_{today}.pdf"
 
-        return Response(
-            content=csv_content,
-            media_type="text/csv",
-            headers={
-                "Content-Disposition": f'attachment; filename="{filename}"',
-                "Content-Type": "text/csv; charset=utf-8-sig",
-            },
-        )
+    return Response(
+        content=pdf_content,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Content-Type": "application/pdf",
+        },
+    )
 
-    elif export_format == "excel":
-        output = BytesIO()
 
-        with pd.ExcelWriter(output, engine="openpyxl") as writer:
-            df.to_excel(writer, index=False, sheet_name="Report")
+def export_csv(
+    report_data: List[Dict[str, Any]],
+    file_name: str,
+    date_from: str,
+    date_to: str,
+) -> Response:
+    if not report_data:
+        csv_content = ""
+    else:
+        headers = get_unique_headers(report_data)
 
-            # Formatting
-            worksheet = writer.sheets["Report"]
+        output = StringIO()
 
-            # Set column widths
-            for column in worksheet.columns:
-                max_length = 0
-                column_letter = column[0].column_letter
-                for cell in column:
-                    cell_value = str(cell.value) if cell.value is not None else ""
-                    if len(cell_value) > max_length:
-                        max_length = len(cell_value)
+        # Write UTF-8 BOM for Excel compatibility (especially for Arabic)
+        output.write("\ufeff")
 
-                adjusted_width = min(max_length + 2, 50)
-                worksheet.column_dimensions[column_letter].width = adjusted_width
+        writer = csv.writer(output)
+        writer.writerow(headers)
 
-            # Make header row bold
-            for cell in worksheet[1]:
-                cell.font = openpyxl.styles.Font(bold=True)  # type: ignore
+        for record in report_data:
+            row = []
+            for header in headers:
+                value = record.get(header, "")
 
-        excel_bytes = output.getvalue()
+                if value is None:
+                    row.append("")
+                else:
+                    row.append(str(value))
+            writer.writerow(row)
+
+        csv_content = output.getvalue()
         output.close()
 
-        filename = (
-            f"Itkan_{file_name}_{start_date}_to_{end_date}_generated_at_{today}.xlsx"
+    start_date = datetime.fromisoformat(date_from).strftime("%Y-%m-%d")
+    end_date = datetime.fromisoformat(date_to).strftime("%Y-%m-%d")
+    today = datetime.now().strftime("%Y-%m-%d")
+
+    filename = f"Itkan_{file_name}_{start_date}_to_{end_date}_generated_at_{today}.csv"
+
+    return Response(
+        content=csv_content,
+        media_type="text/csv",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Content-Type": "text/csv; charset=utf-8-sig",
+        },
+    )
+
+
+def export_excel(
+    report_data: List[Dict[str, Any]],
+    file_name: str,
+    date_from: str,
+    date_to: str,
+) -> Response:
+    wb: Workbook = openpyxl.Workbook()
+    ws: Worksheet = cast(Worksheet, wb.active)
+
+    if not report_data:
+        ws.append(["No data available"])
+    else:
+        headers = get_unique_headers(report_data)
+
+        ws.append(headers)
+
+        # Style header row
+        header_font = Font(bold=True, color="FFFFFF")
+        header_fill = PatternFill(
+            start_color="10B981", end_color="10B981", fill_type="solid"
         )
 
-        return Response(
-            content=excel_bytes,
-            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            headers={
-                "Content-Disposition": f'attachment; filename="{filename}"',
-                "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            },
-        )
+        for cell in ws[1]:
+            cell.font = header_font
+            cell.fill = header_fill
+            cell.alignment = Alignment(horizontal="center")
+
+        # Write data rows
+        for record in report_data:
+            row = []
+            for header in headers:
+                value = record.get(header, "")
+
+                if value is None:
+                    row.append("")
+                else:
+                    row.append(str(value))
+            ws.append(row)
+
+        for column in ws.iter_cols(
+            min_row=1, max_row=ws.max_row, min_col=1, max_col=ws.max_column
+        ):
+            max_length = 0
+            first_cell = column[0]
+            if first_cell.column is not None:
+                column_letter = get_column_letter(first_cell.column)
+            else:
+                continue
+
+            for cell in column:
+                if cell.value is not None:
+                    cell_value = str(cell.value)
+                    cell_length = len(cell_value)
+                    if cell_length > max_length:
+                        max_length = cell_length
+
+            adjusted_width = min(max_length + 2, 50)
+            ws.column_dimensions[column_letter].width = adjusted_width
+
+        for row in range(2, ws.max_row + 1):
+            if row % 2 == 0:
+                fill_color = "F0FDF4"
+            else:
+                fill_color = "FFFFFF"
+
+            for col in range(1, ws.max_column + 1):
+                cell = ws.cell(row=row, column=col)
+                cell.fill = PatternFill(
+                    start_color=fill_color, end_color=fill_color, fill_type="solid"
+                )
+
+                cell.alignment = Alignment(horizontal="right", vertical="top")
+
+    buffer = BytesIO()
+    wb.save(buffer)
+    excel_bytes = buffer.getvalue()
+    buffer.close()
+
+    start_date = datetime.fromisoformat(date_from).strftime("%Y-%m-%d")
+    end_date = datetime.fromisoformat(date_to).strftime("%Y-%m-%d")
+    today = datetime.now().strftime("%Y-%m-%d")
+
+    filename = f"Itkan_{file_name}_{start_date}_to_{end_date}_generated_at_{today}.xlsx"
+
+    return Response(
+        content=excel_bytes,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        },
+    )
+
+
+def get_unique_headers(report_data: List[Dict[str, Any]]):
+    all_headers = set()
+    for record in report_data:
+        all_headers.update(record.keys())
+
+    all_headers.discard("type")
+
+    return sorted(list(all_headers))
