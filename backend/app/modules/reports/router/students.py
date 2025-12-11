@@ -1,7 +1,9 @@
 from typing import Annotated, List
 
+from app.core.authorization import require_permission
 from app.db.session import get_db
 from app.modules.evaluations.models import AttendanceStatus
+from app.modules.permissions.permissions import PermissionCode
 from app.modules.reports.crud.students import query_evaluation_data
 from app.modules.reports.models.students import (
     StudentAttendanceReportData,
@@ -18,7 +20,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 student_reports_router = APIRouter(prefix="/students")
 
 
-@student_reports_router.get("/attendance")
+@student_reports_router.get(
+    "/attendance",
+    dependencies=[Depends(require_permission(PermissionCode.REPORTS_ATTENDANCE_VIEW))],
+)
 async def generate_attendance_report(
     date_from: Annotated[str, Query(alias="from")],
     date_to: Annotated[str, Query(alias="to")],
@@ -77,7 +82,10 @@ async def generate_attendance_report(
     return report_data
 
 
-@student_reports_router.get("/evaluations")
+@student_reports_router.get(
+    "/evaluations",
+    dependencies=[Depends(require_permission(PermissionCode.REPORTS_EVALUATIONS_VIEW))],
+)
 async def generate_evaluations_report(
     date_from: Annotated[str, Query(alias="from")],
     date_to: Annotated[str, Query(alias="to")],
