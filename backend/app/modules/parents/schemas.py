@@ -1,4 +1,3 @@
-# app/modules/parents/schemas.py
 from datetime import datetime
 from typing import List, Optional
 from pydantic import BaseModel, EmailStr, field_validator

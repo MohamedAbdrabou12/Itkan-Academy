@@ -1,4 +1,3 @@
-# app/modules/parents/router.py
 from typing import Optional
 from fastapi import APIRouter, Depends, Request, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession

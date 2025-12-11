@@ -1,4 +1,3 @@
-# backend/app/modules/permissions/permissions.py
 from enum import Enum
 
 
