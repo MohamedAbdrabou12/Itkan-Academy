@@ -20,10 +20,15 @@ async def list_students(
     db: AsyncSession = Depends(get_db),
     page: int = Query(1, ge=1),
     size: int = Query(10, ge=1),
-    search: Optional[str] = Query(None),
-    sort_by: Optional[str] = Query(None),
-    sort_order: Optional[str] = Query("asc"),
-    status: Optional[str] = Query(None),
+    search: Optional[str] = Query(
+        None, description="Search by name, email or national_id"
+    ),
+    sort_by: Optional[str] = Query(
+        None,
+        description="Sort by: full_name, email, status, national_id, admission_date, curriculum_progress",
+    ),
+    sort_order: Optional[str] = Query("asc", description="Sort order: asc or desc"),
+    status: Optional[str] = Query(None, description="Filter by user status"),
 ):
     students_page = await StudentService.list_students(
         db,

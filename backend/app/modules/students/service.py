@@ -13,10 +13,14 @@ from app.modules.users.schemas import (
     BranchInfo,
     UserRead,
 )
+from app.core.utils import create_password_reset_token
 from app.modules.users.crud import user_crud
 from app.services.notification_service.workrs.worker import send_notification_task
 from app.modules.classes.models import Class
 from app.modules.roles.models import Role
+from passlib.context import CryptContext
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 class StudentService:
@@ -53,6 +57,7 @@ class StudentService:
         return {
             **user_data.model_dump(),
             "student_id": student.id,
+            "national_id": student.national_id,
             "class_ids": class_ids,
             "admission_date": student.admission_date,
             "curriculum_progress": student.curriculum_progress,
@@ -98,9 +103,20 @@ class StudentService:
     async def create_student(
         db: AsyncSession, student_in: StudentCreate, creator: Optional[User] = None
     ) -> Dict:
-        existing = await user_crud.get_by_email(db, student_in.email)
-        if existing:
-            raise HTTPException(status_code=400, detail="Email already registered")
+        # Check email uniqueness
+        if student_in.email:
+            existing = await user_crud.get_by_email(db, student_in.email)
+            if existing:
+                raise HTTPException(status_code=400, detail="Email already registered")
+
+        # Check national_id uniqueness
+        students_with_nid = await student_crud.get_all(
+            db, search=student_in.national_id
+        )
+        if any(s.national_id == student_in.national_id for s in students_with_nid):
+            raise HTTPException(
+                status_code=400, detail="National ID already registered"
+            )
 
         # Validate creator branch permissions
         if creator and getattr(creator, "role_name", "").lower() != "admin":
@@ -133,18 +149,25 @@ class StudentService:
         student_role = role_res.scalar_one_or_none()
         role_id = student_role.id if student_role else None
 
+        hashed_password = pwd_context.hash(student_in.password)
+
+        # MODIFICATION: Add login_identifier and login_type for National ID login
         user_payload = UserCreateSchema(
             full_name=student_in.full_name,
             email=student_in.email,
             phone=student_in.phone,
             role_id=role_id,
             branch_ids=student_in.branch_ids,
-            status=UserStatus.pending,
+            status=student_in.status or UserStatus.pending,
+            password=hashed_password,
+            login_identifier=student_in.national_id,
+            login_type="national_id",
         )
         user = await user_crud.create(db, user_payload)
 
         student_payload = {
             "user_id": user.id,
+            "national_id": student_in.national_id,
             "admission_date": student_in.admission_date,
             "curriculum_progress": student_in.curriculum_progress,
         }
@@ -155,6 +178,9 @@ class StudentService:
             db.add(student)
             await db.commit()
             await db.refresh(student)
+
+        # Send reset password notification with fallback to parent
+        await StudentService._send_reset_password_notification(db, user)
 
         # Reload with relations
         result = await db.execute(
@@ -169,6 +195,52 @@ class StudentService:
 
         await StudentService._notify_hr_new_student(db, student, creator)
         return await StudentService._serialize_student(student)
+
+    @staticmethod
+    async def _send_reset_password_notification(db: AsyncSession, user: User):
+        """
+        Send reset password notification.
+        If user has no email, fallback to parents emails.
+        """
+        # from app.modules.parents.models import ParentStudent
+
+        recipients: List[str] = []
+
+        # Primary recipient: student's email
+        if user.email:
+            recipients.append(user.email)
+
+        # Fallback: parent's emails
+        if not recipients and getattr(user, "student", None):
+            parent_links = getattr(user.student, "parent_links", [])
+            for link in parent_links:
+                if (
+                    getattr(link, "parent", None)
+                    and link.parent.user
+                    and link.parent.user.email
+                ):
+                    recipients.append(link.parent.user.email)
+
+        if not recipients:
+            return  # No email to send
+
+        token = create_password_reset_token(user.id)
+        reset_link = f"http://localhost:5173/reset-password?token={token}"
+
+        for email in recipients:
+            try:
+                send_notification_task.delay(
+                    user_id=str(user.id),
+                    channel="email",
+                    template_type="password_reset_request",
+                    payload={
+                        "user_name": user.full_name,
+                        "email": email,
+                        "reset_link": reset_link,
+                    },
+                )
+            except Exception:
+                pass
 
     @staticmethod
     async def update_student(
@@ -187,9 +259,11 @@ class StudentService:
         # Extract user-related fields
         user_fields = {
             f: data.pop(f)
-            for f in ("full_name", "email", "phone", "branch_ids", "status")
+            for f in ("full_name", "email", "phone", "branch_ids", "status", "password")
             if f in data
         }
+
+        email_changed = False
 
         if user_fields:
             if "email" in user_fields and user_fields["email"] != user.email:
@@ -198,8 +272,28 @@ class StudentService:
                     raise HTTPException(
                         status_code=400, detail="Email already registered"
                     )
-            # Update user including status
+                email_changed = True
+
+            if "password" in user_fields:
+                user_fields["password"] = pwd_context.hash(user_fields["password"])
+
             await user_crud.update(db, user, UserUpdate(**user_fields))
+
+            # NOTIFICATION: Send reset password if email added/changed with fallback
+            if email_changed or ("password" in user_fields):
+                await StudentService._send_reset_password_notification(db, user)
+
+        # Check national_id uniqueness when updating
+        if "national_id" in data:
+            nid_exists = await student_crud.get_all(db, search=data["national_id"])
+            if any(
+                s.id != student.id and s.national_id == data["national_id"]
+                for s in nid_exists
+            ):
+                raise HTTPException(
+                    status_code=400, detail="National ID already registered"
+                )
+            student.national_id = data.pop("national_id")
 
         # Update student-specific fields
         class_ids = data.pop("class_ids", None)

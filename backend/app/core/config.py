@@ -1,4 +1,3 @@
-# backend/app/core/config.py
 from pydantic_settings import BaseSettings, SettingsConfigDict
 import os
 

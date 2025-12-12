@@ -42,13 +42,14 @@ class Student(Base):
     __tablename__ = "students"
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    national_id: Mapped[str] = mapped_column(String(20), unique=True, nullable=False)
     admission_date: Mapped[Optional[date]] = mapped_column(Date)
     curriculum_progress: Mapped[Optional[Dict]] = mapped_column(
         JSON, default=None, nullable=True
     )
 
-    user_id: Mapped[int] = mapped_column(
-        ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    user_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), nullable=True
     )
 
     created_at: Mapped[datetime] = mapped_column(
@@ -58,7 +59,6 @@ class Student(Base):
         DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow
     )
 
-    # Relationships
     user: Mapped["User"] = relationship("User", back_populates="student", lazy="joined")
 
     parent_links: Mapped[List["ParentStudent"]] = relationship(

@@ -36,39 +36,6 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 
-# PASSWORD RESET TOKENS
-# def create_password_reset_token(
-#     user_id: int, expires_hours: Optional[int] = None
-# ) -> str:
-#     """
-#     Generate a password reset token with expiry.
-#     """
-#     expire = datetime.utcnow() + timedelta(
-#         hours=expires_hours or PASSWORD_RESET_EXPIRE_HOURS
-#     )
-#     payload = {"sub": str(user_id), "pw_reset": True, "exp": expire}
-#     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
-
-
-# def verify_password_reset_token(token: str) -> int:
-#     """
-#     Decode and verify a password reset token.
-#     Returns user_id or raises HTTPException(401) if invalid or expired.
-#     """
-#     credentials_exception = HTTPException(
-#         status_code=status.HTTP_401_UNAUTHORIZED,
-#         detail="Invalid or expired password reset token.",
-#         headers={"WWW-Authenticate": "Bearer"},
-#     )
-#     try:
-#         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-#         if not payload.get("pw_reset"):
-#             raise credentials_exception
-#         return int(payload.get("sub"))
-#     except Exception:
-#         raise credentials_exception
-
-
 # AUTHENTICATION HELPERS
 async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
