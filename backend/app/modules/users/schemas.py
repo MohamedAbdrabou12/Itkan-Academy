@@ -15,7 +15,7 @@ class BranchInfo(BaseModel):
 
 class UserBase(BaseModel):
     full_name: str
-    email: EmailStr
+    email: Optional[EmailStr] = None
     phone: Optional[str] = None
     branch_ids: Optional[List[int]] = None
 
@@ -33,6 +33,8 @@ class UserCreate(UserBase):
     role_id: Optional[int] = None
     branch_ids: Optional[List[int]] = None
     status: Optional[UserStatus]
+    login_identifier: str
+    login_type: str
 
 
 class UserUpdate(BaseModel):
@@ -44,11 +46,13 @@ class UserUpdate(BaseModel):
     branch_ids: Optional[List[int]] = None
     branches: Optional[List[BranchInfo]] = None
     status: Optional[UserStatus] = None
+    login_identifier: Optional[str] = None
+    login_type: Optional[str] = None
 
     @field_validator("phone")
     def validate_phone(cls, v):
         if v:
-            cleaned = re.sub(r"[^\d+]", "", v)  # remove spaces, - , etc
+            cleaned = re.sub(r"[^\d+]", "", v)
             if not re.match(r"^\+?\d{10,15}$", cleaned):
                 raise ValueError("Invalid phone number format")
             return cleaned
@@ -72,6 +76,8 @@ class UserRead(UserBase):
     status: UserStatus
     branch_ids: Optional[List[int]] = None
     branches: Optional[List[BranchInfo]] = None
+    login_identifier: str
+    login_type: str
 
     class Config:
         from_attributes = True

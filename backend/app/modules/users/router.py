@@ -8,7 +8,7 @@ from app.modules.users.crud import map_user_to_read, user_crud
 from app.modules.users.models import UserStatus
 from app.modules.users.schemas import UserCreate, UserRead, UserRoleUpdate, UserUpdate
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from fastapi_pagination import Page
+from fastapi_pagination import Page  # type: ignore
 from sqlalchemy.ext.asyncio import AsyncSession
 
 user_router = APIRouter(prefix="/users", tags=["Users"])
