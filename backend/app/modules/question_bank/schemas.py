@@ -1,25 +1,20 @@
 from datetime import datetime
 from typing import Optional
-from pydantic import BaseModel, field_validator, model_validator
+from pydantic import BaseModel, model_validator
 from .models import QuestionDifficulty, QuestionType
+
+
+class QuestionOption(BaseModel):
+    key: str
+    option: str
 
 
 class QuestionBankBase(BaseModel):
     title: str
     difficulty: QuestionDifficulty = QuestionDifficulty.MEDIUM
     type: QuestionType = QuestionType.MCQ
-    options: Optional[dict[str, str]] = None
+    options: Optional[list[QuestionOption]] = None
     correct_answer: Optional[str] = None
-
-    @field_validator("correct_answer")
-    @classmethod
-    def validate_correct_answer(cls, v, values):
-        if v is not None:
-            # Validate that correct_answer exists in options
-            options = values.data.get("options", {})
-            if options and v not in options:
-                raise ValueError("correct_answer must exist in options")
-        return v
 
 
 class QuestionBankCreate(QuestionBankBase):
@@ -28,20 +23,18 @@ class QuestionBankCreate(QuestionBankBase):
         # validate options for MCQ type questions
         if self.type == QuestionType.MCQ:
             if not self.options or len(self.options) < 2 or len(self.options) > 6:
-                raise ValueError("MCQ questions must have between 2 and 6 options.")
+                raise ValueError(
+                    "السؤال من النوع اختيار من متعدد يجب ان يحتوى من 2 الى 6 خيارات"
+                )
 
             # Validate correct_option
             if self.correct_answer is None:
-                raise ValueError("MCQ questions must have a correct answer.")
+                raise ValueError("يحب اخيار الاجابة الصحيحة")
         elif self.type in {QuestionType.SHORT_ANSWER, QuestionType.ESSAY}:
             if self.options is not None:
-                raise ValueError(
-                    "Short answer and essay questions should not have options."
-                )
+                raise ValueError("خيارات السؤال غير مطلوبة في هذا النوع")
             if self.correct_answer is not None:
-                raise ValueError(
-                    "Short answer and essay questions should not have a correct answer."
-                )
+                raise ValueError("الاجابة الصحيحة غير مطلوبة في هذا النوع")
 
         return self
 

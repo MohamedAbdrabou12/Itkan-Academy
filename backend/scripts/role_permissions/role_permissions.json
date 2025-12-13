@@ -48,6 +48,10 @@
     "permission_id": 1108
   },
   {
+    "role_id": 1002,
+    "permission_id": 1207
+  },
+  {
     "role_id": 1003,
     "permission_id": 1021
   },

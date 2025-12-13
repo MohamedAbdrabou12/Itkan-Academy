@@ -1,7 +1,7 @@
 from .crud import question_bank_crud
 from .schemas import QuestionBankCreate
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi import HTTPException
+from fastapi import HTTPException, Request
 
 from app.modules.users.models import User
 
@@ -9,16 +9,23 @@ from app.modules.users.models import User
 class QuestionBankService:
     # create new question (check first if the question with the same title and created_by is exists)
     async def create_question(
-        self, db: AsyncSession, question: QuestionBankCreate, user: User
+        self,
+        request: Request,
+        db: AsyncSession,
+        question: QuestionBankCreate,
+        user: User,
     ):
+        active_branch_id = request.state.active_branch_id
+
+        if not active_branch_id:
+            raise HTTPException(status_code=400, detail="لم يتم اضافتك على فرع معين")
+
         existing_question = await question_bank_crud.get_by_title_and_creator(
             db, question.title, user.id
         )
         if existing_question:
-            raise HTTPException(
-                status_code=400, detail="Question with the same title already exists"
-            )
-        return await question_bank_crud.create(db, question, user)
+            raise HTTPException(status_code=400, detail="هذا السؤال موجود بالفعل")
+        return await question_bank_crud.create(db, question, user, active_branch_id)
 
     # get all questions service with option with_shared
     async def get_all_questions(

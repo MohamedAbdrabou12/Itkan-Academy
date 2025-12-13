@@ -53,11 +53,15 @@ class QuestionBankCRUD:
         return result.scalars().first()
 
     async def create(
-        self, db: AsyncSession, question_in: QuestionBankCreate, user: User
+        self,
+        db: AsyncSession,
+        question_in: QuestionBankCreate,
+        user: User,
+        active_branch_id: int,
     ):
         question_date = question_in.model_dump()
         question_date["created_by"] = user.id
-        question_date["branch_id"] = user.branch_id
+        question_date["branch_id"] = active_branch_id
         question = QuestionBank(**question_date)
         db.add(question)
         await db.commit()

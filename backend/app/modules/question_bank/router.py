@@ -1,5 +1,5 @@
 # backend/app/modules/question_bank/router.py
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from typing import List
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -9,6 +9,7 @@ from app.modules.question_bank.schemas import (
     QuestionBankCreate,
     QuestionBankRead,
 )
+from app.core.authorization import require_permission
 from .service import question_bank_service
 from app.modules.users.models import User
 
@@ -57,11 +58,12 @@ async def get_question(
     status_code=status.HTTP_201_CREATED,
 )
 async def create_question(
+    request: Request,
     question_in: QuestionBankCreate,
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    return await question_bank_service.create_question(db, question_in, user)
+    return await question_bank_service.create_question(request, db, question_in, user)
 
 
 @question_bank_router.put(
@@ -88,7 +90,7 @@ async def update_question(
 #     status_code=status.HTTP_204_NO_CONTENT,
 #     dependencies=[
 #         Depends(get_current_user),
-#         Depends(require_permission("question:delete")),
+#         # Depends(require_permission("question:delete")),
 #     ],
 # )
 # async def delete_question(question_id: int, db: AsyncSession = Depends(get_db)):

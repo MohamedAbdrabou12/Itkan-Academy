@@ -28,6 +28,13 @@ class PermissionCode(str, Enum):
     ACADEMIC_CLASSES_EDIT = "academic.classes.edit"
     ACADEMIC_CLASSES_DELETE = "academic.classes.delete"
 
+    # Academic Question Bank
+    ACADEMIC_QUESTION_BANK_ALL = "academic.question_bank.*"
+    ACADEMIC_QUESTION_BANK_VIEW = "academic.question_bank.view"
+    ACADEMIC_QUESTION_BANK_ADD = "academic.question_bank.add"
+    ACADEMIC_QUESTION_BANK_EDIT = "academic.question_bank.edit"
+    ACADEMIC_QUESTION_BANK_DELETE = "academic.question_bank.delete"
+
     # Financial Invoices
     FINANCIAL_INVOICES_ALL = "financial.invoices.*"
     FINANCIAL_INVOICES_PAY = "financial.invoices.pay"
