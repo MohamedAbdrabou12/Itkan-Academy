@@ -4,8 +4,10 @@
     "role_id": 1003,
     "full_name": "أحمد محمود",
     "email": "general_manager@test.com",
+    "login_identifier": "general_manager@test.com",
+    "login_type": "email",
     "phone": "+201000000001",
-    "password_hash": "general_manager",
+    "password": "general_manager",
     "status": "active"
   },
   {
@@ -13,8 +15,10 @@
     "role_id": 1004,
     "full_name": "محمد السيد",
     "email": "education_manager@test.com",
+    "login_identifier": "education_manager@test.com",
+    "login_type": "email",
     "phone": "+201000000002",
-    "password_hash": "education_manager",
+    "password": "education_manager",
     "status": "active"
   },
   {
@@ -22,8 +26,10 @@
     "role_id": 1005,
     "full_name": "خالد عبدالله",
     "email": "education_supervisor@test.com",
+    "login_identifier": "education_supervisor@test.com",
+    "login_type": "email",
     "phone": "+201000000003",
-    "password_hash": "education_supervisor",
+    "password": "education_supervisor",
     "status": "active"
   },
   {
@@ -31,8 +37,10 @@
     "role_id": 1006,
     "full_name": "محمود حسن",
     "email": "branch_supervisor1@test.com",
+    "login_identifier": "branch_supervisor1@test.com",
+    "login_type": "email",
     "phone": "+201000000004",
-    "password_hash": "branch_supervisor1",
+    "password": "branch_supervisor1",
     "status": "active"
   },
   {
@@ -40,8 +48,10 @@
     "role_id": 1006,
     "full_name": "ياسر محمد",
     "email": "branch_supervisor2@test.com",
+    "login_identifier": "branch_supervisor2@test.com",
+    "login_type": "email",
     "phone": "+201000000005",
-    "password_hash": "branch_supervisor2",
+    "password": "branch_supervisor2",
     "status": "active"
   },
   {
@@ -49,8 +59,10 @@
     "role_id": 1006,
     "full_name": "طارق علي",
     "email": "branch_supervisor3@test.com",
+    "login_identifier": "branch_supervisor3@test.com",
+    "login_type": "email",
     "phone": "+201000000006",
-    "password_hash": "branch_supervisor3",
+    "password": "branch_supervisor3",
     "status": "active"
   },
   {
@@ -58,8 +70,10 @@
     "role_id": 1007,
     "full_name": "عمرو إبراهيم",
     "email": "academic_manager@test.com",
+    "login_identifier": "academic_manager@test.com",
+    "login_type": "email",
     "phone": "+201000000007",
-    "password_hash": "academic_manager",
+    "password": "academic_manager",
     "status": "active"
   },
   {
@@ -67,8 +81,10 @@
     "role_id": 1008,
     "full_name": "سامي عبدالرحمن",
     "email": "administrative_manager@test.com",
+    "login_identifier": "administrative_manager@test.com",
+    "login_type": "email",
     "phone": "+201000000008",
-    "password_hash": "administrative_manager",
+    "password": "administrative_manager",
     "status": "active"
   },
   {
@@ -76,8 +92,10 @@
     "role_id": 1009,
     "full_name": "ناصر أحمد",
     "email": "staff_manager@test.com",
+    "login_identifier": "staff_manager@test.com",
+    "login_type": "email",
     "phone": "+201000000009",
-    "password_hash": "staff_manager",
+    "password": "staff_manager",
     "status": "active"
   },
   {
@@ -85,8 +103,10 @@
     "role_id": 1010,
     "full_name": "وليد مصطفى",
     "email": "student_manager@test.com",
+    "login_identifier": "student_manager@test.com",
+    "login_type": "email",
     "phone": "+201000000010",
-    "password_hash": "student_manager",
+    "password": "student_manager",
     "status": "active"
   },
   {
@@ -94,8 +114,10 @@
     "role_id": 1011,
     "full_name": "حسام الدين",
     "email": "financial_manager@test.com",
+    "login_identifier": "financial_manager@test.com",
+    "login_type": "email",
     "phone": "+201000000011",
-    "password_hash": "financial_manager",
+    "password": "financial_manager",
     "status": "active"
   },
   {
@@ -103,8 +125,10 @@
     "role_id": 1002,
     "full_name": "فاطمة أحمد",
     "email": "teacher1@test.com",
+    "login_identifier": "teacher1@test.com",
+    "login_type": "email",
     "phone": "+201000000012",
-    "password_hash": "teacher1",
+    "password": "teacher1",
     "status": "active"
   },
   {
@@ -112,8 +136,10 @@
     "role_id": 1002,
     "full_name": "آية محمد",
     "email": "teacher2@test.com",
+    "login_identifier": "teacher2@test.com",
+    "login_type": "email",
     "phone": "+201000000013",
-    "password_hash": "teacher2",
+    "password": "teacher2",
     "status": "active"
   },
   {
@@ -121,8 +147,10 @@
     "role_id": 1002,
     "full_name": "سارة خالد",
     "email": "teacher3@test.com",
+    "login_identifier": "teacher3@test.com",
+    "login_type": "email",
     "phone": "+201000000014",
-    "password_hash": "teacher3",
+    "password": "teacher3",
     "status": "active"
   },
   {
@@ -130,8 +158,10 @@
     "role_id": 1002,
     "full_name": "مريم محمود",
     "email": "teacher4@test.com",
+    "login_identifier": "teacher4@test.com",
+    "login_type": "email",
     "phone": "+201000000015",
-    "password_hash": "teacher4",
+    "password": "teacher4",
     "status": "active"
   },
   {
@@ -139,8 +169,10 @@
     "role_id": 1002,
     "full_name": "هدى وليد",
     "email": "teacher5@test.com",
+    "login_identifier": "teacher5@test.com",
+    "login_type": "email",
     "phone": "+201000000016",
-    "password_hash": "teacher5",
+    "password": "teacher5",
     "status": "active"
   },
   {
@@ -148,8 +180,10 @@
     "role_id": 1002,
     "full_name": "نورا سعيد",
     "email": "teacher6@test.com",
+    "login_identifier": "teacher6@test.com",
+    "login_type": "email",
     "phone": "+201000000017",
-    "password_hash": "teacher6",
+    "password": "teacher6",
     "status": "active"
   },
   {
@@ -157,8 +191,10 @@
     "role_id": 1001,
     "full_name": "يوسف أحمد",
     "email": "student1@test.com",
+    "login_identifier": "student1@test.com",
+    "login_type": "email",
     "phone": "+201000000018",
-    "password_hash": "student1",
+    "password": "student1",
     "status": "active"
   },
   {
@@ -166,8 +202,10 @@
     "role_id": 1001,
     "full_name": "عمر محمد",
     "email": "student2@test.com",
+    "login_identifier": "student2@test.com",
+    "login_type": "email",
     "phone": "+201000000019",
-    "password_hash": "student2",
+    "password": "student2",
     "status": "active"
   },
   {
@@ -175,8 +213,10 @@
     "role_id": 1001,
     "full_name": "علي خالد",
     "email": "student3@test.com",
+    "login_identifier": "student3@test.com",
+    "login_type": "email",
     "phone": "+201000000020",
-    "password_hash": "student3",
+    "password": "student3",
     "status": "active"
   },
   {
@@ -184,8 +224,10 @@
     "role_id": 1001,
     "full_name": "حمزة محمود",
     "email": "student4@test.com",
+    "login_identifier": "student4@test.com",
+    "login_type": "email",
     "phone": "+201000000021",
-    "password_hash": "student4",
+    "password": "student4",
     "status": "active"
   },
   {
@@ -193,8 +235,10 @@
     "role_id": 1001,
     "full_name": "بسام وليد",
     "email": "student5@test.com",
+    "login_identifier": "student5@test.com",
+    "login_type": "email",
     "phone": "+201000000022",
-    "password_hash": "student5",
+    "password": "student5",
     "status": "active"
   },
   {
@@ -202,8 +246,10 @@
     "role_id": 1001,
     "full_name": "كريم سعيد",
     "email": "student6@test.com",
+    "login_identifier": "student6@test.com",
+    "login_type": "email",
     "phone": "+201000000023",
-    "password_hash": "student6",
+    "password": "student6",
     "status": "active"
   },
   {
@@ -211,8 +257,10 @@
     "role_id": 1001,
     "full_name": "مازن ناصر",
     "email": "student7@test.com",
+    "login_identifier": "student7@test.com",
+    "login_type": "email",
     "phone": "+201000000024",
-    "password_hash": "student7",
+    "password": "student7",
     "status": "active"
   },
   {
@@ -220,8 +268,10 @@
     "role_id": 1001,
     "full_name": "زياد إبراهيم",
     "email": "student8@test.com",
+    "login_identifier": "student8@test.com",
+    "login_type": "email",
     "phone": "+201000000025",
-    "password_hash": "student8",
+    "password": "student8",
     "status": "active"
   },
   {
@@ -229,8 +279,10 @@
     "role_id": 1001,
     "full_name": "فارس عبدالله",
     "email": "student9@test.com",
+    "login_identifier": "student9@test.com",
+    "login_type": "email",
     "phone": "+201000000026",
-    "password_hash": "student9",
+    "password": "student9",
     "status": "active"
   },
   {
@@ -238,8 +290,10 @@
     "role_id": 1001,
     "full_name": "رامي مصطفى",
     "email": "student10@test.com",
+    "login_identifier": "student10@test.com",
+    "login_type": "email",
     "phone": "+201000000027",
-    "password_hash": "student10",
+    "password": "student10",
     "status": "active"
   },
   {
@@ -247,8 +301,10 @@
     "role_id": 1001,
     "full_name": "سيف الدين",
     "email": "student11@test.com",
+    "login_identifier": "student11@test.com",
+    "login_type": "email",
     "phone": "+201000000028",
-    "password_hash": "student11",
+    "password": "student11",
     "status": "active"
   },
   {
@@ -256,26 +312,32 @@
     "role_id": 1001,
     "full_name": "ماهر حسام",
     "email": "student12@test.com",
+    "login_identifier": "student12@test.com",
+    "login_type": "email",
     "phone": "+201000000029",
-    "password_hash": "student12",
+    "password": "student12",
     "status": "active"
   },
   {
     "id": 1030,
-    "role_id": 1012,  
-    "full_name": "أحمد محمود", 
+    "role_id": 1012,
+    "full_name": "أحمد محمود",
     "email": "parent1@test.com",
+    "login_identifier": "parent1@test.com",
+    "login_type": "email",
     "phone": "+201000000030",
-    "password_hash": "parent1",
+    "password": "parent1",
     "status": "active"
   },
   {
     "id": 1031,
-    "role_id": 1012,  
+    "role_id": 1012,
     "full_name": "سارة علي",
     "email": "parent2@test.com",
+    "login_identifier": "parent2@test.com",
+    "login_type": "email",
     "phone": "+201000000031",
-    "password_hash": "parent2",
+    "password": "parent2",
     "status": "active"
   }
 ]

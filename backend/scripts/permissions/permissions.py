@@ -14,10 +14,6 @@ async def add_permissions(db: AsyncSession):
     with open(permissions_file, "r") as file:
         permissions_data = json.load(file)
 
-    added_count = 0
-    updated_count = 0
-    skipped_count = 0
-
     for permission_data in permissions_data:
         permission_id = permission_data["id"]
         permission_name = permission_data["name"]
@@ -32,7 +28,6 @@ async def add_permissions(db: AsyncSession):
             # Permission doesn't exist, add it
             permission = Permission(**permission_data)
             db.add(permission)
-            added_count += 1
             print(f"  ✓ Adding new permission: {permission_name} (ID: {permission_id})")
         else:
             # Permission exists, check if it needs updating
@@ -50,13 +45,11 @@ async def add_permissions(db: AsyncSession):
             if needs_update:
                 # Merge the existing permission to mark it as modified
                 db.add(existing_permission)
-                updated_count += 1
                 print(
                     f"  ↻ Updating permission: {permission_name} (ID: {permission_id})"
                 )
                 print(f"    Changed fields: {', '.join(update_fields)}")
             else:
-                skipped_count += 1
                 print(
                     f"  ○ Permission already up-to-date: {permission_name} (ID: {permission_id})"
                 )
@@ -64,11 +57,6 @@ async def add_permissions(db: AsyncSession):
     try:
         # Commit all changes at once
         await db.commit()
-        print("Seeding completed:")
-        print(f"  - Added: {added_count} new permissions")
-        print(f"  - Updated: {updated_count} existing permissions")
-        print(f"  - Skipped: {skipped_count} unchanged permissions")
-        print(f"  - Total processed: {len(permissions_data)}")
     except Exception as e:
         await db.rollback()
         print(f"  ✗ Error seeding permissions: {e}")
