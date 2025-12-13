@@ -1,4 +1,3 @@
-# backend/app/core/authorization.py
 from fastapi import Depends, HTTPException, status, Request
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession

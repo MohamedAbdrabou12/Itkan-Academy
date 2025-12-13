@@ -25,22 +25,21 @@ class StudentCRUD:
         result = await db.execute(stmt)
         students = result.scalars().all()
 
-        # Filter by search
         if search:
             search_lower = search.lower()
             students = [
                 s
                 for s in students
                 if search_lower in s.user.full_name.lower()
-                or search_lower in s.user.email.lower()
+                or (s.user.email and search_lower in s.user.email.lower())
+                or (s.national_id and search_lower in s.national_id.lower())
             ]
 
-        # Sort manually
         if sort_by:
             reverse = sort_order.lower() == "desc"
             if sort_by in {"full_name", "email", "status"}:
                 students.sort(key=lambda s: getattr(s.user, sort_by), reverse=reverse)
-            elif sort_by in {"admission_date", "curriculum_progress"}:
+            elif sort_by in {"admission_date", "curriculum_progress", "national_id"}:
                 students.sort(key=lambda s: getattr(s, sort_by), reverse=reverse)
             else:
                 students.sort(key=lambda s: s.id, reverse=reverse)
@@ -85,11 +84,9 @@ class StudentCRUD:
     async def update_student_classes(
         self, db: AsyncSession, student: Student, class_ids: List[int]
     ):
-        # Delete existing
         await db.execute(
             delete(StudentClass).where(StudentClass.student_id == student.id)
         )
-        # Add new
         for cid in class_ids:
             db.add(StudentClass(student_id=student.id, class_id=cid))
         await db.commit()

@@ -11,10 +11,8 @@ from app.api.v1.auth.schemas import (
     ValidateResetTokenRequest,
     ValidateResetTokenResponse,
 )
-from app.core.auth import (
-    AuthService,
-    get_current_user,
-)
+from app.core.security import verify_password
+from app.core.auth import AuthService, get_current_user
 from app.core.utils import create_password_reset_token, verify_password_reset_token
 from app.core.authorization import require_permission
 from app.core.security import get_password_hash
@@ -38,14 +36,20 @@ auth_router = APIRouter(prefix="/auth")
 async def register_student(
     payload: RegisterRequest, db: AsyncSession = Depends(get_db)
 ):
+    """
+    Registration for students using NationalID as login_identifier.
+    Email is optional, but phone is required.
+    """
     try:
-        existing = await user_crud.get_by_email(db, payload.email)
+        # Check if NationalID already exists
+        existing = await user_crud.get_by_login_identifier(db, payload.national_id)
         if existing:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Email already registered",
+                detail="NationalID already registered",
             )
 
+        # Get default Student role
         result = await db.execute(select(Role).where(Role.name == "Student"))
         role = result.scalar_one_or_none()
         if not role:
@@ -54,12 +58,15 @@ async def register_student(
                 detail="Default role 'student' not found",
             )
 
+        # Create user
         user = User(
             full_name=payload.full_name,
             email=payload.email,
+            phone=payload.phone,
             password_hash=get_password_hash(payload.password),
             role_id=role.id,
-            phone=payload.phone,
+            login_identifier=payload.national_id,
+            login_type="national_id",
             status=UserStatus.pending.value,
         )
 
@@ -67,13 +74,11 @@ async def register_student(
         await db.commit()
         await db.refresh(user)
 
-        student = Student(
-            user_id=user.id,
-        )
-
+        # Create student profile
+        student = Student(user_id=user.id, national_id=payload.national_id)
         db.add(student)
         await db.commit()
-        await db.refresh(user)
+        await db.refresh(user, ["student"])
 
         return UserRead(
             id=user.id,
@@ -92,18 +97,26 @@ async def register_student(
         )
 
 
-# Login
+# Universal Login
 @auth_router.post("/login", response_model=TokenResponse)
 async def login(payload: LoginRequest, db: AsyncSession = Depends(get_db)):
-    user = await AuthService.authenticate_user(db, payload.email, payload.password)
+    user = await user_crud.get_by_login_identifier(db, payload.identifier)
     if not user:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password"
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid identifier or password",
         )
 
-    if user.status != UserStatus.active.value:  # check for active status
+    if not verify_password(payload.password, user.password_hash):
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Account is not activated yet"
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid identifier or password",
+        )
+
+    if user.status != UserStatus.active.value:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Account is not activated yet",
         )
 
     token = AuthService.generate_access_token_for_user(user)
@@ -131,7 +144,7 @@ async def get_me(current_user: User = Depends(get_current_user)):
     )
 
 
-# Change password for self
+# Password management
 @auth_router.put("/change-password")
 async def change_password(
     payload: ChangePasswordRequest,
@@ -139,7 +152,7 @@ async def change_password(
     db: AsyncSession = Depends(get_db),
 ):
     valid_user = await AuthService.authenticate_user(
-        db, current_user.email, payload.old_password
+        db, current_user.login_identifier, payload.old_password
     )
     if not valid_user:
         raise HTTPException(
@@ -152,7 +165,6 @@ async def change_password(
     return {"message": "Password updated successfully"}
 
 
-# Change password for another user (admin-level)
 @auth_router.put(
     "/change-password/{user_id}",
     dependencies=[
@@ -161,9 +173,7 @@ async def change_password(
     ],
 )
 async def admin_change_password(
-    user_id: int,
-    payload: ChangePasswordRequest,
-    db: AsyncSession = Depends(get_db),
+    user_id: int, payload: ChangePasswordRequest, db: AsyncSession = Depends(get_db)
 ):
     user = await user_crud.get_by_id(db, user_id)
     if not user:
@@ -174,7 +184,9 @@ async def admin_change_password(
     user.password_hash = get_password_hash(payload.new_password)
     db.add(user)
     await db.commit()
-    return {"message": f"Password for user {user.email} updated successfully"}
+    return {
+        "message": f"Password for user {user.email or user.login_identifier} updated successfully"
+    }
 
 
 # Update user status (admin approval)
@@ -201,34 +213,123 @@ async def update_user_status(
     return {"message": f"User status updated to {user.status}"}
 
 
-# Forgot password - send reset link
-@auth_router.post("/forgot-password", response_model=PasswordResetResponse)
+@auth_router.post("/forgot-password")
 async def forgot_password(
     payload: ForgotPasswordRequest, db: AsyncSession = Depends(get_db)
 ):
-    user = await user_crud.get_by_email(db, payload.email)
+    """
+    Forgot password behavior:
+    - If identifier is NationalID:
+        → If user exists → allow direct reset (no email required)
+    - If identifier is email:
+        → Send reset link to user's email or parent's fallback
+    """
 
-    if user and user.email:
+    identifier = payload.identifier.strip()
+    user = None
+    is_email = False
+    is_national = False
+
+    # Determine identifier type
+    if "@" in identifier:
+        is_email = True
+        user = await user_crud.get_by_email(db, identifier)
+
+    elif identifier.isdigit() and len(identifier) == 14:
+        is_national = True
+        user = await user_crud.get_by_login_identifier(db, identifier)
+
+    # Case 1: National ID → direct reset (if exists)
+    if is_national and user:
+        return {
+            "direct_reset": True,
+            "user_id": user.id,
+            "message": "Proceed to reset password directly.",
+        }
+
+    # Case 2: Email → send reset link
+    if is_email and user:
         token = create_password_reset_token(user.id)
         reset_link = f"http://localhost:5173/reset-password?token={token}"
-        payload = {
-            "username": user.full_name,
-            "reset_link": reset_link,
-            "email": user.email,
+        recipients: list[str] = []
+
+        # Primary: user's email
+        if user.email:
+            recipients.append(user.email)
+
+        # Fallback: parent's email(s)
+        if not recipients and getattr(user, "student", None):
+            for link in getattr(user.student, "parent_links", []):
+                parent_email = getattr(link.parent.user, "email", None)
+                if parent_email:
+                    recipients.append(parent_email)
+
+        # Send emails
+        for email in recipients:
+            try:
+                send_notification_task.delay(
+                    user_id=user.id,
+                    channel="email",
+                    template_type="reset_password",
+                    payload={
+                        "username": user.full_name,
+                        "reset_link": reset_link,
+                        "email": email,
+                    },
+                )
+            except Exception:
+                pass
+
+        return {
+            "direct_reset": False,
+            "message": "If this email is registered, a reset link has been sent.",
         }
-        send_notification_task.delay(
-            user_id=user.id,
-            channel="email",
-            template_type="reset_password",
-            payload=payload,
+
+    # If identifier is invalid or user not found → generic response
+    return {
+        "direct_reset": False,
+        "message": "If the identifier is registered, password reset instructions have been sent.",
+    }
+
+
+@auth_router.post("/reset-password-direct", response_model=PasswordResetResponse)
+async def reset_password_direct(
+    payload: ResetPasswordRequest, db: AsyncSession = Depends(get_db)
+):
+    try:
+        user_id = payload.user_id
+        user = await user_crud.get_by_id(db, user_id)
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+            )
+
+        user.password_hash = get_password_hash(payload.new_password)
+        if user.status != UserStatus.active:
+            user.status = UserStatus.active
+
+        db.add(user)
+        await db.commit()
+        await db.refresh(user)
+        return PasswordResetResponse(
+            message="Password has been updated. You can now log in."
+        )
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred during direct password reset",
         )
 
-    return PasswordResetResponse(
-        message="If the email is registered, a password reset link has been sent."
-    )
+
+@auth_router.get("/get-user-name/{user_id}")
+async def get_user_name(user_id: int, db: AsyncSession = Depends(get_db)):
+    user = await user_crud.get_by_id(db, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="Not Found")
+    return {"id": user.id, "full_name": user.full_name}
 
 
-# Validate reset token (new endpoint)
+# Validate reset token
 @auth_router.post("/validate-reset-token", response_model=ValidateResetTokenResponse)
 async def validate_reset_token(payload: ValidateResetTokenRequest):
     try:
