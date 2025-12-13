@@ -2,7 +2,7 @@ from datetime import date
 from operator import and_
 from typing import Any, Dict, Optional, Sequence
 
-from app.modules.evaluations.models import AttendanceStatus, Evaluation
+from app.modules.evaluations.models import Evaluation
 from app.modules.evaluations.schemas import (
     BulkEvaluationCreate,
     StudentEvaluationUpdate,
@@ -34,6 +34,7 @@ class DailyEvaluationCRUD:
         db: AsyncSession,
         current_user: User,
         eval_date: date,
+        branch_id: int,
         bulk_data: BulkEvaluationCreate,
     ) -> int:
         evaluations_to_create = []
@@ -47,9 +48,10 @@ class DailyEvaluationCRUD:
             evaluation = Evaluation(
                 student_id=student_id,
                 class_id=bulk_data.class_id,
+                branch_id=branch_id,
                 date=eval_date,
                 recorded_by_user_id=current_user.id,
-                attendance_status=AttendanceStatus(eval_data.attendance_status.value),
+                attendance_status=eval_data.attendance_status,
                 evaluation_grades=evaluation_grades,
                 notes=eval_data.notes,
             )

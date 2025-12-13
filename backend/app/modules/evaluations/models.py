@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import date, datetime
 from enum import Enum
-from typing import TYPE_CHECKING, Optional, List, Dict
+from typing import TYPE_CHECKING, Dict, List, Optional
 
 from app.db.base import Base
 from sqlalchemy import (
@@ -10,14 +10,17 @@ from sqlalchemy import (
     DateTime,
     ForeignKey,
     Text,
-    Enum as SQLEnum,
     UniqueConstraint,
+)
+from sqlalchemy import (
+    Enum as SQLEnum,
 )
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 # Avoid circular imports
 if TYPE_CHECKING:
+    from app.modules.branches.models import Branch
     from app.modules.classes.models import Class
     from app.modules.students.models import Student
     from app.modules.users.models import User
@@ -45,6 +48,9 @@ class Evaluation(Base):
     class_id: Mapped[int] = mapped_column(
         ForeignKey("classes.id", ondelete="CASCADE"), nullable=False
     )
+    branch_id: Mapped[int] = mapped_column(
+        ForeignKey("branches.id", ondelete="CASCADE"), nullable=False
+    )
     date: Mapped[date] = mapped_column(Date, nullable=False)
     recorded_by_user_id: Mapped[int] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE"), nullable=False
@@ -65,11 +71,11 @@ class Evaluation(Base):
         DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow
     )
 
-    # Relationships
     student: Mapped[Student] = relationship(
         "Student", back_populates="daily_evaluations", lazy="selectin"
     )
     class_: Mapped[Class] = relationship(
         "Class", back_populates="daily_evaluations", lazy="selectin"
     )
+    branch: Mapped[Branch] = relationship("Branch", lazy="selectin")
     recorded_by_user: Mapped[User] = relationship("User", lazy="selectin")

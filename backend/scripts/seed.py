@@ -18,6 +18,7 @@ from scripts.student_classes import add_students_classes
 from scripts.teacher_classes import add_teacher_classes
 from scripts.parents import add_parents
 from scripts.parent_students import add_parent_students
+from scripts.evaluations import add_evaluations
 
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
@@ -27,13 +28,13 @@ from sqlalchemy.ext.asyncio import (
 
 
 async def seed_data():
-    print("Seeding data...", settings.DATABASE_URL)
     if not settings.DATABASE_URL:
         raise ValueError(
             "DATABASE_URL environment variable is not set. "
             "Please configure it in your .env file."
         )
 
+    print("Seeding data...", settings.DATABASE_URL)
     engine = create_async_engine(settings.DATABASE_URL, echo=False)
     AsyncSessionLocal = async_sessionmaker(
         bind=engine, expire_on_commit=False, class_=AsyncSession
@@ -52,6 +53,7 @@ async def seed_data():
         await add_teacher_classes(db)
         await add_parents(db)
         await add_parent_students(db)
+        await add_evaluations(db)
         await db.commit()
         print("\nAll data committed successfully!")
 

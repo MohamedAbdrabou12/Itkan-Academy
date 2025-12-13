@@ -12,5 +12,6 @@
   { "teacher_id": 1006, "class_id": 1005 },
   { "teacher_id": 1006, "class_id": 1007 },
   { "teacher_id": 1001, "class_id": 1008 },
-  { "teacher_id": 1006, "class_id": 1008 }
+  { "teacher_id": 1006, "class_id": 1008 },
+  { "teacher_id": 1006, "class_id": 1009 }
 ]
