@@ -1,13 +1,15 @@
-from fastapi import APIRouter, Depends, status, Query
-from sqlalchemy.ext.asyncio import AsyncSession
+from typing import Optional
+
 from app.core.auth import get_current_user
 from app.core.authorization import require_permission
 from app.db.session import get_db
+from app.modules.permissions.permissions import PermissionCode
 from app.modules.teachers.schemas import TeacherCreate, TeacherRead, TeacherUpdate
 from app.modules.teachers.service import TeacherService
 from app.modules.users.models import User
+from fastapi import APIRouter, Depends, Query, status
 from fastapi_pagination import Page
-from typing import Optional
+from sqlalchemy.ext.asyncio import AsyncSession
 
 teachers_router = APIRouter(prefix="/teachers", tags=["Teachers"])
 
@@ -15,7 +17,7 @@ teachers_router = APIRouter(prefix="/teachers", tags=["Teachers"])
 @teachers_router.get(
     "/",
     response_model=Page[TeacherRead],
-    dependencies=[Depends(require_permission("system.teacher_permissions.view"))],
+    dependencies=[Depends(require_permission(PermissionCode.SYSTEM_TEACHERS_VIEW))],
 )
 async def list_teachers(
     search: Optional[str] = Query(None, description="Search in name"),
@@ -30,7 +32,7 @@ async def list_teachers(
 @teachers_router.get(
     "/{teacher_id}",
     response_model=TeacherRead,
-    dependencies=[Depends(require_permission("system.teacher_permissions.view"))],
+    dependencies=[Depends(require_permission(PermissionCode.SYSTEM_TEACHERS_VIEW))],
 )
 async def get_teacher(teacher_id: int, db: AsyncSession = Depends(get_db)):
     return await TeacherService.get_teacher(db, teacher_id)
@@ -40,7 +42,7 @@ async def get_teacher(teacher_id: int, db: AsyncSession = Depends(get_db)):
     "/",
     response_model=TeacherRead,
     status_code=status.HTTP_201_CREATED,
-    dependencies=[Depends(require_permission("system.teacher_permissions.add"))],
+    dependencies=[Depends(require_permission(PermissionCode.SYSTEM_TEACHERS_ADD))],
 )
 async def create_teacher(
     teacher_in: TeacherCreate,
@@ -67,7 +69,7 @@ async def update_teacher(
 @teachers_router.delete(
     "/{teacher_id}",
     response_model=TeacherRead,
-    dependencies=[Depends(require_permission("system.teacher_permissions.delete"))],
+    dependencies=[Depends(require_permission(PermissionCode.SYSTEM_TEACHERS_DELETE))],
 )
 async def delete_teacher(
     teacher_id: int,

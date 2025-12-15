@@ -25,5 +25,5 @@ from app.modules.exams.models.exam_question import ExamQuestion  # noqa
 from app.modules.exams.models.exam import Exam  # noqa
 from app.modules.financial.models.invoice import Invoice  # noqa
 from app.modules.financial.models.payment import Payment  # noqa
-from app.modules.reports.models import ReportJob  # noqa
+from app.modules.parents.models import Parent, ParentStudent  # noqa
 from app.modules.teachers import models  # noqa

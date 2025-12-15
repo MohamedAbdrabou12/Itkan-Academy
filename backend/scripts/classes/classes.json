@@ -94,5 +94,17 @@
     },
     "status": "active",
     "evaluation_config": ["حفظ", "مراجعة", "سلوك"]
+  },
+  {
+    "id": 1009,
+    "branch_id": 1004,
+    "name": "الصف الثاني - فرع مدينة ناصر",
+    "schedule": {
+      "sunday": ["09:30"],
+      "tuesday": ["08:00"],
+      "thursday": ["09:30"]
+    },
+    "status": "active",
+    "evaluation_config": ["حفظ", "المظهر العام", "سلوك"]
   }
 ]

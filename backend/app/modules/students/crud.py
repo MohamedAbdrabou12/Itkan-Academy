@@ -48,6 +48,20 @@ class StudentCRUD:
 
         return students
 
+    async def get_by_class_ids(
+        self, db: AsyncSession, class_ids: List[int]
+    ) -> List[Student]:
+        stmt = (
+            select(Student)
+            .join(StudentClass)
+            .where(
+                StudentClass.class_id.in_(class_ids),
+            )
+            .distinct(Student.id)
+        )
+        result = await db.execute(stmt)
+        return list(result.scalars().all())
+
     async def get_by_id(self, db: AsyncSession, student_id: int) -> Optional[Student]:
         stmt = (
             select(Student)

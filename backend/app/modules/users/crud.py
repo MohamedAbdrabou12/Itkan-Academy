@@ -53,7 +53,13 @@ class UserCRUD:
                 selectinload(User.role),
                 selectinload(User.branch_links).joinedload(UserBranch.branch),
             )
-            .where(and_(not_(User.teacher.has()), not_(User.student.has())))
+            .where(
+                and_(
+                    not_(User.teacher.has()),
+                    not_(User.student.has()),
+                    not_(User.parent.has()),
+                )
+            )
         )
 
         if search:

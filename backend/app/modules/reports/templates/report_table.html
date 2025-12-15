@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+  <head>
+    <meta charset="UTF-8" />
+    <title>{{ title }}</title>
+    <style>
+      @page {
+        size: A4 landscape;
+        margin: 0.5cm;
+      }
+      body {
+        font-family: "DejaVu Sans", "Arial", sans-serif;
+        direction: rtl;
+        text-align: right;
+        margin: 0;
+        padding: 20px;
+      }
+      .header {
+        text-align: center;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #10b981;
+      }
+      .title {
+        font-size: 22px;
+        font-weight: bold;
+        color: #065f46;
+        margin-bottom: 10px;
+      }
+      .subtitle {
+        font-size: 13px;
+        color: #047857;
+        margin-top: 5px;
+      }
+      .report-info {
+        background-color: #f0fdf4;
+        border: 1px solid #a7f3d0;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .info-item {
+        font-size: 12px;
+        color: #065f46;
+      }
+      .info-label {
+        font-weight: bold;
+        color: #047857;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+        font-size: 10px;
+        table-layout: auto;
+      }
+      th {
+        background-color: #10b981;
+        color: white;
+        padding: 12px 8px;
+        text-align: center;
+        font-weight: bold;
+        border: 1px solid #059669;
+        font-size: 11px;
+        white-space: nowrap;
+      }
+      td {
+        padding: 10px 8px;
+        border: 1px solid #d1fae5;
+        text-align: right;
+        vertical-align: top;
+        word-break: break-word;
+      }
+      tr:nth-child(even) {
+        background-color: #f0fdf4;
+      }
+      tr:nth-child(odd) {
+        background-color: white;
+      }
+      tr:hover {
+        background-color: #d1fae5;
+      }
+      .footer {
+        margin-top: 25px;
+        text-align: center;
+        font-size: 10px;
+        color: #047857;
+        padding-top: 10px;
+        border-top: 1px solid #a7f3d0;
+      }
+      .total-records {
+        background-color: #10b981;
+        color: white;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-weight: bold;
+        font-size: 11px;
+      }
+     
+      .table-container {
+        overflow-x: auto;
+        width: 100%;
+      }
+     
+      .table-container table {
+        min-width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <div class="title">{{ title }}</div>
+    </div>
+
+    <div class="report-info">
+      <div class="info-item">
+        <span class="info-label">الفترة:</span> من {{ date_from }} إلى {{
+        date_to }}
+      </div>
+      <div class="info-item">
+        <span class="info-label">تم الإنشاء في:</span> {{ generated_date }}
+      </div>
+      <div class="total-records">إجمالي السجلات: {{ total_records }}</div>
+    </div>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            {% for header in headers %}
+            <th>{{ header }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in rows %}
+          <tr>
+            {% for cell in row %}
+            <td>{{ cell }}</td>
+            {% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="footer">
+      <div>Itkan © {{ current_year }}</div>
+    </div>
+  </body>
+</html>

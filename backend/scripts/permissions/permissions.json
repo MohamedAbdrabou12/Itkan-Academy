@@ -160,52 +160,44 @@
     "description_ar": "التواصل مع مشرف الفرع"
   },
   {
-    "id": 1020,
-    "code": "reports.*",
-    "name": "Full Reports Access",
-    "name_ar": "الوصول الكامل للتقارير",
-    "description": "Complete access to all reports",
-    "description_ar": "الوصول الكامل لجميع التقارير"
-  },
-  {
     "id": 1021,
-    "code": "reports.academic.view",
-    "name": "View Academic Reports",
-    "name_ar": "عرض التقارير الأكاديمية",
-    "description": "Access to academic reports",
-    "description_ar": "الوصول للتقارير الأكاديمية"
+    "code": "reports.attendance.view",
+    "name": "View Attendance Reports",
+    "name_ar": "عرض التقارير الحضور",
+    "description": "Access to attendance reports",
+    "description_ar": "الوصول للتقارير الحضور"
   },
   {
     "id": 1022,
-    "code": "reports.staff.view",
-    "name": "View Staff Reports",
-    "name_ar": "عرض تقارير الموظفين",
-    "description": "Access to staff reports",
-    "description_ar": "الوصول لتقارير الموظفين"
+    "code": "reports.evaluations.view",
+    "name": "View Evaluations Reports",
+    "name_ar": "عرض تقارير التقييمات",
+    "description": "Access to evaluations reports",
+    "description_ar": "الوصول لتقارير التقييمات"
   },
   {
     "id": 1023,
-    "code": "reports.financial.view",
-    "name": "View Financial Reports",
+    "code": "reports.finance.view",
+    "name": "View Finance Reports",
     "name_ar": "عرض التقارير المالية",
-    "description": "Access to financial reports",
+    "description": "Access to finance reports",
     "description_ar": "الوصول للتقارير المالية"
   },
   {
     "id": 1024,
-    "code": "reports.branches.*",
-    "name": "Full Branches Reports Management",
-    "name_ar": "إدارة تقارير الفروع الكاملة",
-    "description": "Complete control over branches reports",
-    "description_ar": "التحكم الكامل في تقارير الفروع"
+    "code": "reports.teachers.view",
+    "name": "View Teachers Reports",
+    "name_ar": "عرض تقارير المعلمين",
+    "description": "Access to teachers performance reports",
+    "description_ar": "الوصول لتقارير المعلمين"
   },
   {
     "id": 1025,
-    "code": "reports.branches.view",
-    "name": "View Branches Reports",
-    "name_ar": "عرض تقارير الفروع",
-    "description": "Access to branches performance reports",
-    "description_ar": "الوصول لتقارير أداء الفروع"
+    "code": "reports.staff.view",
+    "name": "View Staff Reports",
+    "name_ar": "عرض تقارير الاداريين",
+    "description": "Access to staff performance reports",
+    "description_ar": "الوصول لتقارير الاداريين"
   },
   {
     "id": 1030,
@@ -344,38 +336,6 @@
     "description_ar": "حذف تقييمات أداء المعلمين"
   },
   {
-    "id": 1047,
-    "code": "reports.teacher.*",
-    "name": "Full Teacher Reports Management",
-    "name_ar": "إدارة تقارير المعلمين الكاملة",
-    "description": "Complete control over teacher reports",
-    "description_ar": "التحكم الكامل في تقارير المعلمين"
-  },
-  {
-    "id": 1048,
-    "code": "reports.teacher.view",
-    "name": "View Teacher Reports",
-    "name_ar": "عرض تقارير المعلمين",
-    "description": "Access teacher performance reports",
-    "description_ar": "الوصول لتقارير أداء المعلمين"
-  },
-  {
-    "id": 1049,
-    "code": "reports.student.*",
-    "name": "Full Student Reports Management",
-    "name_ar": "إدارة تقارير الطلاب الكاملة",
-    "description": "Complete control over student reports",
-    "description_ar": "التحكم الكامل في تقارير الطلاب"
-  },
-  {
-    "id": 1050,
-    "code": "reports.student.view",
-    "name": "View Student Reports",
-    "name_ar": "عرض تقارير الطلاب",
-    "description": "Access student performance reports",
-    "description_ar": "الوصول لتقارير أداء الطلاب"
-  },
-  {
     "id": 1051,
     "code": "system.assignments.*",
     "name": "Full Assignments Management",
@@ -417,7 +377,7 @@
   },
   {
     "id": 1056,
-    "code": "system.teacher_permissions.*",
+    "code": "system.teachers.*",
     "name": "Full Teacher Permissions Management",
     "name_ar": "إدارة صلاحيات المعلمين الكاملة",
     "description": "Complete control over teacher permissions",
@@ -425,35 +385,35 @@
   },
   {
     "id": 1057,
-    "code": "system.teacher_permissions.view",
-    "name": "View Teacher Permissions",
-    "name_ar": "عرض صلاحيات المعلمين",
-    "description": "View teacher permissions",
-    "description_ar": "عرض صلاحيات المعلمين"
+    "code": "system.teachers.view",
+    "name": "View Teacher",
+    "name_ar": "عرض المعلمين",
+    "description": "View teachers",
+    "description_ar": "عرض المعلمين"
   },
   {
     "id": 1058,
-    "code": "system.teacher_permissions.add",
-    "name": "Add Teacher Permissions",
-    "name_ar": "إضافة صلاحيات المعلمين",
-    "description": "Add permissions to teachers",
-    "description_ar": "إضافة صلاحيات للمعلمين"
+    "code": "system.teachers.add",
+    "name": "Add Teacher",
+    "name_ar": "إضافة المعلمين",
+    "description": "Add to teachers",
+    "description_ar": "إضافة للمعلمين"
   },
   {
     "id": 1059,
-    "code": "system.teacher_permissions.edit",
-    "name": "Edit Teacher Permissions",
-    "name_ar": "تعديل صلاحيات المعلمين",
-    "description": "Edit teacher permissions",
-    "description_ar": "تعديل صلاحيات المعلمين"
+    "code": "system.teachers.edit",
+    "name": "Edit Teacher",
+    "name_ar": "تعديل المعلمين",
+    "description": "Edit teacher",
+    "description_ar": "تعديل المعلمين"
   },
   {
     "id": 1060,
-    "code": "system.teacher_permissions.delete",
-    "name": "Delete Teacher Permissions",
-    "name_ar": "حذف صلاحيات المعلمين",
-    "description": "Remove teacher permissions",
-    "description_ar": "إزالة صلاحيات المعلمين"
+    "code": "system.teachers.delete",
+    "name": "Delete Teacher",
+    "name_ar": "حذف المعلمين",
+    "description": "Remove teacher",
+    "description_ar": "إزالة المعلمين"
   },
   {
     "id": 1061,
@@ -534,46 +494,6 @@
     "name_ar": "حذف الامتحانات",
     "description": "Delete exams",
     "description_ar": "حذف الامتحانات"
-  },
-  {
-    "id": 1071,
-    "code": "reports.administrative.*",
-    "name": "Full Administrative Reports Management",
-    "name_ar": "إدارة التقارير الإدارية الكاملة",
-    "description": "Complete control over administrative reports",
-    "description_ar": "التحكم الكامل في التقارير الإدارية"
-  },
-  {
-    "id": 1072,
-    "code": "reports.administrative.view",
-    "name": "View Administrative Reports",
-    "name_ar": "عرض التقارير الإدارية",
-    "description": "Access administrative performance reports",
-    "description_ar": "الوصول لتقارير الأداء الإداري"
-  },
-  {
-    "id": 1073,
-    "code": "reports.administrative.approve",
-    "name": "Approve Administrative Reports",
-    "name_ar": "اعتماد التقارير الإدارية",
-    "description": "Approve administrative reports",
-    "description_ar": "اعتماد التقارير الإدارية"
-  },
-  {
-    "id": 1074,
-    "code": "reports.financial_expenses.*",
-    "name": "Full Financial Expenses Management",
-    "name_ar": "إدارة المصروفات المالية الكاملة",
-    "description": "Complete control over financial expenses",
-    "description_ar": "التحكم الكامل في المصروفات المالية"
-  },
-  {
-    "id": 1075,
-    "code": "reports.financial_expenses.approve",
-    "name": "Approve Financial Expenses",
-    "name_ar": "اعتماد المصروفات المالية",
-    "description": "Approve financial expense reports",
-    "description_ar": "اعتماد تقارير المصروفات المالية"
   },
   {
     "id": 1076,
@@ -1032,14 +952,6 @@
     "description_ar": "اعتماد الرواتب الشهرية للمعلمين"
   },
   {
-    "id": 1144,
-    "code": "reports.financial.add",
-    "name": "Add Financial Reports",
-    "name_ar": "إنشاء التقارير المالية",
-    "description": "Add financial reports for students, teachers, school",
-    "description_ar": "إنشاء تقارير مالية للطلاب والمعلمين والمدرسة"
-  },
-  {
     "id": 1145,
     "code": "system.roles.*",
     "name": "Full Roles Management",
@@ -1282,7 +1194,6 @@
   },
   {
     "id": 1210,
-    "code": "academic.question_bank.edit",
     "name": "Edit Question Bank",
     "name_ar": "تعديل بنك الاسئلة",
     "description": "Edit question bank information",
