@@ -120,26 +120,9 @@ async def generate_evaluations_report(
         # Prepare flattened data for export (one row per evaluation)
         export_rows = []
         for item in data_dicts:
-            grades = item.get("evaluation_grades", [])
+            grades = item.get("evaluation_grades", [{}])
 
-            if grades:
-                # One row per evaluation grade
-                for grade in grades:
-                    export_rows.append(
-                        {
-                            "branch_id": item["branch_id"],
-                            "branch_name": item["branch_name"],
-                            "class_id": item["class_id"],
-                            "class_name": item["class_name"],
-                            "student_id": item["student_id"],
-                            "student_name": item["student_name"],
-                            "date": item["date"],
-                            "evaluation_name": grade.get("name", ""),
-                            "grade": grade.get("grade", ""),
-                        }
-                    )
-            else:
-                # Empty row if no grades
+            for grade in grades:
                 export_rows.append(
                     {
                         "branch_id": item["branch_id"],
@@ -149,17 +132,17 @@ async def generate_evaluations_report(
                         "student_id": item["student_id"],
                         "student_name": item["student_name"],
                         "date": item["date"],
-                        "evaluation_name": "",
-                        "grade": "",
+                        "evaluation_name": grade.get("name", ""),
+                        "grade": grade.get("grade", ""),
                     }
                 )
 
-        # Pivot the data
-        pivoted_data = flatten_evaluation_data_for_export(export_rows)
+        # Flatten the data
+        flattened_data = flatten_evaluation_data_for_export(export_rows)
 
         if export_type == ExportType.PDF:
             return export_pdf(
-                report_data=pivoted_data,
+                report_data=flattened_data,
                 file_name="evaluations",
                 date_from=date_from,
                 date_to=date_to,
@@ -167,14 +150,14 @@ async def generate_evaluations_report(
             )
         elif export_type == ExportType.CSV:
             return export_csv(
-                report_data=pivoted_data,
+                report_data=flattened_data,
                 file_name="evaluations",
                 date_from=date_from,
                 date_to=date_to,
             )
         elif export_type == ExportType.EXCEL:
             return export_excel(
-                report_data=pivoted_data,
+                report_data=flattened_data,
                 file_name="evaluations",
                 date_from=date_from,
                 date_to=date_to,

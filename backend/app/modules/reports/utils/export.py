@@ -1,3 +1,4 @@
+from copy import deepcopy
 import csv
 from datetime import datetime
 from io import BytesIO, StringIO
@@ -41,7 +42,7 @@ def export_pdf(
         pdf_content = buffer.getvalue()
         buffer.close()
     else:
-        headers = get_unique_headers(report_data)
+        headers = get_headers(report_data)
 
         rows = []
         for record in report_data:
@@ -56,6 +57,7 @@ def export_pdf(
         generated_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         current_year = datetime.now().strftime("%Y")
 
+        translate_headers(headers)
         html_content = template.render(
             title=title,
             date_from=date_from,
@@ -97,15 +99,18 @@ def export_csv(
     if not report_data:
         csv_content = ""
     else:
-        headers = get_unique_headers(report_data)
+        headers = get_headers(report_data)
 
         output = StringIO()
 
         # Write UTF-8 BOM for Excel compatibility (especially for Arabic)
         output.write("\ufeff")
 
+        translated_headers = deepcopy(headers)
+        translate_headers(translated_headers)
+
         writer = csv.writer(output)
-        writer.writerow(headers)
+        writer.writerow(translated_headers)
 
         for record in report_data:
             row = []
@@ -149,9 +154,11 @@ def export_excel(
     if not report_data:
         ws.append(["No data available"])
     else:
-        headers = get_unique_headers(report_data)
+        headers = get_headers(report_data)
 
-        ws.append(headers)
+        translated_headers = deepcopy(headers)
+        translate_headers(translated_headers)
+        ws.append(translated_headers)
 
         # Style header row
         header_font = Font(bold=True, color="FFFFFF")
@@ -231,11 +238,42 @@ def export_excel(
     )
 
 
-def get_unique_headers(report_data: List[Dict[str, Any]]):
-    all_headers = set()
+__headers_order = [
+    "branch_id",
+    "branch_name",
+    "class_id",
+    "class_name",
+    "student_id",
+    "student_name",
+    "date",
+]
+
+
+def get_headers(report_data: List[Dict[str, Any]]):
+    headers = []
     for record in report_data:
-        all_headers.update(record.keys())
+        for key in record.keys():
+            if key not in headers:
+                try:
+                    headers.insert(__headers_order.index(key), key)
+                except ValueError:
+                    headers.append(key)
 
-    all_headers.discard("type")
+    return headers
 
-    return sorted(list(all_headers))
+
+__headers_translation = {
+    "branch_id": "رقم الفرع",
+    "branch_name": "اسم الفرع",
+    "class_id": "رقم الفصل",
+    "class_name": "اسم الفصل",
+    "student_id": "رقم الطالب",
+    "student_name": "اسم الطالب",
+    "date": "اليوم",
+}
+
+
+def translate_headers(headers: List[str]):
+    for i, header in enumerate(headers):
+        if header in __headers_translation:
+            headers[i] = __headers_translation[header]
