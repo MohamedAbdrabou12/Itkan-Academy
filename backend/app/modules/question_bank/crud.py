@@ -80,11 +80,11 @@ class QuestionBankCRUD:
         await db.refresh(question)
         return question
 
-    # async def delete(self, db: AsyncSession, question_id: int) -> None:
-    #     question = await self.get_by_id(db, question_id)
-    #     if question:
-    #         await db.delete(question)
-    #         await db.commit()
+    async def delete(self, db: AsyncSession, question_id: int) -> None:
+        question = await db.get(QuestionBank, question_id)
+        if question:
+            await db.delete(question)
+            await db.commit()
 
 
 question_bank_crud = QuestionBankCRUD()

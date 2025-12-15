@@ -197,5 +197,22 @@ class ExamQuestionService:
             db, db_obj=exam, total_marks=total_marks
         )
 
+    async def delete_all_questions_from_exam(
+        self, db: AsyncSession, *, exam_id: int, user: User
+    ):
+        exam = await exam_crud.get(db, id=exam_id, user=user)
+        if not exam:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Exam not found"
+            )
+        if exam.status != ExamStatus.DRAFT:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Can only remove questions from draft exams",
+            )
+
+        await exam_question_crud.delete_all_questions_from_exam(db, exam_id=exam_id)
+        db.expire(exam)
+
 
 exam_question_service = ExamQuestionService()

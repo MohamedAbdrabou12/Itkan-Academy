@@ -81,11 +81,11 @@
   },
   {
     "id": 1011,
-    "code": "academic.exams.perform",
+    "code": "academic.exams.add",
     "name": "Take Exams",
-    "name_ar": "أداء الامتحانات",
-    "description": "Taking exams",
-    "description_ar": "أداء الامتحانات"
+    "name_ar": "اضافة الامتحانات",
+    "description": "Adding exams",
+    "description_ar": "اضافة الامتحانات"
   },
   {
     "id": 1012,
@@ -457,11 +457,11 @@
   },
   {
     "id": 1061,
-    "code": "academic.exams.supervise",
-    "name": "Supervise Exams",
+    "code": "academic.exams.edit",
+    "name": "Edit Exams",
     "name_ar": "الإشراف على الامتحانات",
-    "description": "Oversee and manage exams",
-    "description_ar": "الإشراف على الامتحانات وإدارتها"
+    "description": "Edit exams",
+    "description_ar": "تعديل الامتحانات"
   },
   {
     "id": 1062,
@@ -529,11 +529,11 @@
   },
   {
     "id": 1070,
-    "code": "academic.exams.coordinate",
-    "name": "Coordinate Exams",
-    "name_ar": "تنسيق الامتحانات",
-    "description": "Coordinate exams across supervisors, teachers, students",
-    "description_ar": "تنسيق الامتحانات بين المشرفين والمعلمين والطلاب"
+    "code": "academic.exams.delete",
+    "name": "Delete Exams",
+    "name_ar": "حذف الامتحانات",
+    "description": "Delete exams",
+    "description_ar": "حذف الامتحانات"
   },
   {
     "id": 1071,

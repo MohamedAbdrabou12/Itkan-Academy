@@ -31,8 +31,10 @@ class TeacherService:
             role_id=user.role_id,
             role_name=user.role_name,
             branch_name=user.branch_name,
-            status=user.status,
+            login_identifier=user.login_identifier,
+            login_type=user.login_type,
             last_login=user.last_login,
+            status=user.status,
             created_at=user.created_at,
             updated_at=user.updated_at,
             branch_ids=[link.branch_id for link in user.branch_links]
@@ -127,6 +129,8 @@ class TeacherService:
             email=teacher_in.email,
             phone=teacher_in.phone,
             role_id=role_id,
+            login_identifier=teacher_in.email,
+            login_type="email",
             branch_ids=teacher_in.branch_ids,  # allow multiple branches
             status=UserStatus.pending,
         )

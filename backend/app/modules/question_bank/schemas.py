@@ -45,3 +45,7 @@ class QuestionBankRead(QuestionBankBase):
 
     class Config:
         from_attributes = True
+
+
+class Message(BaseModel):
+    message: str

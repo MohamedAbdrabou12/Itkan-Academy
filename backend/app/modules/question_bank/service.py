@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException, Request
 
 from app.modules.users.models import User
+from app.modules.exams.crud import exam_question_crud
 
 
 class QuestionBankService:
@@ -68,8 +69,33 @@ class QuestionBankService:
             raise HTTPException(
                 status_code=400, detail="Question with the same title already exists"
             )
+        # check if the exam used in any exams or not
+        exam_question = await exam_question_crud.get_exam_questions_by_question_id(
+            db, question_id=question_id
+        )
+        if exam_question:
+            raise HTTPException(
+                status_code=400,
+                detail="لا يمكن تعديل السؤال لانه مستخدم فى امتحان",
+            )
         # update question
         return await question_bank_crud.update(db, existing_question, question)
+
+    # delete question
+    async def delete_question(self, db: AsyncSession, question_id: int, user: User):
+        question = await question_bank_crud.get_by_id(db, question_id, user, False)
+        if not question:
+            raise HTTPException(status_code=404, detail="هذا السؤال غير موجود")
+
+        exam_question = await exam_question_crud.get_exam_questions_by_question_id(
+            db, question_id=question_id
+        )
+        if exam_question:
+            raise HTTPException(
+                status_code=400,
+                detail="لا يمكن حذف السؤال لانه مستخدم فى امتحان",
+            )
+        await question_bank_crud.delete(db, question_id)
 
 
 question_bank_service = QuestionBankService()

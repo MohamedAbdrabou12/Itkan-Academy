@@ -16,9 +16,9 @@ class PermissionCode(str, Enum):
     # Academic Exams
     ACADEMIC_EXAMS_ALL = "academic.exams.*"
     ACADEMIC_EXAMS_VIEW = "academic.exams.view"
-    ACADEMIC_EXAMS_PERFORM = "academic.exams.perform"
-    ACADEMIC_EXAMS_SUPERVISE = "academic.exams.supervise"
-    ACADEMIC_EXAMS_COORDINATE = "academic.exams.coordinate"
+    ACADEMIC_EXAMS_ADD = "academic.exams.add"
+    ACADEMIC_EXAMS_EDIT = "academic.exams.edit"
+    ACADEMIC_EXAMS_DELETE = "academic.exams.delete"
 
     # Academic Classes
     ACADEMIC_CLASSES_ALL = "academic.classes.*"

@@ -8,6 +8,7 @@ from app.core.auth import get_current_user
 from app.modules.question_bank.schemas import (
     QuestionBankCreate,
     QuestionBankRead,
+    Message,
 )
 from app.core.authorization import require_permission
 from .service import question_bank_service
@@ -85,14 +86,18 @@ async def update_question(
     )
 
 
-# @question_bank_router.delete(
-#     "/{question_id}",
-#     status_code=status.HTTP_204_NO_CONTENT,
-#     dependencies=[
-#         Depends(get_current_user),
-#         # Depends(require_permission("question:delete")),
-#     ],
-# )
-# async def delete_question(question_id: int, db: AsyncSession = Depends(get_db)):
-#     await question_bank_crud.delete(db, question_id)
-#     return None
+@question_bank_router.delete(
+    "/{question_id}",
+    status_code=status.HTTP_200_OK,
+    dependencies=[
+        Depends(get_current_user),
+        # Depends(require_permission("question:delete")),
+    ],
+)
+async def delete_question(
+    question_id: int,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    await question_bank_service.delete_question(db, question_id, user)
+    return
