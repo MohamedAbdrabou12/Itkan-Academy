@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from app.core.auth import get_current_user
 from app.core.authorization import require_permission
@@ -119,10 +119,14 @@ async def get_class_students_simple(
 )
 async def list_classes(
     request: Request,
-    branch_id: int | None = Query(None),
+    search: Optional[str] = Query(None, description="Search in name"),
+    sort_by: Optional[str] = Query("id", description="Field to sort by"),
+    sort_order: Optional[str] = Query("asc", description="Sort order: asc or desc"),
     db: AsyncSession = Depends(get_db),
 ):
-    classes = await class_crud.get_all(db, request=request)
+    classes = await class_crud.get_all(
+        db, request=request, search=search, sort_by=sort_by, sort_order=sort_order
+    )
     return classes
 
 

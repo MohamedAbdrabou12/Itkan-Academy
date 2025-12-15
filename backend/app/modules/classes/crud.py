@@ -10,9 +10,14 @@ from fastapi_pagination.ext.sqlalchemy import paginate
 
 class ClassCRUD:
     async def get_all(
-        self, db: AsyncSession, request: Optional[Request] = None
+        self,
+        db: AsyncSession,
+        request: Optional[Request] = None,
+        search: Optional[str] = None,
+        sort_by: Optional[str] = None,
+        sort_order: Optional[str] = None,
     ) -> List[Class]:
-        stmt = select(Class).order_by(Class.id)
+        stmt = select(Class)
 
         # Branch scoping
         if request:
@@ -20,6 +25,16 @@ class ClassCRUD:
 
             if branch_id is not None:
                 stmt = stmt.where(Class.branch_id == branch_id)
+        # Search
+        if search:
+            stmt = stmt.where(Class.name.ilike(f"%{search}%"))
+
+        # Apply sorting
+        sort_column = getattr(Class, sort_by) if sort_by else Class.id
+        if sort_order and sort_order.lower() == "desc":
+            stmt = stmt.order_by(sort_column.desc())
+        else:
+            stmt = stmt.order_by(sort_column.asc())
 
         result = await paginate(db, stmt)
         return result

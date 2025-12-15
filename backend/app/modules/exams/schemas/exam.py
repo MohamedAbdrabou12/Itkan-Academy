@@ -7,6 +7,8 @@ from app.modules.question_bank.models import (
     QuestionDifficulty,
     QuestionType,
 )
+from app.modules.exams.schemas.exam_question import ExamQuestionCreate
+from app.modules.question_bank.schemas import QuestionOption
 
 
 class ExamQuestionWithDetails(BaseModel):
@@ -15,8 +17,9 @@ class ExamQuestionWithDetails(BaseModel):
     order: int
     title: str
     difficulty: QuestionDifficulty
-    options: dict
+    options: Optional[list[QuestionOption]]
     type: QuestionType
+    question_id: int
 
     class Config:
         from_attributes = True
@@ -35,6 +38,7 @@ class ExamQuestionWithDetails(BaseModel):
                 "difficulty": question_details.difficulty,
                 "options": question_details.options,
                 "type": question_details.type,
+                "question_id": question_details.id,
             }
         return data
 
@@ -48,11 +52,13 @@ class ExamBase(BaseModel):
 
 
 class ExamCreate(ExamBase):
+    questions: list[ExamQuestionCreate]
+
     @field_validator("end_time")
     @classmethod
     def end_time_must_be_after_start_time(cls, v, values):
         if "start_time" in values.data and v <= values.data["start_time"]:
-            raise ValueError("end_time must be after start_time")
+            raise ValueError("تاريخ الانتهاء يجب أن يكون بعد تاريخ البدء")
         return v
 
 
@@ -62,6 +68,7 @@ class ExamUpdate(BaseModel):
     start_time: Optional[datetime] = None
     end_time: Optional[datetime] = None
     class_id: Optional[int] = None
+    questions: Optional[list[ExamQuestionCreate]] = None
 
     @field_validator("end_time")
     @classmethod
@@ -70,7 +77,7 @@ class ExamUpdate(BaseModel):
         start_time = data.get("start_time")
 
         if "start_time" in data and v and start_time and v <= start_time:
-            raise ValueError("end_time must be after start_time")
+            raise ValueError("تاريخ الانتهاء يجب أن يكون بعد تاريخ البدء")
         return v
 
 

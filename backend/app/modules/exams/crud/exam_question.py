@@ -26,6 +26,14 @@ class ExamQuestionCRUD:
         )
         return result.scalars().all()
 
+    async def get_exam_questions_by_question_id(
+        self, db: AsyncSession, *, question_id: int
+    ):
+        result = await db.execute(
+            select(ExamQuestion).filter(ExamQuestion.question_id == question_id)
+        )
+        return result.scalars().all()
+
     async def create(
         self, db: AsyncSession, *, obj_in: ExamQuestionCreate, exam_id: int, user: User
     ) -> ExamQuestion:
@@ -45,6 +53,7 @@ class ExamQuestionCRUD:
         obj_in: List[ExamQuestionCreate],
         exam_id: int,
         user: User,
+        active_branch_id: int,
     ) -> List[ExamQuestion]:
         db_objs = []
         for item in obj_in:
@@ -52,7 +61,7 @@ class ExamQuestionCRUD:
             db_obj = ExamQuestion(
                 **data,
                 exam_id=exam_id,
-                branch_id=user.branch_id,
+                branch_id=active_branch_id,
             )
             db.add(db_obj)
             db_objs.append(db_obj)
@@ -81,6 +90,15 @@ class ExamQuestionCRUD:
             await db.delete(db_obj)
             await db.commit()
         return db_obj
+
+    async def delete_all_questions_from_exam(self, db: AsyncSession, *, exam_id: int):
+        result = await db.execute(
+            select(ExamQuestion).filter(ExamQuestion.exam_id == exam_id)
+        )
+        db_objs = result.scalars().all()
+        for db_obj in db_objs:
+            await db.delete(db_obj)
+        await db.commit()
 
 
 exam_question_crud = ExamQuestionCRUD()
