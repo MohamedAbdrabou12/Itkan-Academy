@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 from app.modules.students.models import Student
-from app.modules.students.schemas import StudentCreate, StudentRead, StudentUpdate
+from app.modules.students.schemas import StudentCreate, StudentUpdate
 from app.modules.students.crud import student_crud
 from app.modules.users.models import User, UserStatus
 from app.modules.users.schemas import (
@@ -18,9 +18,6 @@ from app.modules.users.crud import user_crud
 from app.services.notification_service.workrs.worker import send_notification_task
 from app.modules.classes.models import Class
 from app.modules.roles.models import Role
-from passlib.context import CryptContext
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 class StudentService:
@@ -35,6 +32,9 @@ class StudentService:
             phone=user.phone,
             role_id=user.role_id,
             role_name=user.role_name,
+            role_name_ar=user.role_name_ar,
+            login_identifier=user.login_identifier,
+            login_type=user.login_type,
             branch_name=user.branch_name,
             status=user.status,
             last_login=user.last_login,
@@ -112,13 +112,22 @@ class StudentService:
     async def create_student(
         db: AsyncSession, student_in: StudentCreate, creator: Optional[User] = None
     ) -> Dict:
-        # Check email uniqueness
+        # Check login_identifier (national_id) uniqueness
+        existing_login = await user_crud.get_by_login_identifier(
+            db, student_in.national_id
+        )
+        if existing_login:
+            raise HTTPException(
+                status_code=400, detail="National ID already registered"
+            )
+
+        # Check email uniqueness (optional)
         if student_in.email:
-            existing = await user_crud.get_by_email(db, student_in.email)
-            if existing:
+            existing_email = await user_crud.get_by_email(db, student_in.email)
+            if existing_email:
                 raise HTTPException(status_code=400, detail="Email already registered")
 
-        # Check national_id uniqueness
+        # Check national_id uniqueness in students table
         students_with_nid = await student_crud.get_all(
             db, search=student_in.national_id
         )
@@ -158,9 +167,7 @@ class StudentService:
         student_role = role_res.scalar_one_or_none()
         role_id = student_role.id if student_role else None
 
-        hashed_password = pwd_context.hash(student_in.password)
-
-        # MODIFICATION: Add login_identifier and login_type for National ID login
+        # Create user
         user_payload = UserCreateSchema(
             full_name=student_in.full_name,
             email=student_in.email,
@@ -168,12 +175,19 @@ class StudentService:
             role_id=role_id,
             branch_ids=student_in.branch_ids,
             status=student_in.status or UserStatus.pending,
-            password=hashed_password,
+            password=student_in.password,
             login_identifier=student_in.national_id,
             login_type="national_id",
         )
+        # Validate password presence
+        if not student_in.password or not student_in.password.strip():
+            raise HTTPException(
+                status_code=400, detail="Password is required for student account"
+            )
+
         user = await user_crud.create(db, user_payload)
 
+        # Create student profile
         student_payload = {
             "user_id": user.id,
             "national_id": student_in.national_id,
@@ -188,10 +202,23 @@ class StudentService:
             await db.commit()
             await db.refresh(student)
 
-        # Send reset password notification with fallback to parent
-        await StudentService._send_reset_password_notification(db, user)
+        # Reload user with relations (no lazy loading)
+        from app.modules.parents.models import ParentStudent, Parent
 
-        # Reload with relations
+        user_result = await db.execute(
+            select(User)
+            .options(
+                selectinload(User.student)
+                .selectinload(Student.parent_links)
+                .selectinload(ParentStudent.parent)
+                .selectinload(Parent.user)
+            )
+            .where(User.id == user.id)
+        )
+        user_with_relations = user_result.scalar_one()
+
+        await StudentService._send_reset_password_notification(db, user_with_relations)
+
         result = await db.execute(
             select(Student)
             .options(
@@ -207,49 +234,34 @@ class StudentService:
 
     @staticmethod
     async def _send_reset_password_notification(db: AsyncSession, user: User):
-        """
-        Send reset password notification.
-        If user has no email, fallback to parents emails.
-        """
-        # from app.modules.parents.models import ParentStudent
-
         recipients: List[str] = []
 
-        # Primary recipient: student's email
         if user.email:
             recipients.append(user.email)
 
-        # Fallback: parent's emails
-        if not recipients and getattr(user, "student", None):
-            parent_links = getattr(user.student, "parent_links", [])
-            for link in parent_links:
-                if (
-                    getattr(link, "parent", None)
-                    and link.parent.user
-                    and link.parent.user.email
-                ):
-                    recipients.append(link.parent.user.email)
+        if not recipients and user.student:
+            for link in user.student.parent_links or []:
+                parent_user = getattr(link.parent, "user", None)
+                if parent_user and parent_user.email:
+                    recipients.append(parent_user.email)
 
         if not recipients:
-            return  # No email to send
+            return
 
         token = create_password_reset_token(user.id)
         reset_link = f"http://localhost:5173/reset-password?token={token}"
 
         for email in recipients:
-            try:
-                send_notification_task.delay(
-                    user_id=str(user.id),
-                    channel="email",
-                    template_type="password_reset_request",
-                    payload={
-                        "user_name": user.full_name,
-                        "email": email,
-                        "reset_link": reset_link,
-                    },
-                )
-            except Exception:
-                pass
+            send_notification_task.delay(
+                user_id=str(user.id),
+                channel="email",
+                template_type="password_reset_request",
+                payload={
+                    "user_name": user.full_name,
+                    "email": email,
+                    "reset_link": reset_link,
+                },
+            )
 
     @staticmethod
     async def update_student(
@@ -265,54 +277,49 @@ class StudentService:
 
         data = student_in.dict(exclude_unset=True)
 
-        # Extract user-related fields
+        if "national_id" in data:
+            new_nid = data.pop("national_id")
+            if new_nid != student.national_id:
+                nid_exists = await student_crud.get_all(db, search=new_nid)
+                if any(
+                    s.id != student.id and s.national_id == new_nid for s in nid_exists
+                ):
+                    raise HTTPException(
+                        status_code=400, detail="National ID already registered"
+                    )
+                student.national_id = new_nid
+                user.login_identifier = new_nid
+
         user_fields = {
             f: data.pop(f)
             for f in ("full_name", "email", "phone", "branch_ids", "status", "password")
             if f in data
         }
 
-        email_changed = False
-
-        if user_fields:
-            if "email" in user_fields and user_fields["email"] != user.email:
-                exist = await user_crud.get_by_email(db, user_fields["email"])
+        if "email" in user_fields:
+            new_email = user_fields["email"]
+            if not new_email or new_email.strip() == "":
+                user_fields["email"] = None
+            elif new_email != user.email:
+                exist = await user_crud.get_by_email(db, new_email)
                 if exist:
                     raise HTTPException(
                         status_code=400, detail="Email already registered"
                     )
-                email_changed = True
+                user_fields["email"] = new_email
 
-            if "password" in user_fields:
-                user_fields["password"] = pwd_context.hash(user_fields["password"])
-
+        if user_fields:
             await user_crud.update(db, user, UserUpdate(**user_fields))
+            await db.refresh(user)
 
-            # NOTIFICATION: Send reset password if email added/changed with fallback
-            if email_changed or ("password" in user_fields):
-                await StudentService._send_reset_password_notification(db, user)
-
-        # Check national_id uniqueness when updating
-        if "national_id" in data:
-            nid_exists = await student_crud.get_all(db, search=data["national_id"])
-            if any(
-                s.id != student.id and s.national_id == data["national_id"]
-                for s in nid_exists
-            ):
-                raise HTTPException(
-                    status_code=400, detail="National ID already registered"
-                )
-            student.national_id = data.pop("national_id")
-
-        # Update student-specific fields
         class_ids = data.pop("class_ids", None)
         if data:
             student = await student_crud.update(db, student, data)
+            await db.refresh(student)
 
         if class_ids is not None:
             await student_crud.update_student_classes(db, student, class_ids)
 
-        # Reload updated student with relations
         result = await db.execute(
             select(Student)
             .options(
@@ -322,6 +329,9 @@ class StudentService:
             .where(Student.id == student.id)
         )
         student = result.scalar_one()
+
+        if user_fields.get("email") is None:
+            await db.refresh(student.user)
 
         return await StudentService._serialize_student(student)
 

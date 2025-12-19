@@ -204,27 +204,27 @@ class UserCRUD:
                 template_type="reset_password",
                 payload=payload,
             )
-        else:
-            # Fallback to parent email if exists
-            student = getattr(db_obj, "student", None)
-            parent_email = None
-            if student and student.parents:
-                for p in student.parents:
-                    if p.user and p.user.email:
-                        parent_email = p.user.email
-                        break
-            if parent_email:
-                payload = {
-                    "username": db_obj.full_name,
-                    "reset_link": reset_link,
-                    "email": parent_email,
-                }
-                send_notification_task.delay(
-                    user_id=db_obj.id,
-                    channel="email",
-                    template_type="reset_password",
-                    payload=payload,
-                )
+        # else:
+        #     # Fallback to parent email if exists
+        #     student = getattr(db_obj, "student", None)
+        #     parent_email = None
+        #     if student and student.parents:
+        #         for p in student.parents:
+        #             if p.user and p.user.email:
+        #                 parent_email = p.user.email
+        #                 break
+        #     if parent_email:
+        #         payload = {
+        #             "username": db_obj.full_name,
+        #             "reset_link": reset_link,
+        #             "email": parent_email,
+        #         }
+        #         send_notification_task.delay(
+        #             user_id=db_obj.id,
+        #             channel="email",
+        #             template_type="reset_password",
+        #             payload=payload,
+        #         )
 
         await db.refresh(db_obj)
         return db_obj

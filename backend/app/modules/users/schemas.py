@@ -33,6 +33,7 @@ class UserCreate(UserBase):
     role_id: Optional[int] = None
     branch_ids: Optional[List[int]] = None
     status: Optional[UserStatus]
+    password: Optional[str] = None  # Add password field
     login_identifier: str
     login_type: str
 
@@ -76,8 +77,8 @@ class UserRead(UserBase):
     status: UserStatus
     branch_ids: Optional[List[int]] = None
     branches: Optional[List[BranchInfo]] = None
-    login_identifier: str
-    login_type: str
+    login_identifier: Optional[str] = None
+    login_type: Optional[str] = None
 
     class Config:
         from_attributes = True

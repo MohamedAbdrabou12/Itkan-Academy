@@ -1195,6 +1195,7 @@
   {
     "id": 1210,
     "name": "Edit Question Bank",
+    "code": "academic.question_bank.edit",
     "name_ar": "تعديل بنك الاسئلة",
     "description": "Edit question bank information",
     "description_ar": "تعديل بيانات بنك الاسئلة"
