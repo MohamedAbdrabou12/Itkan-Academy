@@ -98,7 +98,11 @@ class UserCRUD:
             select(User)
             .where(User.id == user_id)
             .options(
-                selectinload(User.role),
+                selectinload(User.role).options(
+                    selectinload(Role.permission_associations).selectinload(
+                        RolePermission.permission
+                    )
+                ),
                 selectinload(User.teacher),
                 selectinload(User.branch_links).joinedload(UserBranch.branch),
                 selectinload(User.branches),
@@ -110,7 +114,9 @@ class UserCRUD:
                 stmt = stmt.join(User.branch_links).where(
                     UserBranch.branch_id == active_branch
                 )
+
         result = await db.execute(stmt)
+
         return result.scalars().first()
 
     async def get_by_email(self, db: AsyncSession, email: str) -> Optional[User]:
