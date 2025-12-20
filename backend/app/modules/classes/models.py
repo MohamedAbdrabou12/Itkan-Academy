@@ -48,29 +48,24 @@ class Class(Base):
         "StudentClass",
         back_populates="class_",
         cascade="all, delete-orphan",
-        lazy="selectin",
     )
     students: Mapped[List["Student"]] = relationship(
         "Student",
         secondary="student_classes",
         back_populates="classes",
-        lazy="selectin",
+        overlaps="class_,student_links",
     )
-    branch: Mapped["Branch"] = relationship(
-        "Branch", back_populates="classes", lazy="selectin"
-    )
+    branch: Mapped["Branch"] = relationship("Branch", back_populates="classes")
     daily_evaluations: Mapped[List["Evaluation"]] = relationship(
-        "Evaluation", back_populates="class_", lazy="selectin"
+        "Evaluation", back_populates="class_"
     )
     teachers: Mapped[List["Teacher"]] = relationship(
         "Teacher",
         secondary="teacher_classes",
         back_populates="classes",
-        lazy="selectin",
     )
     teacher_links: Mapped[List["TeacherClass"]] = relationship(
         "TeacherClass",
         back_populates="class_",
         cascade="all, delete-orphan",
-        lazy="selectin",
     )

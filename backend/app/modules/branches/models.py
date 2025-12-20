@@ -42,7 +42,7 @@ class Branch(Base):
 
     # Relationships
     classes: Mapped[List[Class]] = relationship(
-        back_populates="branch", lazy="selectin", cascade="all, delete-orphan"
+        back_populates="branch", cascade="all, delete-orphan"
     )
 
     # Association mapped-class links (user_branches)
@@ -50,14 +50,9 @@ class Branch(Base):
         "UserBranch",
         back_populates="branch",
         cascade="save-update, merge",
-        lazy="selectin",
     )
 
     # Convenience many-to-many relationship to users using the association table
     users_m2m: Mapped[List[User]] = relationship(
-        "User",
-        secondary="user_branches", 
-        back_populates="branches",
-        lazy="selectin",
-        viewonly=True
+        "User", secondary="user_branches", back_populates="branches", viewonly=True
     )

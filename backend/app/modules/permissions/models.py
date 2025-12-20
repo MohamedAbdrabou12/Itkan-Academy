@@ -33,7 +33,6 @@ class Permission(Base):
         "RolePermission",
         back_populates="permission",
         cascade="all, delete-orphan",
-        lazy="selectin",
     )
 
     # Convenience property to access roles directly

@@ -9,6 +9,8 @@ import logging
 from app.core.config import settings
 from app.db.session import AsyncSessionLocal
 from app.modules.users.models import User
+from sqlalchemy.orm import selectinload
+
 
 # CONFIGURATION
 SECRET_KEY = settings.SECRET_KEY or "dev-secret-key"
@@ -44,7 +46,13 @@ class BranchContextMiddleware(BaseHTTPMiddleware):
 
                 if user_id:
                     async with AsyncSessionLocal() as db:
-                        stmt = select(User).where(User.id == int(user_id))
+                        stmt = (
+                            select(User)
+                            .where(User.id == int(user_id))
+                            .options(
+                                selectinload(User.role),
+                            )
+                        )
                         result = await db.execute(stmt)
                         user = result.scalars().first()
                         if user:
