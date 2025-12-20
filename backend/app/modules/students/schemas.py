@@ -56,6 +56,7 @@ class StudentUpdate(BaseModel):
     full_name: Optional[str] = None
     email: Optional[EmailStr] = None
     phone: Optional[str] = None
+    national_id: Optional[str] = None
     class_ids: Optional[List[int]] = None
     branch_ids: Optional[List[int]] = None
     admission_date: Optional[date] = None
@@ -79,6 +80,12 @@ class StudentUpdate(BaseModel):
             if not re.match(r"^\+?\d{10,15}$", cleaned):
                 raise ValueError("Invalid phone number format")
             return cleaned
+        return v
+
+    @field_validator("national_id")
+    def validate_national_id(cls, v):
+        if not re.match(r"^\d{14}$", v):  # exactly 14 digits, numbers only
+            raise ValueError("NationalID must be exactly 14 digits and numeric")
         return v
 
 

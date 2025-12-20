@@ -24,16 +24,9 @@ async def list_parents(
     sort_by: Optional[str] = Query("id"),
     sort_order: Optional[str] = Query("asc"),
 ):
-    result = await ParentService.list_parents(
+    return await ParentService.list_parents(
         db, page=page, size=size, search=search, sort_by=sort_by, sort_order=sort_order
     )
-    return {
-        "items": result["items"],
-        "page": result["page"],
-        "size": result["size"],
-        "total": result["total"],
-        "pages": result["pages"],
-    }
 
 
 @parents_router.get(

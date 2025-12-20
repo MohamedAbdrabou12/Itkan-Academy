@@ -2,15 +2,14 @@ from datetime import datetime
 from typing import List, Optional
 from pydantic import BaseModel, EmailStr, field_validator
 import re
-from app.modules.users.schemas import UserRead
-from app.modules.students.schemas import StudentRead
+from app.modules.users.schemas import UserRead, BranchInfo
 from app.modules.users.models import UserStatus
 
 
 class ParentBase(BaseModel):
     occupation: Optional[str] = None
     address: Optional[str] = None
-    relationship_type: str  # required: 'father'|'mother'|'guardian'
+    relationship_type: str
 
     @field_validator("relationship_type")
     def validate_relationship_type(cls, v):
@@ -21,11 +20,9 @@ class ParentBase(BaseModel):
 
 
 class ParentCreate(ParentBase):
-    # We create linked user at same time (no branches)
     full_name: str
     email: EmailStr
     phone: Optional[str] = None
-    password: Optional[str] = None
 
     @field_validator("phone")
     def validate_phone(cls, v):
@@ -42,11 +39,9 @@ class ParentUpdate(BaseModel):
     address: Optional[str] = None
     relationship_type: Optional[str] = None
 
-    # optional user updates
     full_name: Optional[str] = None
     email: Optional[EmailStr] = None
     phone: Optional[str] = None
-    password: Optional[str] = None
     status: Optional[UserStatus] = None
 
     @field_validator("phone")
@@ -59,18 +54,32 @@ class ParentUpdate(BaseModel):
         return v
 
 
-class ParentMini(BaseModel):
-    id: int
-    user: UserRead
-
-    class Config:
-        from_attributes = True
+class ParentChildRead(BaseModel):
+    student_id: int
+    full_name: Optional[str] = None
+    email: Optional[EmailStr] = None
+    phone: Optional[str] = None
+    role_id: Optional[int] = None
+    role_name: Optional[str] = None
+    role_name_ar: Optional[str] = None
+    branch_name: Optional[str] = None
+    branch_ids: Optional[List[int]] = []
+    branches: Optional[List[BranchInfo]] = []
+    login_type: Optional[str] = None
+    login_identifier: Optional[str] = None
+    status: Optional[str] = None
+    class_ids: Optional[List[int]] = []
+    admission_date: Optional[datetime] = None
+    curriculum_progress: Optional[dict] = None
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+    last_login: Optional[datetime] = None
 
 
 class ParentRead(ParentBase):
     id: int
-    user: UserRead
-    children: Optional[List[StudentRead]] = []
+    user: Optional[UserRead] = None
+    children: Optional[List[ParentChildRead]] = []
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
