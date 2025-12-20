@@ -40,7 +40,6 @@ async def get_teacher(teacher_id: int, db: AsyncSession = Depends(get_db)):
 
 @teachers_router.post(
     "/",
-    response_model=TeacherRead,
     status_code=status.HTTP_201_CREATED,
     dependencies=[Depends(require_permission(PermissionCode.SYSTEM_TEACHERS_ADD))],
 )

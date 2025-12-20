@@ -80,7 +80,7 @@ class TeacherService:
     @staticmethod
     async def create_teacher(
         db: AsyncSession, teacher_in: TeacherCreate, creator: Optional[User] = None
-    ) -> Dict:
+    ):
         existing = await user_crud.get_by_email(db, teacher_in.email)
         if existing:
             raise HTTPException(status_code=400, detail="هذا البريد مستخدم بالفعل")
@@ -157,8 +157,6 @@ class TeacherService:
 
         # Notify HR/admin
         await TeacherService._notify_hr_new_teacher(db, teacher, creator)
-        teacher.user = user
-        return await TeacherService._serialize_teacher(teacher)
 
     @staticmethod
     async def update_teacher(

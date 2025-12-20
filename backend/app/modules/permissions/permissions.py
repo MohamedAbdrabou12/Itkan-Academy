@@ -155,7 +155,7 @@ class PermissionCode(str, Enum):
     SYSTEM_TEACHERS_VIEW = "system.teachers.view"
     SYSTEM_TEACHERS_ADD = "system.teachers.add"
     SYSTEM_TEACHERS_EDIT = "system.teachers.edit"
-    SYSTEM_TEACHERS_DELETE = "system.teacher.delete"
+    SYSTEM_TEACHERS_DELETE = "system.teachers.delete"
 
     # System Student
     SYSTEM_STUDENTS_ALL = "system.students.*"

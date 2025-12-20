@@ -38,8 +38,11 @@ class UserBranch(Base):
         DateTime(timezone=True), default=datetime.utcnow
     )
 
-    user = relationship("User", back_populates="branch_links", lazy="selectin")
-    branch = relationship("Branch", back_populates="user_links", lazy="selectin")
+    user = relationship(
+        "User",
+        back_populates="branch_links",
+    )
+    branch = relationship("Branch", back_populates="user_links")
 
 
 class User(Base):
@@ -72,14 +75,11 @@ class User(Base):
     )
     login_type: Mapped[str] = mapped_column(String(20), nullable=False)
 
-    role: Mapped[Optional["Role"]] = relationship(
-        "Role", back_populates="users", lazy="joined"
-    )
+    role: Mapped[Optional["Role"]] = relationship("Role", back_populates="users")
 
     branch_links: Mapped[List["UserBranch"]] = relationship(
         "UserBranch",
         back_populates="user",
-        lazy="selectin",
         viewonly=True,
     )
 
@@ -87,14 +87,12 @@ class User(Base):
         "Branch",
         secondary="user_branches",
         back_populates="users_m2m",
-        lazy="selectin",
         viewonly=True,
     )
 
     notifications: Mapped[List["Notification"]] = relationship(
         "Notification",
         back_populates="user",
-        lazy="selectin",
         cascade="all, delete-orphan",
     )
     student: Mapped[Optional["Student"]] = relationship(
@@ -104,7 +102,7 @@ class User(Base):
         "Teacher", back_populates="user", uselist=False
     )
     exam_attempts: Mapped[List[ExamAttempt]] = relationship(
-        "ExamAttempt", back_populates="student", lazy="selectin"
+        "ExamAttempt", back_populates="student"
     )
     parent: Mapped[Optional["Parent"]] = relationship(
         "Parent", back_populates="user", uselist=False

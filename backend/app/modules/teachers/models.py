@@ -60,20 +60,16 @@ class Teacher(Base):
     )
 
     # Relationships
-    user: Mapped[Optional["User"]] = relationship(
-        "User", back_populates="teacher", lazy="joined"
-    )
+    user: Mapped[Optional["User"]] = relationship("User", back_populates="teacher")
     class_links: Mapped[List["TeacherClass"]] = relationship(
         "TeacherClass",
         back_populates="teacher",
         cascade="all, delete-orphan",
-        lazy="selectin",
     )
     classes: Mapped[List["Class"]] = relationship(
         "Class",
         secondary="teacher_classes",
         back_populates="teachers",
-        lazy="selectin",
     )
 
     def __repr__(self) -> str:

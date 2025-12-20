@@ -21,7 +21,7 @@ class Role(Base):
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
     name_ar: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
-    description: Mapped[Optional[str]]= mapped_column(Text)
+    description: Mapped[Optional[str]] = mapped_column(Text)
     description_ar: Mapped[Optional[str]] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=datetime.utcnow
@@ -31,16 +31,13 @@ class Role(Base):
     )
 
     # One-to-many with User
-    users: Mapped[List[User]] = relationship(
-        "User", back_populates="role", lazy="selectin"
-    )
+    users: Mapped[List[User]] = relationship("User", back_populates="role")
 
     # Relationship through RolePermission (many-to-many)
     permission_associations: Mapped[List[RolePermission]] = relationship(
         "RolePermission",
         back_populates="role",
         cascade="all, delete-orphan",
-        lazy="selectin",
     )
 
     # Convenience property to access permissions directly

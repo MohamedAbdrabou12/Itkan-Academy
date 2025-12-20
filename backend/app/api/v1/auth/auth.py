@@ -112,7 +112,6 @@ async def login(payload: LoginRequest, db: AsyncSession = Depends(get_db)):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid identifier or password",
         )
-
     if user.status != UserStatus.active.value:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -120,28 +119,13 @@ async def login(payload: LoginRequest, db: AsyncSession = Depends(get_db)):
         )
 
     token = AuthService.generate_access_token_for_user(user)
-    return TokenResponse(
-        access_token=token,
-        user=UserRead(
-            id=user.id,
-            full_name=user.full_name,
-            email=user.email,
-            role_name=user.role.name,
-            status=user.status,
-        ),
-    )
+    return {"access_token": token, "user": user}
 
 
 # Get current authenticated user
 @auth_router.get("/me", response_model=UserRead)
 async def get_me(current_user: User = Depends(get_current_user)):
-    return UserRead(
-        id=current_user.id,
-        full_name=current_user.full_name,
-        email=current_user.email,
-        role_name=current_user.role.name,
-        status=current_user.status,
-    )
+    return current_user
 
 
 # Password management

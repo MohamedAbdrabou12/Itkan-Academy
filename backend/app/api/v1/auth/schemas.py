@@ -2,6 +2,8 @@ from pydantic import BaseModel, EmailStr
 from app.modules.users.models import UserStatus
 from typing import Optional
 from pydantic import field_validator
+from pydantic import BaseModel, EmailStr, field_validator, model_validator
+
 import re
 
 
@@ -29,6 +31,18 @@ class RegisterRequest(BaseModel):
         return v
 
 
+# Branch representation
+class Branch(BaseModel):
+    id: int
+    name: str
+
+
+class permission(BaseModel):
+    id: int
+    code: str
+    description: str
+
+
 # User representation
 class UserRead(BaseModel):
     id: int
@@ -36,6 +50,30 @@ class UserRead(BaseModel):
     email: Optional[str]
     role_name: str
     status: UserStatus
+    permissions: Optional[list[permission]] = None
+    branches: Optional[list[Branch]] = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def flatten_from_orm(cls, data):
+        flatten_data = {}
+        for field in cls.model_fields:
+            value = getattr(data, field, None)
+            if value is not None:
+                flatten_data[field] = value
+
+            if field == "permissions" and data.role:
+                flatten_data[field] = [
+                    permission(
+                        id=assoc.permission.id,
+                        code=assoc.permission.code,
+                        description=assoc.permission.description,
+                    )
+                    for assoc in data.role.permission_associations
+                    if assoc.permission
+                ]
+
+        return flatten_data
 
     class Config:
         from_attributes = True

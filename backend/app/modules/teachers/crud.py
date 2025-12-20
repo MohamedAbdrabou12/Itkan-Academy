@@ -49,7 +49,14 @@ class TeacherCRUD:
         stmt = (
             select(Teacher)
             .where(Teacher.user_id == teacher_id)
-            .options(joinedload(Teacher.user), selectinload(Teacher.classes))
+            .options(
+                joinedload(Teacher.user).options(
+                    selectinload(User.role),
+                    selectinload(User.branches),
+                    selectinload(User.branch_links),
+                ),
+                selectinload(Teacher.classes),
+            )
             .where(Teacher.user.has(User.status != UserStatus.deactive.value))
         )
         result = await db.execute(stmt)
@@ -64,7 +71,7 @@ class TeacherCRUD:
         teacher = Teacher(**data)
         db.add(teacher)
         await db.commit()
-        await db.refresh(teacher)
+        await db.refresh(teacher, attribute_names=["classes"])
         return teacher
 
     async def update(self, db: AsyncSession, teacher: Teacher, data: dict) -> Teacher:
@@ -72,7 +79,8 @@ class TeacherCRUD:
             setattr(teacher, field, value)
         db.add(teacher)
         await db.commit()
-        await db.refresh(teacher)
+        # refresh teacher joined with classes
+        await db.refresh(teacher, attribute_names=["classes"])
         return teacher
 
     async def delete(self, db: AsyncSession, teacher: Teacher) -> Teacher:

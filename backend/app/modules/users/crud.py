@@ -6,6 +6,8 @@ from app.modules.users.models import User, UserBranch, UserStatus
 from app.modules.users.schemas import BranchInfo, UserCreate, UserRead, UserUpdate
 from app.services.notification_service.workrs.worker import send_notification_task
 from fastapi import HTTPException, Request
+from app.modules.roles.models import Role
+from app.modules.role_permissions.models import RolePermission
 from fastapi_pagination.ext.sqlalchemy import paginate as sqlalchemy_paginate  # type: ignore
 from sqlalchemy import asc, desc, not_, and_, or_
 from sqlalchemy import delete as sa_delete
@@ -96,9 +98,14 @@ class UserCRUD:
             select(User)
             .where(User.id == user_id)
             .options(
-                selectinload(User.role),
+                selectinload(User.role).options(
+                    selectinload(Role.permission_associations).selectinload(
+                        RolePermission.permission
+                    )
+                ),
                 selectinload(User.teacher),
                 selectinload(User.branch_links).joinedload(UserBranch.branch),
+                selectinload(User.branches),
             )
         )
         if request:
@@ -107,7 +114,9 @@ class UserCRUD:
                 stmt = stmt.join(User.branch_links).where(
                     UserBranch.branch_id == active_branch
                 )
+
         result = await db.execute(stmt)
+
         return result.scalars().first()
 
     async def get_by_email(self, db: AsyncSession, email: str) -> Optional[User]:
@@ -129,8 +138,11 @@ class UserCRUD:
             select(User)
             .where(User.login_identifier == identifier)
             .options(
-                selectinload(User.role),
+                selectinload(User.role)
+                .selectinload(Role.permission_associations)
+                .selectinload(RolePermission.permission),
                 selectinload(User.branch_links).joinedload(UserBranch.branch),
+                selectinload(User.branches),
             )
         )
         result = await db.execute(stmt)

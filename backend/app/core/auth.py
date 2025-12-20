@@ -45,6 +45,7 @@ async def get_current_user(
     Extracts authenticated user from JWT token.
     Token does NOT depend on branch_id — branch context handled via X-Branch-ID header.
     """
+
     token = credentials.credentials
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,

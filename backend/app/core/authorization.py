@@ -6,6 +6,8 @@ from app.db.session import get_db
 from app.modules.permissions.models import Permission
 from app.modules.roles.models import Role
 from app.modules.users.models import User
+from sqlalchemy.orm import selectinload
+from app.modules.role_permissions.models import RolePermission
 
 
 # PERMISSION RETRIEVAL
@@ -16,14 +18,13 @@ async def get_user_permissions(db: AsyncSession, user: User) -> list[str]:
     if not user.role:
         return []
 
-    # Prefer cached relationship if already loaded
-    if getattr(user.role, "permissions", []):
-        return [perm.code for perm in user.role.permissions if hasattr(perm, "code")]
-
-    # Otherwise, fetch directly from database
-    stmt = select(Permission.code).join(Role.permissions).where(Role.id == user.role.id)
+    stmt = (
+        select(Permission)
+        .join(RolePermission)
+        .where(RolePermission.role_id == user.role.id)
+    )
     result = await db.execute(stmt)
-    return [row[0] for row in result.fetchall()]
+    return [permission.code for permission in result.scalars().all()]
 
 
 # BRANCH ACCESS VALIDATION
@@ -77,7 +78,6 @@ def require_permission(permission_code: str):
 
         # Check if user has the required permission
         user_permissions = await get_user_permissions(db, current_user)
-
         # generic permission code
         generic_permission_code = generate_generic_permission(permission_code)
         if (
