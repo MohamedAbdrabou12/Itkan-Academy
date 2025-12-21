@@ -163,6 +163,17 @@ class PermissionCode(str, Enum):
     SYSTEM_STUDENTS_ADD = "system.students.add"
     SYSTEM_STUDENTS_EDIT = "system.students.edit"
     SYSTEM_STUDENTS_DELETE = "system.students.delete"
+    SYSTEM_STUDENTS_APPROVE = "system.students.approve"
+    SYSTEM_STUDENTS_REJECT = "system.students.reject"
+
+    # System Parents
+    SYSTEM_PARENTS_ALL = "system.parents.*"
+    SYSTEM_PARENTS_VIEW = "system.parents.view"
+    SYSTEM_PARENTS_ADD = "system.parents.add"
+    SYSTEM_PARENTS_EDIT = "system.parents.edit"
+    SYSTEM_PARENTS_DELETE = "system.parents.delete"
+    SYSTEM_PARENTS_LINK_CHILD = "system.parents.link_child"
+    SYSTEM_PARENTS_UNLINK_CHILD = "system.parents.unlink_child"
 
     # Penalty Staff
     PENALTY_STAFF_ALL = "penalty.staff.*"
@@ -215,18 +226,6 @@ class PermissionCode(str, Enum):
     ACTIVITIES_PARTIES_ADD = "activities.parties.add"
     ACTIVITIES_PARTIES_EDIT = "activities.parties.edit"
     ACTIVITIES_PARTIES_DELETE = "activities.parties.delete"
-
-    # Parent Permissions
-
-    # Parent Management
-    PARENTS_ALL = "parent.management.*"
-    PARENTS_LIST = "parent.management.list"
-    PARENTS_VIEW = "parent.management.view"
-    PARENTS_ADD = "parent.management.add"
-    PARENTS_EDIT = "parent.management.edit"
-    PARENTS_DELETE = "parent.management.delete"
-    PARENTS_LINK_CHILD = "parent.link_child"
-    PARENTS_UNLINK_CHILD = "parent.unlink_child"
 
     # Parent Evaluation Access
     EVALUATION_STUDENT_VIEW_FOR_PARENT = "evaluation.student.view_for_parent"

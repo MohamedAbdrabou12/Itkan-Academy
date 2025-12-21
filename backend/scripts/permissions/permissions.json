@@ -1113,7 +1113,7 @@
     "description_ar": "إضافة موظفين جدد"
   },
   {
-    "id": 1200,
+    "id": 1168,
     "code": "parent.management.*",
     "name": "Full Parent Management",
     "name_ar": "إدارة أولياء الأمور الكاملة",
@@ -1121,7 +1121,7 @@
     "description_ar": "التحكم الكامل في جميع عمليات أولياء الأمور"
   },
   {
-    "id": 1201,
+    "id": 1169,
     "code": "parent.management.view",
     "name": "View Parents",
     "name_ar": "عرض أولياء الأمور",
@@ -1129,7 +1129,7 @@
     "description_ar": "الوصول لعرض بيانات أولياء الأمور"
   },
   {
-    "id": 1202,
+    "id": 1170,
     "code": "parent.management.add",
     "name": "Add Parents",
     "name_ar": "إضافة أولياء الأمور",
@@ -1137,7 +1137,7 @@
     "description_ar": "إضافة أولياء أمور جدد"
   },
   {
-    "id": 1203,
+    "id": 1171,
     "code": "parent.management.edit",
     "name": "Edit Parents",
     "name_ar": "تعديل أولياء الأمور",
@@ -1145,7 +1145,7 @@
     "description_ar": "تعديل بيانات أولياء الأمور"
   },
   {
-    "id": 1204,
+    "id": 1172,
     "code": "parent.management.delete",
     "name": "Delete Parents",
     "name_ar": "حذف أولياء الأمور",
@@ -1153,7 +1153,7 @@
     "description_ar": "حذف بيانات أولياء الأمور"
   },
   {
-    "id": 1205,
+    "id": 1173,
     "code": "parent.link_child",
     "name": "Link Child to Parent",
     "name_ar": "ربط طالب بولي أمر",
@@ -1161,7 +1161,7 @@
     "description_ar": "ربط طالب بولي أمر"
   },
   {
-    "id": 1206,
+    "id": 1174,
     "code": "parent.unlink_child",
     "name": "Unlink Child from Parent",
     "name_ar": "فصل طالب عن ولي أمر",
