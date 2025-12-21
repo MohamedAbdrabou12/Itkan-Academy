@@ -54,7 +54,6 @@ def map_parent_to_read(parent: Parent) -> Dict:
                 "phone": child_user.phone,
                 "role_id": child_user.role_id,
                 "role_name": child_user.role_name,
-                "branch_name": child_user.branch_name,
                 "login_type": child_user.login_type,
                 "login_identifier": child_user.login_identifier,
                 "role_name_ar": child_user.role_name_ar,

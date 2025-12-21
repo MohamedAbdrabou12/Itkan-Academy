@@ -34,8 +34,8 @@ class UserCreate(UserBase):
     branch_ids: Optional[List[int]] = None
     status: Optional[UserStatus]
     password: Optional[str] = None  # Add password field
-    login_identifier: str
-    login_type: str
+    login_identifier: Optional[str] = None
+    login_type: Optional[str] = None
 
 
 class UserUpdate(BaseModel):
@@ -70,7 +70,6 @@ class UserRead(UserBase):
     role_id: Optional[int]
     role_name: Optional[str] = None
     role_name_ar: Optional[str] = None
-    branch_name: Optional[str] = None
     last_login: Optional[datetime] | None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None

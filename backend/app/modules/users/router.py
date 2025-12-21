@@ -47,7 +47,7 @@ async def create_staff(
     user: UserCreate,
     db: AsyncSession = Depends(get_db),
 ):
-    return await user_crud.create(db, user)
+    return await user_crud.create(db, user, is_staff=True)
 
 
 @user_router.patch(

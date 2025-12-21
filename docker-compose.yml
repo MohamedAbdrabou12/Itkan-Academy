@@ -21,7 +21,7 @@ services:
       - POSTGRES_DB=itkan_db
     volumes:
       - postgres_data:/var/lib/postgresql/data/
-      - ./pg_logs:/var/lib/postgresql/data/log
+      - ./pg_logs:/var/log/postgresql
 
   redis:
     image: redis:alpine

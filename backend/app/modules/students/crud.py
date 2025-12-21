@@ -1,9 +1,10 @@
 from typing import List, Optional
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, delete
-from sqlalchemy.orm import selectinload, joinedload
+
 from app.modules.students.models import Student, StudentClass
-from app.modules.users.models import User
+from app.modules.users.models import User, UserBranch
+from sqlalchemy import delete, select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import contains_eager, joinedload, selectinload
 
 
 class StudentCRUD:
@@ -16,12 +17,24 @@ class StudentCRUD:
         sort_order: Optional[str] = "asc",
     ) -> List[Student]:
         stmt = select(Student).options(
-            selectinload(Student.classes), joinedload(Student.user)
+            selectinload(Student.classes),
+            joinedload(Student.user).options(
+                joinedload(User.role),
+                selectinload(User.branch_links).joinedload(UserBranch.branch),
+            ),
         )
 
         if status:
-            stmt = stmt.join(Student.user).where(User.status == status)
-
+            stmt = (
+                stmt.join(Student.user)
+                .where(User.status == status)
+                .options(
+                    contains_eager(Student.user).options(
+                        joinedload(User.role),
+                        selectinload(User.branch_links).joinedload(UserBranch.branch),
+                    )
+                )
+            )
         result = await db.execute(stmt)
         students = result.scalars().all()
 
@@ -35,7 +48,7 @@ class StudentCRUD:
                 or (s.national_id and search_lower in s.national_id.lower())
             ]
 
-        if sort_by:
+        if sort_order and sort_by:
             reverse = sort_order.lower() == "desc"
             if sort_by in {"full_name", "email", "status"}:
                 students.sort(key=lambda s: getattr(s.user, sort_by), reverse=reverse)

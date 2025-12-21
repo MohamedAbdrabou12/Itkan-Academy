@@ -1,4 +1,5 @@
 from typing import Dict, List, Optional
+
 from app.core.auth import get_current_user
 from app.core.authorization import require_permission
 from app.db.session import get_db
@@ -14,7 +15,6 @@ students_router = APIRouter(prefix="/students", tags=["Students"])
 
 @students_router.get(
     "/",
-    response_model=dict,
     dependencies=[Depends(require_permission(PermissionCode.SYSTEM_STUDENTS_VIEW))],
 )
 async def list_students(
@@ -88,7 +88,6 @@ async def create_student(
 
 @students_router.put(
     "/{student_id}",
-    response_model=StudentRead,
     dependencies=[Depends(require_permission(PermissionCode.SYSTEM_STUDENTS_EDIT))],
 )
 async def update_student(
@@ -97,15 +96,6 @@ async def update_student(
     db: AsyncSession = Depends(get_db),
 ):
     return await StudentService.update_student(db, student_id, student_in)
-
-
-@students_router.delete(
-    "/{student_id}",
-    response_model=StudentRead,
-    dependencies=[Depends(require_permission(PermissionCode.SYSTEM_STUDENTS_DELETE))],
-)
-async def delete_student(student_id: int, db: AsyncSession = Depends(get_db)):
-    return await StudentService.delete_student(db, student_id)
 
 
 @students_router.post(

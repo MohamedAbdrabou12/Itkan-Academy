@@ -12,7 +12,7 @@ class RoleBase(BaseModel):
 
 
 class RoleCreate(RoleBase):
-    permission_ids: Optional[List[int]] = []
+    pass
 
 
 class RoleUpdate(BaseModel):

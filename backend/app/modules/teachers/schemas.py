@@ -100,7 +100,6 @@ class TeacherRead(BaseModel):
                 "role_id": user_details.role_id,
                 "role_name": user_details.role_name,
                 "role_name_ar": user_details.role_name_ar,
-                "branch_name": user_details.branch_name,
                 "status": user_details.status,
                 "last_login": user_details.last_login,
                 "created_at": user_details.created_at,

@@ -1,29 +1,36 @@
-from typing import Optional, Dict, List
-from fastapi import HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
-from sqlalchemy.orm import selectinload
-from app.modules.students.models import Student
-from app.modules.students.schemas import StudentCreate, StudentUpdate
-from app.modules.students.crud import student_crud
-from app.modules.users.models import User, UserStatus
-from app.modules.users.schemas import (
-    UserCreate as UserCreateSchema,
-    UserUpdate,
-    BranchInfo,
-    UserRead,
-)
+from typing import Dict, List, Optional
+
 from app.core.utils import create_password_reset_token
-from app.modules.users.crud import user_crud
-from app.services.notification_service.workrs.worker import send_notification_task
 from app.modules.classes.models import Class
 from app.modules.roles.models import Role
+from app.modules.students.crud import student_crud
+from app.modules.students.models import Student
+from app.modules.students.schemas import StudentCreate, StudentUpdate
+from app.modules.users.crud import user_crud
+from app.modules.users.models import User, UserBranch, UserStatus
+from app.modules.users.schemas import (
+    BranchInfo,
+    UserRead,
+    UserUpdate,
+)
+from app.modules.users.schemas import (
+    UserCreate as UserCreateSchema,
+)
+from app.services.notification_service.workrs.worker import send_notification_task
+from fastapi import HTTPException
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload, selectinload
+from app.modules.parents.models import Parent, ParentStudent
 
 
 class StudentService:
     @staticmethod
     async def _serialize_student(student: Student) -> Dict:
-        user: User = getattr(student, "user", None)
+        user: User | None = getattr(student, "user", None)
+
+        if user is None:
+            raise HTTPException(status_code=404, detail="Linked user not found")
 
         user_data = UserRead(
             id=user.id,
@@ -35,7 +42,6 @@ class StudentService:
             role_name_ar=user.role_name_ar,
             login_identifier=user.login_identifier,
             login_type=user.login_type,
-            branch_name=user.branch_name,
             status=user.status,
             last_login=user.last_login,
             created_at=user.created_at,
@@ -43,7 +49,9 @@ class StudentService:
             branch_ids=[link.branch_id for link in user.branch_links]
             if user.branch_links
             else [],
-            branches=[BranchInfo.from_orm(link.branch) for link in user.branch_links]
+            branches=[
+                BranchInfo.model_validate(link.branch) for link in user.branch_links
+            ]
             if user.branch_links
             else [],
         )
@@ -138,13 +146,15 @@ class StudentService:
 
         # Validate creator branch permissions
         if creator and getattr(creator, "role_name", "").lower() != "admin":
-            creator_branches = getattr(creator, "branch_ids", []) or []
+            creator_branches = getattr(creator, "branch_ids", [])
             student_branches = student_in.branch_ids or []
-            if not any(b in creator_branches for b in student_branches):
-                raise HTTPException(
-                    status_code=400,
-                    detail="Student branches must match creator's branches",
-                )
+
+            if creator_branches:
+                if not any(b in creator_branches for b in student_branches):
+                    raise HTTPException(
+                        status_code=400,
+                        detail="Student branches must match creator's branches",
+                    )
 
         # Validate class-branch relation
         class_objs: List[Class] = []
@@ -202,9 +212,6 @@ class StudentService:
             await db.commit()
             await db.refresh(student)
 
-        # Reload user with relations (no lazy loading)
-        from app.modules.parents.models import ParentStudent, Parent
-
         user_result = await db.execute(
             select(User)
             .options(
@@ -222,8 +229,11 @@ class StudentService:
         result = await db.execute(
             select(Student)
             .options(
-                selectinload(Student.user).selectinload(User.branches),
                 selectinload(Student.classes),
+                joinedload(Student.user).options(
+                    joinedload(User.role),
+                    selectinload(User.branch_links).joinedload(UserBranch.branch),
+                ),
             )
             .where(Student.id == student.id)
         )
@@ -310,55 +320,27 @@ class StudentService:
 
         if user_fields:
             await user_crud.update(db, user, UserUpdate(**user_fields))
-            await db.refresh(user)
 
         class_ids = data.pop("class_ids", None)
         if data:
             student = await student_crud.update(db, student, data)
-            await db.refresh(student)
 
         if class_ids is not None:
             await student_crud.update_student_classes(db, student, class_ids)
 
         result = await db.execute(
-            select(Student)
-            .options(
-                selectinload(Student.user).selectinload(User.branches),
-                selectinload(Student.classes),
+                select(Student)
+                .options(
+                    selectinload(Student.classes),
+                    joinedload(Student.user).options(
+                        joinedload(User.role),
+                        selectinload(User.branch_links).joinedload(UserBranch.branch),
+                    ),
+                )
+                .where(Student.id == student.id)
             )
-            .where(Student.id == student.id)
-        )
-        student = result.scalar_one()
+        student = result.scalars().unique().one()
 
-        if user_fields.get("email") is None:
-            await db.refresh(student.user)
-
-        return await StudentService._serialize_student(student)
-
-    @staticmethod
-    async def delete_student(db: AsyncSession, student_id: int) -> Dict:
-        student = await student_crud.get_by_id(db, student_id)
-        if not student:
-            raise HTTPException(status_code=404, detail="Student not found")
-
-        attendance_exists = bool(getattr(student, "attendance_records", []))
-        payment_exists = bool(getattr(student, "invoices", []))
-        if attendance_exists or payment_exists:
-            raise HTTPException(
-                status_code=400,
-                detail="Cannot delete student with attendance or payments",
-            )
-
-        user = await db.get(User, student.user_id)
-        if not user:
-            raise HTTPException(status_code=404, detail="Linked user not found")
-
-        user.status = UserStatus.deactive.value
-        db.add(user)
-        await db.commit()
-        await db.refresh(user)
-
-        student.user = user
         return await StudentService._serialize_student(student)
 
     @staticmethod
@@ -373,7 +355,7 @@ class StudentService:
         if not user:
             raise HTTPException(status_code=404, detail="Linked user not found")
 
-        user.status = UserStatus.active.value
+        user.status = UserStatus.active
         db.add(user)
         await db.commit()
         await db.refresh(student)

@@ -162,7 +162,6 @@ class PermissionCode(str, Enum):
     SYSTEM_STUDENTS_VIEW = "system.students.view"
     SYSTEM_STUDENTS_ADD = "system.students.add"
     SYSTEM_STUDENTS_EDIT = "system.students.edit"
-    SYSTEM_STUDENTS_DELETE = "system.students.delete"
 
     # Penalty Staff
     PENALTY_STAFF_ALL = "penalty.staff.*"
@@ -219,12 +218,10 @@ class PermissionCode(str, Enum):
     # Parent Permissions
 
     # Parent Management
-    PARENTS_ALL = "parent.management.*"
-    PARENTS_LIST = "parent.management.list"
-    PARENTS_VIEW = "parent.management.view"
-    PARENTS_ADD = "parent.management.add"
-    PARENTS_EDIT = "parent.management.edit"
-    PARENTS_DELETE = "parent.management.delete"
+    PARENTS_MANAGEMENT_ALL = "parent.management.*"
+    PARENTS_MANAGEMENT_VIEW = "parent.management.view"
+    PARENTS_MANAGEMENT_ADD = "parent.management.add"
+    PARENTS_MANAGEMENT_EDIT = "parent.management.edit"
     PARENTS_LINK_CHILD = "parent.link_child"
     PARENTS_UNLINK_CHILD = "parent.unlink_child"
 
