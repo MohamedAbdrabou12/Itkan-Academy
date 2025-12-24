@@ -1,4 +1,3 @@
-# app/backend/scripts/seed.py
 import asyncio
 import os
 import sys
