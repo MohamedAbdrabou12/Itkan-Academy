@@ -6,7 +6,7 @@
     "email": "general_manager@test.com",
     "login_identifier": "general_manager@test.com",
     "login_type": "email",
-    "phone": "+201000000001",
+    "phone": "01000000001",
     "password": "general_manager",
     "status": "active"
   },
@@ -17,7 +17,7 @@
     "email": "education_manager@test.com",
     "login_identifier": "education_manager@test.com",
     "login_type": "email",
-    "phone": "+201000000002",
+    "phone": "01000000002",
     "password": "education_manager",
     "status": "active"
   },
@@ -28,7 +28,7 @@
     "email": "education_supervisor@test.com",
     "login_identifier": "education_supervisor@test.com",
     "login_type": "email",
-    "phone": "+201000000003",
+    "phone": "01000000003",
     "password": "education_supervisor",
     "status": "active"
   },
@@ -39,7 +39,7 @@
     "email": "branch_supervisor1@test.com",
     "login_identifier": "branch_supervisor1@test.com",
     "login_type": "email",
-    "phone": "+201000000004",
+    "phone": "01000000004",
     "password": "branch_supervisor1",
     "status": "active"
   },
@@ -50,7 +50,7 @@
     "email": "branch_supervisor2@test.com",
     "login_identifier": "branch_supervisor2@test.com",
     "login_type": "email",
-    "phone": "+201000000005",
+    "phone": "01000000005",
     "password": "branch_supervisor2",
     "status": "active"
   },
@@ -61,7 +61,7 @@
     "email": "branch_supervisor3@test.com",
     "login_identifier": "branch_supervisor3@test.com",
     "login_type": "email",
-    "phone": "+201000000006",
+    "phone": "01000000006",
     "password": "branch_supervisor3",
     "status": "active"
   },
@@ -72,7 +72,7 @@
     "email": "academic_manager@test.com",
     "login_identifier": "academic_manager@test.com",
     "login_type": "email",
-    "phone": "+201000000007",
+    "phone": "01000000007",
     "password": "academic_manager",
     "status": "active"
   },
@@ -83,7 +83,7 @@
     "email": "administrative_manager@test.com",
     "login_identifier": "administrative_manager@test.com",
     "login_type": "email",
-    "phone": "+201000000008",
+    "phone": "01000000008",
     "password": "administrative_manager",
     "status": "active"
   },
@@ -94,7 +94,7 @@
     "email": "staff_manager@test.com",
     "login_identifier": "staff_manager@test.com",
     "login_type": "email",
-    "phone": "+201000000009",
+    "phone": "01000000009",
     "password": "staff_manager",
     "status": "active"
   },
@@ -105,7 +105,7 @@
     "email": "student_manager@test.com",
     "login_identifier": "student_manager@test.com",
     "login_type": "email",
-    "phone": "+201000000010",
+    "phone": "01000000010",
     "password": "student_manager",
     "status": "active"
   },
@@ -116,7 +116,7 @@
     "email": "financial_manager@test.com",
     "login_identifier": "financial_manager@test.com",
     "login_type": "email",
-    "phone": "+201000000011",
+    "phone": "01000000011",
     "password": "financial_manager",
     "status": "active"
   },
@@ -127,7 +127,7 @@
     "email": "teacher1@test.com",
     "login_identifier": "teacher1@test.com",
     "login_type": "email",
-    "phone": "+201000000012",
+    "phone": "01000000012",
     "password": "teacher1",
     "status": "active"
   },
@@ -138,7 +138,7 @@
     "email": "teacher2@test.com",
     "login_identifier": "teacher2@test.com",
     "login_type": "email",
-    "phone": "+201000000013",
+    "phone": "01000000013",
     "password": "teacher2",
     "status": "active"
   },
@@ -149,7 +149,7 @@
     "email": "teacher3@test.com",
     "login_identifier": "teacher3@test.com",
     "login_type": "email",
-    "phone": "+201000000014",
+    "phone": "01000000014",
     "password": "teacher3",
     "status": "active"
   },
@@ -160,7 +160,7 @@
     "email": "teacher4@test.com",
     "login_identifier": "teacher4@test.com",
     "login_type": "email",
-    "phone": "+201000000015",
+    "phone": "01000000015",
     "password": "teacher4",
     "status": "active"
   },
@@ -171,7 +171,7 @@
     "email": "teacher5@test.com",
     "login_identifier": "teacher5@test.com",
     "login_type": "email",
-    "phone": "+201000000016",
+    "phone": "01000000016",
     "password": "teacher5",
     "status": "active"
   },
@@ -182,7 +182,7 @@
     "email": "teacher6@test.com",
     "login_identifier": "teacher6@test.com",
     "login_type": "email",
-    "phone": "+201000000017",
+    "phone": "01000000017",
     "password": "teacher6",
     "status": "active"
   },
@@ -193,7 +193,7 @@
     "email": "student1@test.com",
     "login_identifier": "student1@test.com",
     "login_type": "email",
-    "phone": "+201000000018",
+    "phone": "01000000018",
     "password": "student1",
     "status": "active"
   },
@@ -204,7 +204,7 @@
     "email": "student2@test.com",
     "login_identifier": "student2@test.com",
     "login_type": "email",
-    "phone": "+201000000019",
+    "phone": "01000000019",
     "password": "student2",
     "status": "active"
   },
@@ -215,7 +215,7 @@
     "email": "student3@test.com",
     "login_identifier": "student3@test.com",
     "login_type": "email",
-    "phone": "+201000000020",
+    "phone": "01000000020",
     "password": "student3",
     "status": "active"
   },
@@ -226,7 +226,7 @@
     "email": "student4@test.com",
     "login_identifier": "student4@test.com",
     "login_type": "email",
-    "phone": "+201000000021",
+    "phone": "01000000021",
     "password": "student4",
     "status": "active"
   },
@@ -237,7 +237,7 @@
     "email": "student5@test.com",
     "login_identifier": "student5@test.com",
     "login_type": "email",
-    "phone": "+201000000022",
+    "phone": "01000000022",
     "password": "student5",
     "status": "active"
   },
@@ -248,7 +248,7 @@
     "email": "student6@test.com",
     "login_identifier": "student6@test.com",
     "login_type": "email",
-    "phone": "+201000000023",
+    "phone": "01000000023",
     "password": "student6",
     "status": "active"
   },
@@ -259,7 +259,7 @@
     "email": "student7@test.com",
     "login_identifier": "student7@test.com",
     "login_type": "email",
-    "phone": "+201000000024",
+    "phone": "01000000024",
     "password": "student7",
     "status": "active"
   },
@@ -270,7 +270,7 @@
     "email": "student8@test.com",
     "login_identifier": "student8@test.com",
     "login_type": "email",
-    "phone": "+201000000025",
+    "phone": "01000000025",
     "password": "student8",
     "status": "active"
   },
@@ -281,7 +281,7 @@
     "email": "student9@test.com",
     "login_identifier": "student9@test.com",
     "login_type": "email",
-    "phone": "+201000000026",
+    "phone": "01000000026",
     "password": "student9",
     "status": "active"
   },
@@ -292,7 +292,7 @@
     "email": "student10@test.com",
     "login_identifier": "student10@test.com",
     "login_type": "email",
-    "phone": "+201000000027",
+    "phone": "01000000027",
     "password": "student10",
     "status": "active"
   },
@@ -303,7 +303,7 @@
     "email": "student11@test.com",
     "login_identifier": "student11@test.com",
     "login_type": "email",
-    "phone": "+201000000028",
+    "phone": "01000000028",
     "password": "student11",
     "status": "active"
   },
@@ -314,7 +314,7 @@
     "email": "student12@test.com",
     "login_identifier": "student12@test.com",
     "login_type": "email",
-    "phone": "+201000000029",
+    "phone": "01000000029",
     "password": "student12",
     "status": "active"
   },
@@ -325,7 +325,7 @@
     "email": "parent1@test.com",
     "login_identifier": "parent1@test.com",
     "login_type": "email",
-    "phone": "+201000000030",
+    "phone": "01000000030",
     "password": "parent1",
     "status": "active"
   },
@@ -336,7 +336,7 @@
     "email": "parent2@test.com",
     "login_identifier": "parent2@test.com",
     "login_type": "email",
-    "phone": "+201000000031",
+    "phone": "01000000031",
     "password": "parent2",
     "status": "active"
   }

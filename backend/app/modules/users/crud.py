@@ -1,3 +1,4 @@
+# backend/app/modules/users/crud.py
 from typing import List, Optional
 from app.core.security import get_password_hash as hash_password
 from app.core.utils import create_password_reset_token
@@ -166,8 +167,13 @@ class UserCRUD:
             if not isinstance(obj_in, dict)
             else obj_in.copy()
         )
-        if "password" in data:
-            data["password_hash"] = hash_password(data.pop("password"))
+        # if "password" in data:
+        #     data["password_hash"] = hash_password(data.pop("password"))
+        password = data.pop("password", None)
+        if password:
+            data["password_hash"] = hash_password(password)
+        else:
+            data["password_hash"] = ""
 
         status_val = data.get("status", UserStatus.pending.value)
         if isinstance(status_val, UserStatus):
