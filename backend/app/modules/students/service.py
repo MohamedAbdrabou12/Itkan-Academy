@@ -1,22 +1,22 @@
-from typing import Optional, Dict, List
-from fastapi import HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
-from sqlalchemy.orm import selectinload
-from app.modules.students.models import Student
-from app.modules.students.schemas import StudentCreate, StudentUpdate
-from app.modules.students.crud import student_crud
-from app.modules.users.models import User, UserStatus
-from app.modules.users.schemas import (
-    UserCreate as UserCreateSchema,
-    UserUpdate,
-    BranchInfo,
-)
+from typing import Dict, List, Optional
+
 from app.core.utils import create_password_reset_token
-from app.modules.users.crud import user_crud
-from app.services.notification_service.workrs.worker import send_notification_task
 from app.modules.classes.models import Class
 from app.modules.roles.models import Role
+from app.modules.students.crud import student_crud
+from app.modules.students.models import Student
+from app.modules.students.schemas import StudentCreate, StudentUpdate
+from app.modules.users.crud import user_crud
+from app.modules.users.models import User, UserBranch, UserStatus
+from app.modules.users.schemas import (
+    BranchInfo,
+)
+from app.services.notification_service.workrs.worker import send_notification_task
+from fastapi import HTTPException
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload, selectinload
+from app.modules.parents.models import Parent, ParentStudent
 
 
 class StudentService:
@@ -131,7 +131,19 @@ class StudentService:
                     status_code=400,
                     detail="Student branches must match creator's branches",
                 )
+                
+#         Validate creator branch permissions
+#         if creator and getattr(creator, "role_name", "").lower() != "admin":
+#             creator_branches = getattr(creator, "branch_ids", [])
+#             student_branches = student_in.branch_ids or []
 
+#             if creator_branches:
+#                 if not any(b in creator_branches for b in student_branches):
+#                     raise HTTPException(
+#                         status_code=400,
+#                         detail="Student branches must match creator's branches",
+#                     )
+                    
         class_objs = []
         if student_in.class_ids:
             for cid in student_in.class_ids:
@@ -260,6 +272,7 @@ class StudentService:
                 status_code=400,
                 detail="Cannot delete student with attendance or payments",
             )
+        student = result.scalars().unique().one()
 
         user = await db.get(User, student.user_id)
         user.status = UserStatus.deactive.value

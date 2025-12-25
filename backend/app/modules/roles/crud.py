@@ -77,26 +77,18 @@ class RoleCRUD:
         result = await db.execute(stmt)
         return result.scalars().first()
 
-    async def create(self, db: AsyncSession, obj_in: RoleCreate) -> Role:
-        # Extract permissions if provided
-        permission_ids = getattr(obj_in, "permission_ids", [])
+    async def create(self, db: AsyncSession, role_data: RoleCreate) -> Role:
 
         # Create role
         db_obj = Role(
-            name=obj_in.name,
-            name_ar=obj_in.name_ar,
-            description=obj_in.description,
-            description_ar=obj_in.description_ar,
+            name=role_data.name,
+            name_ar=role_data.name_ar,
+            description=role_data.description,
+            description_ar=role_data.description_ar,
         )
         db.add(db_obj)
-        await db.flush()  # Flush to get the ID
-
-        # Add permissions if provided
-        if permission_ids:
-            await self._add_permissions_to_role(db, db_obj.id, permission_ids)
 
         await db.commit()
-        await db.refresh(db_obj)
         return db_obj
 
     async def update(self, db: AsyncSession, db_obj: Role, obj_in: RoleUpdate) -> Role:

@@ -1,11 +1,11 @@
 from typing import Optional
-from fastapi import APIRouter, Depends, Request, Query, status
-from sqlalchemy.ext.asyncio import AsyncSession
-from app.db.session import get_db
+
 from app.core.auth import get_current_user
 from app.core.authorization import require_permission
+from app.db.session import get_db
 from app.modules.parents.schemas import ParentCreate, ParentRead, ParentUpdate
 from app.modules.parents.service import ParentService
+from app.modules.permissions.permissions import PermissionCode
 from app.modules.users.models import User
 from app.modules.permissions.permissions import PermissionCode
 
@@ -63,7 +63,6 @@ async def update_parent(
     parent_id: int,
     parent_in: ParentUpdate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
 ):
     data = parent_in.model_dump(exclude_unset=True)
     return await ParentService.update_parent(db, parent_id, data)

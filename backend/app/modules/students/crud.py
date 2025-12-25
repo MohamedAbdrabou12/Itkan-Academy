@@ -42,7 +42,7 @@ class StudentCRUD:
         result = await db.execute(stmt)
         students = list(result.scalars().all())
 
-        if sort_by:
+        if sort_order and sort_by:
             reverse = sort_order.lower() == "desc"
             if sort_by in {"full_name", "email", "status"}:
                 students.sort(

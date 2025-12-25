@@ -59,7 +59,7 @@ class User(Base):
     )
     phone: Mapped[Optional[str]] = mapped_column(String(20))
     password_hash: Mapped[str] = mapped_column(Text, nullable=False)
-    status: Mapped[str] = mapped_column(
+    status: Mapped[UserStatus] = mapped_column(
         String(20), default=UserStatus.pending.value, nullable=False
     )
     last_login: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
@@ -115,10 +115,6 @@ class User(Base):
     @property
     def role_name_ar(self) -> Optional[str]:
         return self.role.name_ar if self.role else None
-
-    @property
-    def branch_name(self) -> Optional[str]:
-        return self.branches[0].name if self.branches else None
 
     def __repr__(self) -> str:
         return f"<User(id={self.id}, name='{self.full_name}')>"

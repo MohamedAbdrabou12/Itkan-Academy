@@ -1073,14 +1073,6 @@
     "description_ar": "تعديل معلومات الطالب"
   },
   {
-    "id": 1163,
-    "code": "system.students.delete",
-    "name": "Delete Students",
-    "name_ar": "حذف الطلاب",
-    "description": "Delete students",
-    "description_ar": "حذف الطلاب"
-  },
-  {
     "id": 1164,
     "code": "system.staff.*",
     "name": "Full Staff Management",

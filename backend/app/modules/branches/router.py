@@ -55,11 +55,11 @@ async def list_branches(
     "/",
     response_model=BranchRead,
     status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(require_permission(PermissionCode.SYSTEM_BRANCHES_ADD))],
 )
 async def create_branch(
     branch_in: BranchCreate,
     db: AsyncSession = Depends(get_db),
-    _=[Depends(require_permission(PermissionCode.SYSTEM_BRANCHES_ADD))],
 ):
     return await branch_crud.create(db, branch_in)
 
@@ -67,11 +67,11 @@ async def create_branch(
 @branch_router.put(
     "/{branch_id}",
     response_model=BranchRead,
+    dependencies=[Depends(require_permission(PermissionCode.SYSTEM_BRANCHES_EDIT))],
 )
 async def update_branch(
     branch_id: int,
     branch_in: BranchUpdate,
     db: AsyncSession = Depends(get_db),
-    _=[Depends(require_permission(PermissionCode.SYSTEM_BRANCHES_EDIT))],
 ):
     return await branch_crud.update(db, branch_id, branch_in)

@@ -36,16 +36,31 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 
+def get_current_user_id(
+    credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
+) -> Optional[int]:
+    token = credentials.credentials
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Invalid or expired authentication credentials.",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id = payload.get("sub") or payload.get("user_id")
+        if not user_id:
+            raise credentials_exception
+        return int(user_id)
+    except JWTError:
+        raise credentials_exception
+
+
 # AUTHENTICATION HELPERS
 async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
     db: AsyncSession = Depends(get_db),
 ) -> User:
-    """
-    Extracts authenticated user from JWT token.
-    Token does NOT depend on branch_id — branch context handled via X-Branch-ID header.
-    """
-
     token = credentials.credentials
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,

@@ -1,4 +1,3 @@
-# backend/app/modules/teachers/models.py
 from __future__ import annotations
 from datetime import datetime, date
 import enum

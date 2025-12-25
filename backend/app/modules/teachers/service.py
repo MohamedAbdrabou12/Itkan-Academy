@@ -22,7 +22,11 @@ from app.modules.users.schemas import BranchInfo
 class TeacherService:
     @staticmethod
     async def _serialize_teacher(teacher: Teacher) -> Dict:
-        user: User = getattr(teacher, "user", None)
+        user: User | None = getattr(teacher, "user", None)
+
+        if user is None:
+            raise HTTPException(status_code=404, detail="Linked user not found")
+        
         user_data = UserRead(
             id=user.id,
             full_name=user.full_name,
@@ -30,7 +34,6 @@ class TeacherService:
             phone=user.phone,
             role_id=user.role_id,
             role_name=user.role_name,
-            branch_name=user.branch_name,
             login_identifier=user.login_identifier,
             login_type=user.login_type,
             last_login=user.last_login,

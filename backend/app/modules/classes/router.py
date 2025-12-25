@@ -66,13 +66,12 @@ async def get_teachers_classes_with_header(
 
 @classes_router.get(
     "/{class_id}/students/",
-    response_model=List[ClassStudentsResponse],
+    dependencies=[Depends(require_permission(PermissionCode.ACADEMIC_CLASSES_VIEW))],
 )
 async def get_class_students_simple(
     class_id: int,
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
-    _=[Depends(require_permission(PermissionCode.ACADEMIC_CLASSES_VIEW))],
 ):
     try:
         # Verify teacher access to this class
@@ -165,14 +164,11 @@ async def get_class(class_id: int, db: AsyncSession = Depends(get_db)):
     "/",
     response_model=ClassRead,
     status_code=status.HTTP_201_CREATED,
-    dependencies=[
-        Depends(get_current_user),
-    ],
+    dependencies=[Depends(require_permission(PermissionCode.ACADEMIC_CLASSES_ADD))],
 )
 async def create_class(
     class_in: ClassCreate,
     db: AsyncSession = Depends(get_db),
-    _=[Depends(require_permission(PermissionCode.ACADEMIC_CLASSES_ADD))],
 ):
     return await class_crud.create(db, class_in)
 
@@ -180,15 +176,12 @@ async def create_class(
 @classes_router.put(
     "/{class_id}",
     response_model=ClassRead,
-    dependencies=[
-        Depends(get_current_user),
-    ],
+    dependencies=[Depends(require_permission(PermissionCode.ACADEMIC_CLASSES_EDIT))],
 )
 async def update_class(
     class_id: int,
     class_in: ClassUpdate,
     db: AsyncSession = Depends(get_db),
-    _=[Depends(require_permission(PermissionCode.ACADEMIC_CLASSES_EDIT))],
 ):
     class_ = await class_crud.get_by_id(db, class_id, request=None)
     if not class_:
@@ -199,14 +192,11 @@ async def update_class(
 @classes_router.delete(
     "/{class_id}",
     status_code=status.HTTP_202_ACCEPTED,
-    dependencies=[
-        Depends(get_current_user),
-    ],
+    dependencies=[Depends(require_permission(PermissionCode.ACADEMIC_CLASSES_DELETE))],
 )
 async def delete_class(
     class_id: int,
     db: AsyncSession = Depends(get_db),
-    _=[Depends(require_permission(PermissionCode.ACADEMIC_CLASSES_DELETE))],
 ):
     await class_crud.delete(db, class_id)
     return None

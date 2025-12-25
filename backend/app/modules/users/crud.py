@@ -1,19 +1,20 @@
 from typing import List, Optional
+
 from app.core.security import get_password_hash as hash_password
 from app.core.utils import create_password_reset_token
 from app.modules.branches.models import Branch
+from app.modules.role_permissions.models import RolePermission
+from app.modules.roles.models import Role
 from app.modules.users.models import User, UserBranch, UserStatus
 from app.modules.users.schemas import BranchInfo, UserCreate, UserRead, UserUpdate
 from app.services.notification_service.workrs.worker import send_notification_task
 from fastapi import HTTPException, Request
-from app.modules.roles.models import Role
-from app.modules.role_permissions.models import RolePermission
-from fastapi_pagination.ext.sqlalchemy import paginate as sqlalchemy_paginate  # type: ignore
-from sqlalchemy import asc, desc, not_, and_, or_
+from fastapi_pagination.ext.sqlalchemy import paginate
+from sqlalchemy import and_, asc, desc, not_, or_
 from sqlalchemy import delete as sa_delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from sqlalchemy.orm import selectinload
+from sqlalchemy.orm import joinedload, selectinload
 
 
 def map_user_to_read(user: User) -> UserRead:
@@ -25,7 +26,6 @@ def map_user_to_read(user: User) -> UserRead:
         role_id=user.role_id,
         role_name=user.role_name,
         role_name_ar=user.role_name_ar,
-        branch_name=user.branch_name,
         status=user.status,
         last_login=user.last_login,
         created_at=user.created_at,
@@ -88,7 +88,7 @@ class UserCRUD:
         else:
             query = query.order_by(asc(sort_column))
 
-        result = await sqlalchemy_paginate(db, query)
+        result = await paginate(db, query)
         return result
 
     async def get_by_id(
@@ -159,7 +159,7 @@ class UserCRUD:
         await db.refresh(user)
 
     async def create(
-        self, db: AsyncSession, obj_in: dict | UserCreate
+        self, db: AsyncSession, obj_in: dict | UserCreate, is_staff: bool = False
     ) -> Optional[User]:
         data = (
             obj_in.dict(exclude_unset=True)
@@ -185,12 +185,13 @@ class UserCRUD:
             password_hash=data.get("password_hash", ""),
             role_id=data.get("role_id"),
             status=status_val,
-            login_identifier=data["login_identifier"],
-            login_type=data["login_type"],
+            login_identifier=data.get("email")
+            if is_staff
+            else data["login_identifier"],
+            login_type="email" if is_staff else data["login_type"],
         )
         db.add(db_obj)
         await db.commit()
-        await db.refresh(db_obj)
 
         branch_ids = data.get("branch_ids")
         if branch_ids:
@@ -205,46 +206,29 @@ class UserCRUD:
                     detail=f"Invalid or missing branch_ids: {', '.join(map(str, missing))}",
                 )
             await self._sync_user_branches(db, db_obj, branch_ids)
+            await db.commit()
 
-        # Send reset password notification
         token = create_password_reset_token(db_obj.id)
         reset_link = f"http://localhost:5173/reset-password?token={token}"
         if db_obj.email:
-            payload = {
-                "username": db_obj.full_name,
-                "reset_link": reset_link,
-                "email": db_obj.email,
-            }
             send_notification_task.delay(
                 user_id=db_obj.id,
                 channel="email",
                 template_type="reset_password",
-                payload=payload,
+                payload={
+                    "username": db_obj.full_name,
+                    "reset_link": reset_link,
+                    "email": db_obj.email,
+                },
             )
-        # else:
-        #     # Fallback to parent email if exists
-        #     student = getattr(db_obj, "student", None)
-        #     parent_email = None
-        #     if student and student.parents:
-        #         for p in student.parents:
-        #             if p.user and p.user.email:
-        #                 parent_email = p.user.email
-        #                 break
-        #     if parent_email:
-        #         payload = {
-        #             "username": db_obj.full_name,
-        #             "reset_link": reset_link,
-        #             "email": parent_email,
-        #         }
-        #         send_notification_task.delay(
-        #             user_id=db_obj.id,
-        #             channel="email",
-        #             template_type="reset_password",
-        #             payload=payload,
-        #         )
 
-        await db.refresh(db_obj)
-        return db_obj
+        stmt = (
+            select(User)
+            .where(User.id == db_obj.id)
+            .options(joinedload(User.role), selectinload(User.branches))
+        )
+        result = await db.execute(stmt)
+        return result.scalar_one_or_none()
 
     async def update(
         self, db: AsyncSession, db_obj: User, obj_in: dict | UserUpdate

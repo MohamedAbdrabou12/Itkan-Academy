@@ -1,8 +1,7 @@
 from datetime import datetime, timezone
 from operator import and_
-from typing import List
 
-from app.core.auth import get_current_user
+from app.core.auth import get_current_user, get_current_user_id
 from app.core.authorization import require_permission
 from app.db.session import get_db
 from app.modules.evaluations.models import Evaluation
@@ -16,10 +15,12 @@ from app.modules.evaluations.services import (
     validate_evaluations_common,
 )
 from app.modules.permissions.permissions import PermissionCode
+from app.modules.teachers.models import Teacher
 from app.modules.users.models import User
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload, selectinload
 
 from .constants import EVALUATION_EDITING_TIMEFRAME
 from .crud import evaluations_crud
@@ -27,11 +28,13 @@ from .crud import evaluations_crud
 evaluations_router = APIRouter(prefix="/evaluations", tags=["Evaluations"])
 
 
-@evaluations_router.get("/", response_model=List[ListEvaluationsResponseItem])
+@evaluations_router.get(
+    "/",
+    dependencies=[Depends(require_permission(PermissionCode.EVALUATION_STUDENT_VIEW))],
+)
 async def list_evaluations(
     db: AsyncSession = Depends(get_db),
     current_user=Depends(get_current_user),
-    _=[Depends(require_permission(PermissionCode.EVALUATION_STUDENT_VIEW))],
 ):
     evaluations = await evaluations_crud.get_all(db, current_user.id)
 
@@ -54,13 +57,26 @@ async def list_evaluations(
 @evaluations_router.post(
     "/",
     status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(require_permission(PermissionCode.EVALUATION_STUDENT_ADD))],
 )
 async def bulk_create_evaluations(
     bulk_data: BulkEvaluationCreate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
-    _=[Depends(require_permission(PermissionCode.EVALUATION_STUDENT_ADD))],
+    user_id: int = Depends(get_current_user_id),
 ):
+    print("user_id", user_id)
+    stmt = (
+        select(User)
+        .where(User.id == user_id)
+        .options(
+            joinedload(User.role),
+            selectinload(User.branches),
+            selectinload(User.teacher).selectinload(Teacher.classes),
+        )
+    )
+    result = await db.execute(stmt)
+    current_user = result.scalars().unique().one()
+
     eval_date, class_obj = await get_date_and_class(db, bulk_data)
     validate_evaluations_common(bulk_data, current_user, eval_date, class_obj)
 
@@ -105,12 +121,12 @@ async def bulk_create_evaluations(
 
 @evaluations_router.put(
     "/",
+    dependencies=[Depends(require_permission(PermissionCode.EVALUATION_STUDENT_EDIT))],
 )
 async def bulk_update_evaluations(
     bulk_data: BulkEvaluationUpdate,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
-    _=[Depends(require_permission(PermissionCode.EVALUATION_STUDENT_EDIT))],
 ):
     eval_date, class_obj = await get_date_and_class(db, bulk_data)
     validate_evaluations_common(
