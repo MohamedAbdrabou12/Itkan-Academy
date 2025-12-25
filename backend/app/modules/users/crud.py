@@ -1,4 +1,3 @@
-# backend/app/modules/users/crud.py
 from typing import List, Optional
 from app.core.security import get_password_hash as hash_password
 from app.core.utils import create_password_reset_token
