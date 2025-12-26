@@ -10,11 +10,6 @@ from app.modules.users.crud import user_crud
 from app.modules.users.models import User, UserBranch, UserStatus
 from app.modules.users.schemas import (
     BranchInfo,
-    UserRead,
-    UserUpdate,
-)
-from app.modules.users.schemas import (
-    UserCreate as UserCreateSchema,
 )
 from app.services.notification_service.workrs.worker import send_notification_task
 from fastapi import HTTPException
@@ -27,43 +22,48 @@ from app.modules.parents.models import Parent, ParentStudent
 class StudentService:
     @staticmethod
     async def _serialize_student(student: Student) -> Dict:
-        user: User | None = getattr(student, "user", None)
+        user: User = student.user
+        if not user:
+            return {}
 
-        if user is None:
-            raise HTTPException(status_code=404, detail="Linked user not found")
+        role_name = user.role.name if user.role else None
+        role_name_ar = getattr(user.role, "name_ar", None) if user.role else None
 
-        user_data = UserRead(
-            id=user.id,
-            full_name=user.full_name,
-            email=user.email,
-            phone=user.phone,
-            role_id=user.role_id,
-            role_name=user.role_name,
-            role_name_ar=user.role_name_ar,
-            login_identifier=user.login_identifier,
-            login_type=user.login_type,
-            status=user.status,
-            last_login=user.last_login,
-            created_at=user.created_at,
-            updated_at=user.updated_at,
-            branch_ids=[link.branch_id for link in user.branch_links]
-            if user.branch_links
-            else [],
-            branches=[
-                BranchInfo.model_validate(link.branch) for link in user.branch_links
-            ]
-            if user.branch_links
-            else [],
-        )
+        branch_ids = []
+        branches_info = []
+        primary_branch_name = None
 
-        class_ids = (
-            [c.id for c in getattr(student, "classes", [])]
-            if getattr(student, "classes", None)
-            else []
-        )
+        if user.branch_links:
+            for link in user.branch_links:
+                branch_ids.append(link.branch_id)
+                if link.branch:
+                    branches_info.append(BranchInfo.from_orm(link.branch))
+                    if not primary_branch_name:
+                        primary_branch_name = link.branch.name
+
+        user_data = {
+            "id": user.id,
+            "full_name": user.full_name,
+            "email": user.email,
+            "phone": user.phone,
+            "role_id": user.role_id,
+            "role_name": role_name,
+            "role_name_ar": role_name_ar,
+            "login_identifier": user.login_identifier,
+            "login_type": user.login_type,
+            "branch_name": primary_branch_name,
+            "status": user.status,
+            "last_login": user.last_login,
+            "created_at": user.created_at,
+            "updated_at": user.updated_at,
+            "branch_ids": branch_ids,
+            "branches": branches_info,
+        }
+
+        class_ids = [c.id for c in getattr(student, "classes", [])]
 
         return {
-            **user_data.model_dump(),
+            **user_data,
             "student_id": student.id,
             "national_id": student.national_id,
             "class_ids": class_ids,
@@ -84,14 +84,18 @@ class StudentService:
         students = await student_crud.get_all(
             db, status=status, search=search, sort_by=sort_by, sort_order=sort_order
         )
-        serialized = [await StudentService._serialize_student(s) for s in students]
 
-        total = len(serialized)
+        total = len(students)
         start = (page - 1) * size
         end = start + size
+        page_items = students[start:end]
+
+        serialized = []
+        for s in page_items:
+            serialized.append(await StudentService._serialize_student(s))
 
         return {
-            "items": serialized[start:end],
+            "items": serialized,
             "page": page,
             "size": size,
             "total": total,
@@ -99,65 +103,48 @@ class StudentService:
         }
 
     @staticmethod
-    async def get_students_by_classes(
-        db: AsyncSession, class_ids: List[int]
-    ) -> List[Dict]:
-        students = await student_crud.get_by_class_ids(db, class_ids)
-        return [
-            {"id": student.id, "name": student.user.full_name} for student in students
-        ]
-
-    @staticmethod
     async def get_student(db: AsyncSession, student_id: int) -> Dict:
         student = await student_crud.get_by_id(db, student_id)
         if not student:
             raise HTTPException(status_code=404, detail="Student not found")
-        if not getattr(student, "user", None):
-            student.user = await db.get(User, student.user_id)
         return await StudentService._serialize_student(student)
 
     @staticmethod
     async def create_student(
         db: AsyncSession, student_in: StudentCreate, creator: Optional[User] = None
     ) -> Dict:
-        # Check login_identifier (national_id) uniqueness
-        existing_login = await user_crud.get_by_login_identifier(
-            db, student_in.national_id
-        )
-        if existing_login:
+        if await user_crud.get_by_login_identifier(db, student_in.national_id):
             raise HTTPException(
                 status_code=400, detail="National ID already registered"
             )
 
-        # Check email uniqueness (optional)
-        if student_in.email:
-            existing_email = await user_crud.get_by_email(db, student_in.email)
-            if existing_email:
-                raise HTTPException(status_code=400, detail="Email already registered")
+        if student_in.email and await user_crud.get_by_email(db, student_in.email):
+            raise HTTPException(status_code=400, detail="Email already registered")
 
-        # Check national_id uniqueness in students table
-        students_with_nid = await student_crud.get_all(
-            db, search=student_in.national_id
-        )
-        if any(s.national_id == student_in.national_id for s in students_with_nid):
-            raise HTTPException(
-                status_code=400, detail="National ID already registered"
-            )
+        if creator and getattr(creator, "role_name", "") != "General Manager":
+            creator_branches = [
+                link.branch_id for link in getattr(creator, "branch_links", [])
+            ]
 
-        # Validate creator branch permissions
-        if creator and getattr(creator, "role_name", "").lower() != "admin":
-            creator_branches = getattr(creator, "branch_ids", [])
-            student_branches = student_in.branch_ids or []
+            if not any(b in creator_branches for b in (student_in.branch_ids or [])):
+                raise HTTPException(
+                    status_code=400,
+                    detail="Student branches must match creator's branches",
+                )
+                
+#         Validate creator branch permissions
+#         if creator and getattr(creator, "role_name", "").lower() != "admin":
+#             creator_branches = getattr(creator, "branch_ids", [])
+#             student_branches = student_in.branch_ids or []
 
-            if creator_branches:
-                if not any(b in creator_branches for b in student_branches):
-                    raise HTTPException(
-                        status_code=400,
-                        detail="Student branches must match creator's branches",
-                    )
-
-        # Validate class-branch relation
-        class_objs: List[Class] = []
+#             if creator_branches:
+#                 if not any(b in creator_branches for b in student_branches):
+#                     raise HTTPException(
+#                         status_code=400,
+#                         detail="Student branches must match creator's branches",
+#                     )
+                    
+        class_objs = []
         if student_in.class_ids:
             for cid in student_in.class_ids:
                 cls = await db.get(Class, cid)
@@ -172,32 +159,26 @@ class StudentService:
                     )
                 class_objs.append(cls)
 
-        # Get student role
         role_res = await db.execute(select(Role).where(Role.name.ilike("student")))
         student_role = role_res.scalar_one_or_none()
-        role_id = student_role.id if student_role else None
 
-        # Create user
         user_payload = UserCreateSchema(
             full_name=student_in.full_name,
             email=student_in.email,
             phone=student_in.phone,
-            role_id=role_id,
+            role_id=student_role.id if student_role else None,
             branch_ids=student_in.branch_ids,
             status=student_in.status or UserStatus.pending,
             password=student_in.password,
             login_identifier=student_in.national_id,
             login_type="national_id",
         )
-        # Validate password presence
-        if not student_in.password or not student_in.password.strip():
-            raise HTTPException(
-                status_code=400, detail="Password is required for student account"
-            )
+
+        if not student_in.password:
+            raise HTTPException(status_code=400, detail="Password is required")
 
         user = await user_crud.create(db, user_payload)
 
-        # Create student profile
         student_payload = {
             "user_id": user.id,
             "national_id": student_in.national_id,
@@ -208,11 +189,11 @@ class StudentService:
 
         if class_objs:
             student.classes = class_objs
-            db.add(student)
             await db.commit()
-            await db.refresh(student)
 
-        user_result = await db.execute(
+        from app.modules.parents.models import ParentStudent, Parent
+
+        user_res = await db.execute(
             select(User)
             .options(
                 selectinload(User.student)
@@ -222,126 +203,82 @@ class StudentService:
             )
             .where(User.id == user.id)
         )
-        user_with_relations = user_result.scalar_one()
+        user_full = user_res.scalar_one()
+        await StudentService._send_reset_password_notification(db, user_full)
 
-        await StudentService._send_reset_password_notification(db, user_with_relations)
+        full_student = await student_crud.get_by_id(db, student.id)
+        await StudentService._notify_hr_new_student(db, full_student, creator)
 
-        result = await db.execute(
-            select(Student)
-            .options(
-                selectinload(Student.classes),
-                joinedload(Student.user).options(
-                    joinedload(User.role),
-                    selectinload(User.branch_links).joinedload(UserBranch.branch),
-                ),
-            )
-            .where(Student.id == student.id)
-        )
-        student = result.scalar_one()
-
-        await StudentService._notify_hr_new_student(db, student, creator)
-        return await StudentService._serialize_student(student)
-
-    @staticmethod
-    async def _send_reset_password_notification(db: AsyncSession, user: User):
-        recipients: List[str] = []
-
-        if user.email:
-            recipients.append(user.email)
-
-        if not recipients and user.student:
-            for link in user.student.parent_links or []:
-                parent_user = getattr(link.parent, "user", None)
-                if parent_user and parent_user.email:
-                    recipients.append(parent_user.email)
-
-        if not recipients:
-            return
-
-        token = create_password_reset_token(user.id)
-        reset_link = f"http://localhost:5173/reset-password?token={token}"
-
-        for email in recipients:
-            send_notification_task.delay(
-                user_id=str(user.id),
-                channel="email",
-                template_type="password_reset_request",
-                payload={
-                    "user_name": user.full_name,
-                    "email": email,
-                    "reset_link": reset_link,
-                },
-            )
+        return await StudentService._serialize_student(full_student)
 
     @staticmethod
     async def update_student(
         db: AsyncSession, student_id: int, student_in: StudentUpdate
     ) -> Dict:
+        # Load student with relationships to avoid session issues
         student = await student_crud.get_by_id(db, student_id)
         if not student:
             raise HTTPException(status_code=404, detail="Student not found")
 
-        user = await db.get(User, student.user_id)
-        if not user:
-            raise HTTPException(status_code=404, detail="Linked user not found")
-
         data = student_in.dict(exclude_unset=True)
 
         if "national_id" in data:
-            new_nid = data.pop("national_id")
+            new_nid = data["national_id"]
             if new_nid != student.national_id:
-                nid_exists = await student_crud.get_all(db, search=new_nid)
+                existing = await student_crud.get_all(db, search=new_nid)
                 if any(
-                    s.id != student.id and s.national_id == new_nid for s in nid_exists
+                    s.id != student.id and s.national_id == new_nid for s in existing
                 ):
                     raise HTTPException(
                         status_code=400, detail="National ID already registered"
                     )
-                student.national_id = new_nid
+                user = await db.get(User, student.user_id)
                 user.login_identifier = new_nid
 
-        user_fields = {
-            f: data.pop(f)
-            for f in ("full_name", "email", "phone", "branch_ids", "status", "password")
-            if f in data
-        }
+        user_fields = [
+            "full_name",
+            "email",
+            "phone",
+            "branch_ids",
+            "status",
+            "password",
+        ]
+        user_update_data = {f: data.pop(f) for f in user_fields if f in data}
 
-        if "email" in user_fields:
-            new_email = user_fields["email"]
-            if not new_email or new_email.strip() == "":
-                user_fields["email"] = None
-            elif new_email != user.email:
-                exist = await user_crud.get_by_email(db, new_email)
-                if exist:
-                    raise HTTPException(
-                        status_code=400, detail="Email already registered"
-                    )
-                user_fields["email"] = new_email
+        if user_update_data:
+            user = await db.get(User, student.user_id)
+            await user_crud.update(db, user, UserUpdate(**user_update_data))
 
-        if user_fields:
-            await user_crud.update(db, user, UserUpdate(**user_fields))
-
-        class_ids = data.pop("class_ids", None)
-        if data:
-            student = await student_crud.update(db, student, data)
-
-        if class_ids is not None:
+        if "class_ids" in data:
+            class_ids = data.pop("class_ids")
             await student_crud.update_student_classes(db, student, class_ids)
+            student = await student_crud.get_by_id(db, student_id)
 
-        result = await db.execute(
-                select(Student)
-                .options(
-                    selectinload(Student.classes),
-                    joinedload(Student.user).options(
-                        joinedload(User.role),
-                        selectinload(User.branch_links).joinedload(UserBranch.branch),
-                    ),
-                )
-                .where(Student.id == student.id)
+        if data:
+            await student_crud.update(db, student, data)
+
+        return await StudentService.get_student(db, student_id)
+
+    @staticmethod
+    async def delete_student(db: AsyncSession, student_id: int) -> Dict:
+        student = await student_crud.get_by_id(db, student_id)
+        if not student:
+            raise HTTPException(status_code=404, detail="Student not found")
+
+        if getattr(student, "attendance_records", []) or getattr(
+            student, "invoices", []
+        ):
+            raise HTTPException(
+                status_code=400,
+                detail="Cannot delete student with attendance or payments",
             )
         student = result.scalars().unique().one()
 
-        return await StudentService._serialize_student(student)
+        user = await db.get(User, student.user_id)
+        user.status = UserStatus.deactive.value
+        await db.commit()
+
+        return await StudentService.get_student(db, student_id)
 
     @staticmethod
     async def approve_student(
@@ -352,13 +289,8 @@ class StudentService:
             raise HTTPException(status_code=404, detail="Student not found")
 
         user = await db.get(User, student.user_id)
-        if not user:
-            raise HTTPException(status_code=404, detail="Linked user not found")
-
-        user.status = UserStatus.active
-        db.add(user)
+        user.status = UserStatus.active.value
         await db.commit()
-        await db.refresh(student)
 
         try:
             send_notification_task.delay(
@@ -374,8 +306,7 @@ class StudentService:
         except Exception:
             pass
 
-        student.user = user
-        return await StudentService._serialize_student(student)
+        return await StudentService.get_student(db, student_id)
 
     @staticmethod
     async def reject_student(
@@ -386,11 +317,7 @@ class StudentService:
             raise HTTPException(status_code=404, detail="Student not found")
 
         user = await db.get(User, student.user_id)
-        if not user:
-            raise HTTPException(status_code=404, detail="Linked user not found")
-
         user.status = UserStatus.rejected.value
-        db.add(user)
         await db.commit()
 
         try:
@@ -407,8 +334,37 @@ class StudentService:
         except Exception:
             pass
 
-        student.user = user
-        return await StudentService._serialize_student(student)
+        return await StudentService.get_student(db, student_id)
+
+    @staticmethod
+    async def _send_reset_password_notification(db: AsyncSession, user: User):
+        recipients = []
+        if user.email:
+            recipients.append(user.email)
+
+        if not recipients and user.student:
+            for link in getattr(user.student, "parent_links", []):
+                parent_user = getattr(link.parent, "user", None)
+                if parent_user and parent_user.email:
+                    recipients.append(parent_user.email)
+
+        if not recipients:
+            return
+
+        token = create_password_reset_token(user.id)
+        reset_link = f"http://localhost:5173/reset-password?token={token}"
+
+        for email in list(set(recipients)):
+            send_notification_task.delay(
+                user_id=str(user.id),
+                channel="email",
+                template_type="password_reset_request",
+                payload={
+                    "user_name": user.full_name,
+                    "email": email,
+                    "reset_link": reset_link,
+                },
+            )
 
     @staticmethod
     async def _notify_hr_new_student(
@@ -419,20 +375,12 @@ class StudentService:
         if not hr_role:
             return
 
-        from app.modules.users.models import User as UserModel
-
-        res = await db.execute(select(UserModel).where(UserModel.role_id == hr_role.id))
+        res = await db.execute(select(User).where(User.role_id == hr_role.id))
         hr_users = res.scalars().all()
-        if not hr_users:
-            return
 
         payload = {
             "student_id": student.id,
-            "student_name": creator.full_name
-            if creator
-            else (
-                student.user.full_name if getattr(student, "user", None) else "Unknown"
-            ),
+            "student_name": student.user.full_name if student.user else "Unknown",
             "created_by": creator.full_name if creator else "System",
         }
 
@@ -446,3 +394,10 @@ class StudentService:
                 )
             except Exception:
                 pass
+
+    @staticmethod
+    async def get_students_by_classes(
+        db: AsyncSession, class_ids: List[int]
+    ) -> List[Dict]:
+        students = await student_crud.get_by_class_ids(db, class_ids)
+        return [{"id": s.id, "name": s.user.full_name} for s in students]

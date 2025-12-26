@@ -166,8 +166,13 @@ class UserCRUD:
             if not isinstance(obj_in, dict)
             else obj_in.copy()
         )
-        if "password" in data:
-            data["password_hash"] = hash_password(data.pop("password"))
+        # if "password" in data:
+        #     data["password_hash"] = hash_password(data.pop("password"))
+        password = data.pop("password", None)
+        if password:
+            data["password_hash"] = hash_password(password)
+        else:
+            data["password_hash"] = ""
 
         status_val = data.get("status", UserStatus.pending.value)
         if isinstance(status_val, UserStatus):

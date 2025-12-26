@@ -101,7 +101,7 @@ async def update_student(
 @students_router.post(
     "/{student_id}/approve",
     response_model=StudentRead,
-    dependencies=[Depends(require_permission("student.management.manage"))],
+    dependencies=[Depends(require_permission(PermissionCode.SYSTEM_STUDENTS_APPROVE))],
 )
 async def approve_student(
     student_id: int,
@@ -114,7 +114,7 @@ async def approve_student(
 @students_router.post(
     "/{student_id}/reject",
     response_model=StudentRead,
-    dependencies=[Depends(require_permission("student.management.manage"))],
+    dependencies=[Depends(require_permission(PermissionCode.SYSTEM_STUDENTS_REJECT))],
 )
 async def reject_student(
     student_id: int,
