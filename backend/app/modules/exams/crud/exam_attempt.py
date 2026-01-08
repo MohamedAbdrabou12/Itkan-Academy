@@ -6,8 +6,14 @@ from app.modules.exams.schemas.exam_attempt import (
     ExamAttemptCreate,
     ExamAttemptUpdate,
     ExamQuestionAnswers,
+    ExamGradeRequest,
 )
 from app.modules.users.models import User
+from sqlalchemy.orm import selectinload
+
+from app.modules.exams.models.exam_answer import ExamAnswer
+from app.modules.exams.models.exam import Exam
+from app.modules.exams.models.exam_question import ExamQuestion
 
 
 class ExamAttemptCRUD:
@@ -24,7 +30,28 @@ class ExamAttemptCRUD:
         return db_obj
 
     async def get(self, db: AsyncSession, id: int) -> Optional[ExamAttempt]:
-        result = await db.execute(select(ExamAttempt).filter(ExamAttempt.id == id))
+        result = await db.execute(
+            select(ExamAttempt)
+            .options(
+                selectinload(ExamAttempt.exam).options(selectinload(Exam.questions))
+            )
+            .options(
+                selectinload(ExamAttempt.answers).options(
+                    selectinload(ExamAnswer.question)
+                )
+            )
+            .options(
+                selectinload(ExamAttempt.answers).options(
+                    selectinload(ExamAnswer.question).options(
+                        selectinload(ExamQuestion.question)
+                    )
+                )
+            )
+            .options(
+                selectinload(ExamAttempt.student), selectinload(ExamAttempt.student)
+            )
+            .where(ExamAttempt.id == id)
+        )
         return result.scalars().first()
 
     async def get_with_user(
@@ -51,6 +78,15 @@ class ExamAttemptCRUD:
         result = await db.execute(statement)
         return result.scalars().first()
 
+    async def get_exam_attempts(self, db: AsyncSession, *, exam_id: int):
+        statement = (
+            select(ExamAttempt)
+            .options(selectinload(ExamAttempt.student))
+            .where(ExamAttempt.exam_id == exam_id)
+        )
+        result = await db.execute(statement)
+        return result.scalars().all()
+
     async def update(
         self, db: AsyncSession, *, db_obj: ExamAttempt, obj_in: ExamAttemptUpdate
     ) -> ExamAttempt:
@@ -70,7 +106,7 @@ class ExamAttemptCRUD:
         return db_obj
 
     async def grade_exam(
-        self, db: AsyncSession, *, id: int, exam_answers: list[ExamQuestionAnswers]
+        self, db: AsyncSession, *, id: int, exam_answers: list[ExamGradeRequest]
     ):
         total_score = 0
         for question in exam_answers:

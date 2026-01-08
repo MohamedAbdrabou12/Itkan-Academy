@@ -15,6 +15,7 @@ if TYPE_CHECKING:
     from app.modules.students.models import Student, StudentClass  # noqa: F401
     from app.modules.evaluations.models import Evaluation  # noqa: F401
     from app.modules.teachers.models import Teacher, TeacherClass  # noqa: F401
+    from app.modules.exams.models import Exam  # noqa: F401
 
 
 class ClassStatus(Enum):
@@ -69,3 +70,4 @@ class Class(Base):
         back_populates="class_",
         cascade="all, delete-orphan",
     )
+    exams: Mapped[List["Exam"]] = relationship("Exam", back_populates="class_")

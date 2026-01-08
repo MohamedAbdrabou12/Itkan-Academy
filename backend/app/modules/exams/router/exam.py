@@ -5,14 +5,20 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.session import get_db
 from app.core.auth import get_current_user
 from app.modules.users.models import User
-from app.modules.exams.schemas.exam import ExamCreate, ExamRead, ExamUpdate
+from app.modules.exams.schemas.exam import (
+    AvailableExams,
+    ExamCreate,
+    ExamRead,
+    ExamUpdate,
+    TakeExamRead,
+)
 from app.modules.exams.services import exam_service
 from fastapi_pagination import Page
 
 exam_router = APIRouter(prefix="/exams", tags=["Exams"])
 
 
-@exam_router.post("/", response_model=ExamRead, status_code=status.HTTP_201_CREATED)
+@exam_router.post("/", status_code=status.HTTP_201_CREATED)
 async def create_exam(
     exam_in: ExamCreate,
     request: Request,
@@ -39,6 +45,23 @@ async def list_exams(
     if not exams:
         return []
     return exams
+
+
+@exam_router.get("/available-exams", response_model=list[AvailableExams])
+async def get_available_exams(
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    return await exam_service.get_available_exams(db, user)
+
+
+@exam_router.get("/take/{exam_id}", response_model=TakeExamRead)
+async def get_take_exam(
+    exam_id: int,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    return await exam_service.get_take_exam(db, user, exam_id)
 
 
 @exam_router.get("/{exam_id}", response_model=ExamRead)
@@ -73,7 +96,7 @@ async def delete_exam(
     return
 
 
-@exam_router.post("/{exam_id}/publish", response_model=ExamRead)
+@exam_router.post("/{exam_id}/publish")
 async def publish_exam(
     exam_id: int,
     db: AsyncSession = Depends(get_db),
@@ -82,7 +105,7 @@ async def publish_exam(
     return await exam_service.publish_exam(db, id=exam_id, user=user)
 
 
-@exam_router.post("/{exam_id}/close", response_model=ExamRead)
+@exam_router.post("/{exam_id}/close")
 async def close_exam(
     exam_id: int,
     db: AsyncSession = Depends(get_db),

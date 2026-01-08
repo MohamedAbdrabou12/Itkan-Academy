@@ -24,9 +24,11 @@ class ExamQuestion(Base):
 
     # Relationships
     exam: Mapped["Exam"] = relationship("Exam", back_populates="questions")
-    question: Mapped["QuestionBank"] = relationship(lazy="selectin")
-    branch: Mapped["Branch"] = relationship(lazy="selectin")
-    answers: Mapped[List["ExamAnswer"]] = relationship("ExamAnswer", back_populates="question")
+    question: Mapped["QuestionBank"] = relationship("QuestionBank")
+
+    answers: Mapped[List["ExamAnswer"]] = relationship(
+        "ExamAnswer", back_populates="question"
+    )
 
     __table_args__ = (
         UniqueConstraint("exam_id", "question_id", name="uq_exam_question"),

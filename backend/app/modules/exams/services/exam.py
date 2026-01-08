@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException, Request, status
@@ -84,6 +85,23 @@ class ExamService:
             )
         return exam
 
+    async def get_take_exam(self, db: AsyncSession, user: User, exam_id: int):
+        exam_attempt = await exam_crud.get_take_exam(db, user, exam_id)
+        if not exam_attempt:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="الامتحان غير موجود"
+            )
+        start_time = exam_attempt.start_time
+        duration = exam_attempt.exam.duration_minutes
+        end_time = start_time + timedelta(minutes=duration)
+        if end_time < datetime.now().astimezone(timezone.utc):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="انتهى وقت الامتحان",
+            )
+
+        return exam_attempt
+
     async def get_all_exams(
         self,
         db: AsyncSession,
@@ -94,6 +112,9 @@ class ExamService:
         sort_order: Optional[str] = None,
     ):
         return await exam_crud.get_multi(db, user, request, search, sort_by, sort_order)
+
+    async def get_available_exams(self, db: AsyncSession, user: User):
+        return await exam_crud.get_available_exams(db, user)
 
     async def update_exam(
         self,
