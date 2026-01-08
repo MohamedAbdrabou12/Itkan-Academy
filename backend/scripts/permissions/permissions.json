@@ -16,22 +16,6 @@
     "description_ar": "الوصول لعرض المنهج والجدول الزمني"
   },
   {
-    "id": 1003,
-    "code": "academic.performance.*",
-    "name": "Full Performance Management",
-    "name_ar": "إدارة الأداء الكاملة",
-    "description": "Complete control over performance reports",
-    "description_ar": "التحكم الكامل في تقارير الأداء"
-  },
-  {
-    "id": 1004,
-    "code": "academic.performance.view",
-    "name": "View Performance Reports",
-    "name_ar": "عرض تقارير الأداء",
-    "description": "View memorization, revision and performance reports",
-    "description_ar": "عرض تقارير الحفظ والمراجعة والأداء"
-  },
-  {
     "id": 1005,
     "code": "financial.invoices.*",
     "name": "Full Invoice Management",
@@ -1199,5 +1183,45 @@
     "name_ar": "حذف بنك الاسئلة",
     "description": "Delete question bank information",
     "description_ar": "حذف بيانات بنك الاسئلة"
+  },
+  {
+    "id": 1212,
+    "code": "academic.curriculum_content.*",
+    "name": "Full Curriculum Content Management",
+    "name_ar": "إدارة المحتوى الدراسى الكاملة",
+    "description": "Complete control over all curriculum content operations",
+    "description_ar": "التحكم الكامل فى المحتوى الدراسى"
+  },
+  {
+    "id": 1213,
+    "code": "academic.curriculum_content.view",
+    "name": "View Curriculum Content",
+    "name_ar": "عرض المحتوى الدراسى",
+    "description": "Access to view curriculum content",
+    "description_ar": "القدرة على عرض المحتوى الدراسى"
+  },
+  {
+    "id": 1214,
+    "code": "academic.curriculum_content.add",
+    "name": "Add Curriculum Content",
+    "name_ar": "إضافة للمحتوى الدراسى",
+    "description": "Access to add curriculum content",
+    "description_ar": "القدرة على إضافة للمحتوى الدراسى"
+  },
+  {
+    "id": 1215,
+    "code": "academic.curriculum_content.edit",
+    "name": "Edit Curriculum Content",
+    "name_ar": "التعديل على المحتوى الدراسى",
+    "description": "Access to edit curriculum content",
+    "description_ar": "القدرة على التعديل على المحتوى الدراسى"
+  },
+  {
+    "id": 1216,
+    "code": "academic.curriculum_content.delete",
+    "name": "Delete Curriculum Content",
+    "name_ar": "حذف من المحتوى الدراسى",
+    "description": "Access to delete curriculum content",
+    "description_ar": "القدرة على حذف من المحتوى الدراسى"
   }
 ]

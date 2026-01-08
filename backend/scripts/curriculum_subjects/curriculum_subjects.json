@@ -1,0 +1,18 @@
+[
+  {
+    "curriculum_id": 1001,
+    "subject_id": 1001
+  },
+  {
+    "curriculum_id": 1001,
+    "subject_id": 1002
+  },
+  {
+    "curriculum_id": 1002,
+    "subject_id": 1001
+  },
+  {
+    "curriculum_id": 1002,
+    "subject_id": 1002
+  }
+]

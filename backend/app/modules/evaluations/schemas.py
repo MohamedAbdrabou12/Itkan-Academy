@@ -1,5 +1,4 @@
 from datetime import date, datetime, timedelta, timezone
-from typing import Dict, List, Optional
 
 from pydantic import BaseModel, field_validator
 
@@ -17,7 +16,7 @@ type EvaluationGradeUpdate = EvaluationGradeCreate
 class StudentEvaluationCreate(BaseModel):
     attendance_status: AttendanceStatus
     notes: str = ""
-    evaluations: Optional[List[EvaluationGradeCreate]] = []
+    evaluations: list[EvaluationGradeCreate] | None = []
 
 
 type StudentEvaluationUpdate = StudentEvaluationCreate
@@ -26,7 +25,8 @@ type StudentEvaluationUpdate = StudentEvaluationCreate
 class BulkEvaluationCreate(BaseModel):
     class_id: int
     date: str  # YYYY-MM-DD
-    records: Dict[int, StudentEvaluationCreate]  # student_id -> evaluation data
+    unit_item_id: int
+    records: dict[int, StudentEvaluationCreate]  # student_id -> evaluation data
 
     @field_validator("date")
     def validate_date_not_future(cls, v):
@@ -43,7 +43,8 @@ class BulkEvaluationCreate(BaseModel):
 class BulkEvaluationUpdate(BaseModel):
     class_id: int
     date: str
-    records: Dict[int, StudentEvaluationUpdate]
+    unit_item_id: int
+    records: dict[int, StudentEvaluationUpdate]
 
     @field_validator("date")
     def validate_date_not_future(cls, v):
@@ -64,6 +65,6 @@ class ListEvaluationsResponseItem(BaseModel):
     branch_id: int
     date: str
     attendance_status: str
-    evaluation_grades: List[Dict]
-    notes: Optional[str]
+    evaluation_grades: list[dict]
+    notes: str | None
     created_at: str

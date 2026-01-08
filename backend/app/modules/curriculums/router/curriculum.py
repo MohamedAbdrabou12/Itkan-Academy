@@ -1,0 +1,86 @@
+from typing import Annotated
+
+from app.core.authorization import require_permission
+from app.db.session import get_db
+from app.modules.curriculums.crud.curriculum import curriculum_crud
+from app.modules.curriculums.schemas.curriculum import (
+    CurriculumCreate,
+    CurriculumResponse,
+    CurriculumUpdate,
+)
+from app.modules.curriculums.schemas.subject import SubjectResponse
+from app.modules.permissions.permissions import PermissionCode
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
+
+curriculums_router = APIRouter(prefix="/curriculums", tags=["Curriculums"])
+
+
+@curriculums_router.post(
+    "/",
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(require_permission(PermissionCode.ACADEMIC_CURRICULUM_ADD))],
+)
+async def create_curriculum(
+    data: CurriculumCreate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> CurriculumResponse:
+    curriculum = await curriculum_crud.create(db, data)
+    return CurriculumResponse(
+        id=curriculum.id,
+        name=curriculum.name,
+        description=curriculum.description,
+        academic_year=curriculum.academic_year,
+        is_active=curriculum.is_active,
+    )
+
+
+@curriculums_router.get(
+    "/",
+    status_code=status.HTTP_200_OK,
+    dependencies=[Depends(require_permission(PermissionCode.ACADEMIC_CURRICULUM_VIEW))],
+)
+async def get_curriculums(
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> list[CurriculumResponse]:
+    curriculums = await curriculum_crud.get_all(db)
+    return [
+        CurriculumResponse(
+            id=curriculum.id,
+            name=curriculum.name,
+            description=curriculum.description,
+            academic_year=curriculum.academic_year,
+            is_active=curriculum.is_active,
+        )
+        for curriculum in curriculums
+    ]
+
+
+@curriculums_router.get(
+    "/{id}/subjects",
+    status_code=status.HTTP_200_OK,
+    dependencies=[Depends(require_permission(PermissionCode.ACADEMIC_CURRICULUM_CONTENT_VIEW))],
+)
+async def get_curriculum_subjects(
+    db: Annotated[AsyncSession, Depends(get_db)], id: int
+) -> list[SubjectResponse]:
+    subjects = await curriculum_crud.get_subjects(db, id)
+    if subjects is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"Curriculum with ID {id} not found"
+        )
+
+    return [SubjectResponse(id=subject.id, name=subject.name) for subject in subjects]
+
+
+@curriculums_router.put(
+    "/{id}",
+    status_code=status.HTTP_200_OK,
+    dependencies=[Depends(require_permission(PermissionCode.ACADEMIC_CURRICULUM_EDIT))],
+)
+async def edit_curriculum(
+    id: int,
+    data: CurriculumUpdate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> None:
+    await curriculum_crud.update(db, id, data)

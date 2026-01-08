@@ -9,9 +9,12 @@ class PermissionCode(str, Enum):
     ACADEMIC_CURRICULUM_EDIT = "academic.curriculum.edit"
     ACADEMIC_CURRICULUM_DELETE = "academic.curriculum.delete"
 
-    # Academic Performance
-    ACADEMIC_PERFORMANCE_ALL = "academic.performance.*"
-    ACADEMIC_PERFORMANCE_VIEW = "academic.performance.view"
+    # Academic Curriculum Content
+    ACADEMIC_CURRICULUM_CONTENT_ALL = "academic.curriculum_content.*"
+    ACADEMIC_CURRICULUM_CONTENT_VIEW = "academic.curriculum_content.view"
+    ACADEMIC_CURRICULUM_CONTENT_ADD = "academic.curriculum_content.add"
+    ACADEMIC_CURRICULUM_CONTENT_EDIT = "academic.curriculum_content.edit"
+    ACADEMIC_CURRICULUM_CONTENT_DELETE = "academic.curriculum_content.delete"
 
     # Academic Exams
     ACADEMIC_EXAMS_ALL = "academic.exams.*"

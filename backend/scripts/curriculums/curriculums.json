@@ -1,0 +1,14 @@
+[
+  {
+    "id": 1001,
+    "name": "الصف الأول",
+    "academic_year": "2025/2026",
+    "is_active": true
+  },
+  {
+    "id": 1002,
+    "name": "الصف الثانى",
+    "academic_year": "2025/2026",
+    "is_active": true
+  }
+]

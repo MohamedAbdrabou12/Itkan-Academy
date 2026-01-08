@@ -1,4 +1,4 @@
-# app/db/base.py
+# ruff: noqa: E402, F401, F811
 from sqlalchemy.orm import DeclarativeBase
 
 
@@ -7,23 +7,25 @@ class Base(DeclarativeBase):
 
 
 # Import all models so Alembic can detect them
-from app.modules.users import models  # noqa
-from app.modules.branches import models  # noqa
-from app.modules.roles import models  # noqa
-from app.modules.permissions.models import Permission  # noqa
-from app.modules.role_permissions.models import RolePermission  # noqa
-from app.modules.audits.models import AuditLog  # noqa
-from app.modules.classes import models  # noqa
-from app.modules.students import models  # noqa
-from app.modules.audits import models  # noqa
-from app.modules.notifications import models  # noqa
-from app.modules.question_bank import models  # noqa
-from app.modules.evaluations.models import Evaluation  # noqa
-from app.modules.exams.models.exam_attempt import ExamAttempt  # noqa
-from app.modules.exams.models.exam_answer import ExamAnswer  # noqa
-from app.modules.exams.models.exam_question import ExamQuestion  # noqa
-from app.modules.exams.models.exam import Exam  # noqa
-from app.modules.financial.models.invoice import Invoice  # noqa
-from app.modules.financial.models.payment import Payment  # noqa
-from app.modules.parents.models import Parent, ParentStudent  # noqa
-from app.modules.teachers import models  # noqa
+from app.modules.audits import models
+from app.modules.audits.models import AuditLog
+from app.modules.branches import models
+from app.modules.classes import models
+from app.modules.curriculums.models import curriculum, subject, subject_unit
+from app.modules.evaluations.models import Evaluation
+from app.modules.exams.models.exam import Exam
+from app.modules.exams.models.exam_answer import ExamAnswer
+from app.modules.exams.models.exam_attempt import ExamAttempt
+from app.modules.exams.models.exam_question import ExamQuestion
+from app.modules.financial.models.invoice import Invoice
+from app.modules.financial.models.payment import Payment
+from app.modules.notifications import models
+from app.modules.parents.models import Parent, ParentStudent
+from app.modules.permissions.models import Permission
+from app.modules.question_bank import models
+from app.modules.role_permissions.models import RolePermission
+from app.modules.roles import models
+from app.modules.student_progress import models
+from app.modules.students import models
+from app.modules.teachers import models
+from app.modules.users import models

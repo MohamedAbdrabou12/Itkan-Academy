@@ -1,6 +1,7 @@
+from collections.abc import Sequence
 from datetime import date
 from operator import and_
-from typing import Any, Dict, Optional, Sequence
+from typing import Any
 
 from app.modules.evaluations.models import Evaluation
 from app.modules.evaluations.schemas import (
@@ -8,6 +9,7 @@ from app.modules.evaluations.schemas import (
     StudentEvaluationUpdate,
 )
 from app.modules.evaluations.services import check_evaluation_grades
+from app.modules.student_progress.models import StudentProgress
 from app.modules.users.models import User
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -15,11 +17,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 class DailyEvaluationCRUD:
     async def get_all(
-        self, db: AsyncSession, recorded_by_user_id: int, date: Optional[date] = None
+        self, db: AsyncSession, recorded_by_user_id: int, date: date | None = None
     ) -> Sequence[Evaluation]:
-        query = select(Evaluation).where(
-            Evaluation.recorded_by_user_id == recorded_by_user_id
-        )
+        query = select(Evaluation).where(Evaluation.recorded_by_user_id == recorded_by_user_id)
 
         if date is not None:
             query = query.where(Evaluation.date == date)
@@ -59,6 +59,18 @@ class DailyEvaluationCRUD:
 
         if evaluations_to_create:
             db.add_all(evaluations_to_create)
+            await db.commit()
+
+            progress_to_create = []
+            for evaluation in evaluations_to_create:
+                await db.refresh(evaluation)
+                progress_to_create.append(
+                    StudentProgress(
+                        student_id=evaluation.student_id,
+                        unit_item_id=bulk_data.unit_item_id,
+                        evaluation_id=evaluation.id,
+                    )
+                )
 
         return len(evaluations_to_create)
 
@@ -66,7 +78,7 @@ class DailyEvaluationCRUD:
         self,
         db: AsyncSession,
         eval_date: date,
-        records: Dict[int, StudentEvaluationUpdate],
+        records: dict[int, StudentEvaluationUpdate],
     ) -> int:
         updated_evaluations = []
         for student_id, eval_data in records.items():

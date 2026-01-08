@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import date, datetime
 from enum import Enum
-from typing import TYPE_CHECKING, Dict, List, Optional
+from typing import TYPE_CHECKING
 
 from app.db.base import Base
 from sqlalchemy import (
@@ -12,16 +12,14 @@ from sqlalchemy import (
     Text,
     UniqueConstraint,
 )
-from sqlalchemy import (
-    Enum as SQLEnum,
-)
+from sqlalchemy import Enum as SQLEnum
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-# Avoid circular imports
 if TYPE_CHECKING:
     from app.modules.branches.models import Branch
     from app.modules.classes.models import Class
+    from app.modules.curriculums.models.subject_unit_item import SubjectUnitItem
     from app.modules.students.models import Student
     from app.modules.users.models import User
 
@@ -36,9 +34,7 @@ class AttendanceStatus(Enum):
 class Evaluation(Base):
     __tablename__ = "daily_evaluations"
     __table_args__ = (
-        UniqueConstraint(
-            "student_id", "date", "class_id", name="uq_evaluation_student_class_date"
-        ),
+        UniqueConstraint("student_id", "date", "class_id", name="uq_evaluation_student_class_date"),
     )
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
@@ -51,6 +47,10 @@ class Evaluation(Base):
     branch_id: Mapped[int] = mapped_column(
         ForeignKey("branches.id", ondelete="CASCADE"), nullable=False
     )
+    unit_item_id: Mapped[int] = mapped_column(
+        ForeignKey("subject_unit_items.id", ondelete="CASCADE"),
+        nullable=False,
+    )
     date: Mapped[date] = mapped_column(Date, nullable=False)
     recorded_by_user_id: Mapped[int] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE"), nullable=False
@@ -60,13 +60,11 @@ class Evaluation(Base):
         SQLEnum(AttendanceStatus), nullable=False
     )
 
-    evaluation_grades: Mapped[List[Dict]] = mapped_column(JSONB, default=list)
+    evaluation_grades: Mapped[list[dict]] = mapped_column(JSONB, default=list)
 
-    notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
 
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=datetime.utcnow
-    )
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow
     )
@@ -78,4 +76,5 @@ class Evaluation(Base):
         "Class", back_populates="daily_evaluations", lazy="selectin"
     )
     branch: Mapped[Branch] = relationship("Branch", lazy="selectin")
+    unit_item: Mapped[SubjectUnitItem] = relationship("SubjectUnitItem", lazy="selectin")
     recorded_by_user: Mapped[User] = relationship("User", lazy="selectin")
