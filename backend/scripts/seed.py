@@ -18,10 +18,10 @@ from scripts.roles import add_roles
 from scripts.student_classes import add_students_classes
 from scripts.student_progress import add_student_progress
 from scripts.students import add_students
-from scripts.subject_units.subject_units import add_subject_units
 from scripts.subjects.subjects import add_subjects
 from scripts.teacher_classes import add_teacher_classes
 from scripts.teachers import add_teachers
+from scripts.units.units import add_units
 from scripts.user_branch import add_user_branch
 from scripts.users import add_users
 from sqlalchemy.ext.asyncio import (
@@ -52,7 +52,7 @@ async def seed_data():
         await add_curriculums(db)
         await add_subjects(db)
         await add_curriculum_subjects(db)
-        await add_subject_units(db)
+        await add_units(db)
         await add_classes(db)
         await add_students_classes(db)
         await add_teacher_classes(db)

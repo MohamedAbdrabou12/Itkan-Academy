@@ -2,7 +2,7 @@ from collections.abc import Sequence
 
 from app.modules.curriculums.models.curriculum import Curriculum
 from app.modules.curriculums.models.subject import Subject
-from app.modules.curriculums.models.subject_unit import SubjectUnit
+from app.modules.curriculums.models.unit import Unit
 from app.modules.curriculums.schemas.subject import SubjectCreate, SubjectUpdate
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -28,7 +28,7 @@ class SubjectCRUD:
 
         return [link.curriculum for link in subject.curriculum_links]
 
-    async def get_units(self, db: AsyncSession, id: int) -> Sequence[SubjectUnit] | None:
+    async def get_units(self, db: AsyncSession, id: int) -> Sequence[Unit] | None:
         query = await db.execute(select(Subject).where(Subject.id == id))
 
         subject = query.scalar_one_or_none()

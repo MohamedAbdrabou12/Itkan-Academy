@@ -6,10 +6,10 @@ from sqlalchemy import DateTime, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 if TYPE_CHECKING:
-    from app.modules.curriculums.models.subject_unit_item import SubjectUnitItem
+    from app.modules.curriculums.models.unit_item import UnitItem
     from app.modules.evaluations.models import Evaluation
-    from app.modules.students.models import Student
     from app.modules.exams.models.exam_attempt import ExamAttempt
+    from app.modules.students.models import Student
 
 
 class StudentProgress(Base):
@@ -20,16 +20,18 @@ class StudentProgress(Base):
         ForeignKey("students.id", ondelete="CASCADE"), nullable=False
     )
     unit_item_id: Mapped[int] = mapped_column(
-        ForeignKey("subject_unit_items.id", ondelete="CASCADE"), nullable=False
+        ForeignKey("unit_items.id", ondelete="CASCADE"), nullable=False
     )
     evaluation_id: Mapped[int | None] = mapped_column(
         ForeignKey("daily_evaluations.id"), nullable=True
     )
-    exam_attempt_id: Mapped[int | None] = mapped_column(ForeignKey("exam_attempts.id"), nullable=True)
+    exam_attempt_id: Mapped[int | None] = mapped_column(
+        ForeignKey("exam_attempts.id"), nullable=True
+    )
 
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow)
 
     student: Mapped["Student"] = relationship("Student", lazy="selectin")
-    unit_item: Mapped["SubjectUnitItem"] = relationship("SubjectUnitItem", lazy="selectin")
+    unit_item: Mapped["UnitItem"] = relationship("UnitItem", lazy="selectin")
     evaluation: Mapped["Evaluation"] = relationship("Evaluation", lazy="selectin")
     exam_attempt: Mapped["ExamAttempt"] = relationship("ExamAttempt", lazy="selectin")

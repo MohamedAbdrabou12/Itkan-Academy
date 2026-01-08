@@ -3,7 +3,7 @@ from datetime import datetime
 from app.db.base import Base
 from app.modules.classes.models import Class
 from app.modules.curriculums.models.curriculum import CurriculumSubject
-from app.modules.curriculums.models.subject_unit import SubjectUnit
+from app.modules.curriculums.models.unit import Unit
 from sqlalchemy import DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -26,6 +26,6 @@ class Subject(Base):
     class_links: Mapped[list[Class]] = relationship(
         "Class", back_populates="subject", lazy="selectin"
     )
-    units: Mapped[list[SubjectUnit]] = relationship(
-        "SubjectUnit", back_populates="subject", lazy="selectin"
+    units: Mapped[list[Unit]] = relationship(
+        "Unit", back_populates="subject", lazy="selectin"
     )

@@ -19,7 +19,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 if TYPE_CHECKING:
     from app.modules.branches.models import Branch
     from app.modules.classes.models import Class
-    from app.modules.curriculums.models.subject_unit_item import SubjectUnitItem
+    from app.modules.curriculums.models.unit_item import UnitItem
     from app.modules.students.models import Student
     from app.modules.users.models import User
 
@@ -48,7 +48,7 @@ class Evaluation(Base):
         ForeignKey("branches.id", ondelete="CASCADE"), nullable=False
     )
     unit_item_id: Mapped[int] = mapped_column(
-        ForeignKey("subject_unit_items.id", ondelete="CASCADE"),
+        ForeignKey("unit_items.id", ondelete="CASCADE"),
         nullable=False,
     )
     date: Mapped[date] = mapped_column(Date, nullable=False)
@@ -76,5 +76,5 @@ class Evaluation(Base):
         "Class", back_populates="daily_evaluations", lazy="selectin"
     )
     branch: Mapped[Branch] = relationship("Branch", lazy="selectin")
-    unit_item: Mapped[SubjectUnitItem] = relationship("SubjectUnitItem", lazy="selectin")
+    unit_item: Mapped[UnitItem] = relationship("UnitItem", lazy="selectin")
     recorded_by_user: Mapped[User] = relationship("User", lazy="selectin")

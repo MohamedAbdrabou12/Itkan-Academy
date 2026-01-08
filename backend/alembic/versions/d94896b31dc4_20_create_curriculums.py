@@ -1,8 +1,8 @@
 """20_create_curriculums
 
-Revision ID: 14286f97957c
+Revision ID: d94896b31dc4
 Revises: 690108e0a1f8
-Create Date: 2026-01-08 19:59:03.301183
+Create Date: 2026-01-08 21:09:53.996017
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '14286f97957c'
+revision = 'd94896b31dc4'
 down_revision = '690108e0a1f8'
 branch_labels = None
 depends_on = None
@@ -41,7 +41,7 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['subject_id'], ['subjects.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('subject_units',
+    op.create_table('units',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('title', sa.String(), nullable=False),
     sa.Column('description', sa.String(), nullable=False),
@@ -51,13 +51,13 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['subject_id'], ['subjects.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('subject_unit_items',
+    op.create_table('unit_items',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('title', sa.String(), nullable=False),
-    sa.Column('type', sa.Enum('LESSON', 'EXAM', 'VIDEO', name='subjectunititemtype'), nullable=False),
+    sa.Column('type', sa.Enum('LESSON', 'EXAM', 'VIDEO', name='unititemtype'), nullable=False),
     sa.Column('content', sa.String(), nullable=False),
     sa.Column('unit_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['unit_id'], ['subject_units.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['unit_id'], ['units.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('student_progress',
@@ -70,15 +70,15 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['evaluation_id'], ['daily_evaluations.id'], ),
     sa.ForeignKeyConstraint(['exam_attempt_id'], ['exam_attempts.id'], ),
     sa.ForeignKeyConstraint(['student_id'], ['students.id'], ondelete='CASCADE'),
-    sa.ForeignKeyConstraint(['unit_item_id'], ['subject_unit_items.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['unit_item_id'], ['unit_items.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.add_column('classes', sa.Column('curriculum_id', sa.Integer(), nullable=False))
     op.add_column('classes', sa.Column('subject_id', sa.Integer(), nullable=False))
-    op.create_foreign_key(None, 'classes', 'subjects', ['subject_id'], ['id'])
     op.create_foreign_key(None, 'classes', 'curriculums', ['curriculum_id'], ['id'])
+    op.create_foreign_key(None, 'classes', 'subjects', ['subject_id'], ['id'])
     op.add_column('daily_evaluations', sa.Column('unit_item_id', sa.Integer(), nullable=False))
-    op.create_foreign_key(None, 'daily_evaluations', 'subject_unit_items', ['unit_item_id'], ['id'], ondelete='CASCADE')
+    op.create_foreign_key(None, 'daily_evaluations', 'unit_items', ['unit_item_id'], ['id'], ondelete='CASCADE')
     # ### end Alembic commands ###
 
 
@@ -91,8 +91,8 @@ def downgrade() -> None:
     op.drop_column('classes', 'subject_id')
     op.drop_column('classes', 'curriculum_id')
     op.drop_table('student_progress')
-    op.drop_table('subject_unit_items')
-    op.drop_table('subject_units')
+    op.drop_table('unit_items')
+    op.drop_table('units')
     op.drop_table('curriculum_subjects')
     op.drop_table('subjects')
     op.drop_table('curriculums')

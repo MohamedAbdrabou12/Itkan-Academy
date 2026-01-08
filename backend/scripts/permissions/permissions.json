@@ -1186,42 +1186,42 @@
   },
   {
     "id": 1212,
-    "code": "academic.curriculum_content.*",
-    "name": "Full Curriculum Content Management",
+    "code": "academic.educational_content.*",
+    "name": "Full Educational Content Management",
     "name_ar": "إدارة المحتوى الدراسى الكاملة",
-    "description": "Complete control over all curriculum content operations",
+    "description": "Complete control over all educational content operations",
     "description_ar": "التحكم الكامل فى المحتوى الدراسى"
   },
   {
     "id": 1213,
-    "code": "academic.curriculum_content.view",
-    "name": "View Curriculum Content",
+    "code": "academic.educational_content.view",
+    "name": "View Educational Content",
     "name_ar": "عرض المحتوى الدراسى",
-    "description": "Access to view curriculum content",
+    "description": "Access to view educational content",
     "description_ar": "القدرة على عرض المحتوى الدراسى"
   },
   {
     "id": 1214,
-    "code": "academic.curriculum_content.add",
-    "name": "Add Curriculum Content",
+    "code": "academic.educational_content.add",
+    "name": "Add Educational Content",
     "name_ar": "إضافة للمحتوى الدراسى",
-    "description": "Access to add curriculum content",
+    "description": "Access to add educational content",
     "description_ar": "القدرة على إضافة للمحتوى الدراسى"
   },
   {
     "id": 1215,
-    "code": "academic.curriculum_content.edit",
-    "name": "Edit Curriculum Content",
+    "code": "academic.educational_content.edit",
+    "name": "Edit Educational Content",
     "name_ar": "التعديل على المحتوى الدراسى",
-    "description": "Access to edit curriculum content",
+    "description": "Access to edit educational content",
     "description_ar": "القدرة على التعديل على المحتوى الدراسى"
   },
   {
     "id": 1216,
-    "code": "academic.curriculum_content.delete",
-    "name": "Delete Curriculum Content",
+    "code": "academic.educational_content.delete",
+    "name": "Delete Educational Content",
     "name_ar": "حذف من المحتوى الدراسى",
-    "description": "Access to delete curriculum content",
+    "description": "Access to delete educational content",
     "description_ar": "القدرة على حذف من المحتوى الدراسى"
   }
 ]

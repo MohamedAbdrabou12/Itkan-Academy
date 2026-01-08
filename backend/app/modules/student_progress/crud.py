@@ -1,8 +1,8 @@
 from collections.abc import Iterable, Sequence
 from operator import and_
 
-from app.modules.curriculums.models.subject_unit import SubjectUnit
-from app.modules.curriculums.models.subject_unit_item import SubjectUnitItem
+from app.modules.curriculums.models.unit import Unit
+from app.modules.curriculums.models.unit_item import UnitItem
 from app.modules.student_progress.models import StudentProgress
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -14,12 +14,12 @@ class StudentProgressCRUD:
     ) -> Sequence[StudentProgress]:
         query_result = await db.execute(
             select(StudentProgress)
-            .join(SubjectUnitItem, StudentProgress.unit_item_id == SubjectUnitItem.id)
-            .join(SubjectUnit, SubjectUnitItem.unit_id == SubjectUnit.id)
+            .join(UnitItem, StudentProgress.unit_item_id == UnitItem.id)
+            .join(Unit, UnitItem.unit_id == Unit.id)
             .where(
                 and_(
                     StudentProgress.student_id == student_id,
-                    SubjectUnit.subject_id == subject_id,
+                    Unit.subject_id == subject_id,
                 )
             )
         )
@@ -31,12 +31,12 @@ class StudentProgressCRUD:
     ) -> Sequence[StudentProgress]:
         query_result = await db.execute(
             select(StudentProgress)
-            .join(SubjectUnitItem, StudentProgress.unit_item_id == SubjectUnitItem.id)
-            .join(SubjectUnit, SubjectUnitItem.unit_id == SubjectUnit.id)
+            .join(UnitItem, StudentProgress.unit_item_id == UnitItem.id)
+            .join(Unit, UnitItem.unit_id == Unit.id)
             .where(
                 and_(
                     StudentProgress.student_id.in_(child_ids),
-                    SubjectUnit.subject_id == subject_id,
+                    Unit.subject_id == subject_id,
                 )
             )
         )

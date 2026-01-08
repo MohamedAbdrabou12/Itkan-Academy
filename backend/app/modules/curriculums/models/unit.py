@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING
 
 from app.db.base import Base
-from app.modules.curriculums.models.subject_unit_item import SubjectUnitItem
+from app.modules.curriculums.models.unit_item import UnitItem
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -9,8 +9,8 @@ if TYPE_CHECKING:
     from app.modules.curriculums.models.subject import Subject
 
 
-class SubjectUnit(Base):
-    __tablename__ = "subject_units"
+class Unit(Base):
+    __tablename__ = "units"
 
     id: Mapped[int] = mapped_column(primary_key=True, nullable=False)
     title: Mapped[str] = mapped_column(nullable=False)
@@ -23,6 +23,6 @@ class SubjectUnit(Base):
     )
 
     subject: Mapped["Subject"] = relationship("Subject", back_populates="units", lazy="selectin")
-    items: Mapped[list[SubjectUnitItem]] = relationship(
-        "SubjectUnitItem", back_populates="unit", lazy="selectin"
+    items: Mapped[list[UnitItem]] = relationship(
+        "UnitItem", back_populates="unit", lazy="selectin"
     )

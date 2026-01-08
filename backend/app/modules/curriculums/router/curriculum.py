@@ -59,7 +59,7 @@ async def get_curriculums(
 @curriculums_router.get(
     "/{id}/subjects",
     status_code=status.HTTP_200_OK,
-    dependencies=[Depends(require_permission(PermissionCode.ACADEMIC_CURRICULUM_CONTENT_VIEW))],
+    dependencies=[Depends(require_permission(PermissionCode.ACADEMIC_EDUCATIONAL_CONTENT_VIEW))],
 )
 async def get_curriculum_subjects(
     db: Annotated[AsyncSession, Depends(get_db)], id: int
