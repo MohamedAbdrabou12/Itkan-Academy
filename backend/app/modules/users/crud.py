@@ -105,7 +105,7 @@ class UserCRUD:
                 ),
                 selectinload(User.teacher),
                 selectinload(User.branch_links).joinedload(UserBranch.branch),
-                selectinload(User.branches),
+                selectinload(User.branches).options(selectinload(Branch.classes)),
             )
         )
         if request:

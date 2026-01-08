@@ -1,3 +1,4 @@
+import datetime
 from fastapi import Request
 from sqlalchemy import and_, or_
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,13 +11,24 @@ from app.modules.users.models import User
 from app.modules.exams.models.exam_question import ExamQuestion
 from sqlalchemy.orm import selectinload, joinedload
 
+from app.modules.exams.models.exam_attempt import ExamAttempt
 from fastapi_pagination.ext.sqlalchemy import paginate
 
 
 class ExamCRUD:
     async def get(self, db: AsyncSession, id: int, user: User) -> Optional[Exam]:
         result = await db.execute(
-            select(Exam).where(and_(Exam.id == id, Exam.created_by == user.id))
+            select(Exam)
+            .options(selectinload(Exam.questions).selectinload(ExamQuestion.question))
+            .where(and_(Exam.id == id, Exam.created_by == user.id))
+        )
+        return result.scalars().first()
+
+    async def get_exam_by_id(self, db: AsyncSession, id: int) -> Optional[Exam]:
+        result = await db.execute(
+            select(Exam)
+            .options(selectinload(Exam.questions).selectinload(ExamQuestion.question))
+            .where(Exam.id == id)
         )
         return result.scalars().first()
 
@@ -55,6 +67,30 @@ class ExamCRUD:
         )
         return result
 
+    async def get_available_exams(self, db: AsyncSession, user: User):
+        branches = user.branches
+        class_ids = []
+        for branch in branches:
+            for classObj in branch.classes:
+                class_ids.append(classObj.id)
+        query = (
+            select(Exam)
+            .options(
+                selectinload(Exam.questions).selectinload(ExamQuestion.question),
+                selectinload(Exam.creator),
+                selectinload(Exam.class_),
+                selectinload(Exam.attempts.and_(ExamAttempt.student_id == user.id)),
+            )
+            .where(
+                and_(
+                    Exam.class_id.in_(class_ids),
+                    Exam.status == ExamStatus.PUBLISHED,
+                )
+            )
+        )
+        result = await db.execute(query)
+        return result.scalars().all()
+
     async def get_by_title_and_class(
         self, db: AsyncSession, title: str, class_id: int
     ) -> Optional[Exam]:
@@ -62,6 +98,21 @@ class ExamCRUD:
             select(Exam).filter(Exam.title == title, Exam.class_id == class_id)
         )
         return result.scalars().first()
+
+    async def get_take_exam(self, db: AsyncSession, user: User, exam_id: int):
+        query = (
+            select(ExamAttempt).options(
+                selectinload(ExamAttempt.exam)
+                .selectinload(Exam.questions)
+                .selectinload(ExamQuestion.question),
+                selectinload(ExamAttempt.answers),
+            )
+        ).where(and_(ExamAttempt.exam_id == exam_id, ExamAttempt.student_id == user.id))
+
+        result = await db.execute(query)
+        exam_attempts = result.scalars().first()
+
+        return exam_attempts
 
     async def create(
         self,

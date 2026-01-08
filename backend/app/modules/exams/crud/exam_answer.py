@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Sequence
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from app.modules.exams.models.exam_answer import ExamAnswer
@@ -7,8 +7,12 @@ from app.modules.exams.schemas.exam_answer import (
     ExamAnswerCreate,
     ExamAnswerUpdate,
     ExamAnswerBulkCreate,
+    ExamAnswerBulkItemSubmit,
 )
 from app.modules.users.models import User
+from fastapi import HTTPException, status
+
+from app.modules.exams.schemas.exam_attempt import ExamGradeRequest
 
 
 class ExamAnswerCRUD:
@@ -24,7 +28,7 @@ class ExamAnswerCRUD:
         db: AsyncSession,
         *,
         attempt_id: int,
-        answers_in: List[ExamAnswerBulkItem],
+        answers_in: List[ExamAnswerBulkItemSubmit],
     ) -> List[ExamAnswer]:
         db_objs = []
         for item in answers_in:
@@ -59,6 +63,25 @@ class ExamAnswerCRUD:
         await db.commit()
         await db.refresh(db_obj)
         return db_obj
+
+    async def update_bulk(
+        self,
+        db: AsyncSession,
+        answers_in: List[ExamGradeRequest],
+        exam_answers: Sequence[ExamAnswer],
+    ):
+        for answer in answers_in:
+            db_answer = next(
+                (a for a in exam_answers if a.question_id == answer.question_id),
+                None,
+            )
+            if not db_answer:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="لم يتم ايجاد اجابة للسؤال في الامتحان",
+                )
+            db_answer.marks_obtained = answer.marks_obtained
+        await db.commit()
 
     async def delete(self, db: AsyncSession, *, id: int):
         db_obj = await db.get(ExamAnswer, id)

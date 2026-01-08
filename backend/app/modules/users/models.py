@@ -16,6 +16,7 @@ if TYPE_CHECKING:
     from app.modules.students.models import Student
     from app.modules.teachers.models import Teacher
     from app.modules.parents.models import Parent
+    from app.modules.exams.models.exam import Exam
 
 
 class UserStatus(str, Enum):
@@ -87,7 +88,6 @@ class User(Base):
         "Branch",
         secondary="user_branches",
         back_populates="users_m2m",
-        viewonly=True,
     )
 
     notifications: Mapped[List["Notification"]] = relationship(
@@ -106,6 +106,9 @@ class User(Base):
     )
     parent: Mapped[Optional["Parent"]] = relationship(
         "Parent", back_populates="user", uselist=False
+    )
+    created_exams: Mapped[List["Exam"]] = relationship(
+        "Exam", back_populates="creator", cascade="all, delete-orphan"
     )
 
     @property
