@@ -9,6 +9,9 @@ class UnitItemResponse(BaseModel):
     content: str
     unit_id: int
 
+    class Config:
+        from_attributes = True
+
 
 class UnitItemCreate(BaseModel):
     title: str

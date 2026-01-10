@@ -39,7 +39,6 @@ async def create_curriculum(
 @curriculums_router.get(
     "/",
     status_code=status.HTTP_200_OK,
-    dependencies=[Depends(require_permission(PermissionCode.ACADEMIC_CURRICULUM_VIEW))],
 )
 async def get_curriculums(
     db: Annotated[AsyncSession, Depends(get_db)],

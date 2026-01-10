@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from app.modules.classes.models import ClassStatus
+from app.modules.curriculums.schemas.subject import Subject
 from pydantic import BaseModel
 
 
@@ -31,6 +32,7 @@ class ClassRead(ClassBase):
     created_at: datetime
     updated_at: datetime
     status: ClassStatus | None = None
+    subject: Subject | None = None
 
     class Config:
         from_attributes = True

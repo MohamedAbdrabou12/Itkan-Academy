@@ -38,8 +38,9 @@ async def get_teachers_classes_with_header(
         teacher_query = (
             select(Teacher)
             .where(Teacher.user_id == user.id)
-            .options(selectinload(Teacher.classes))
+            .options(selectinload(Teacher.classes).selectinload(Class.subject))
         )
+
         result = await db.execute(teacher_query)
         teacher = result.scalar_one_or_none()
 

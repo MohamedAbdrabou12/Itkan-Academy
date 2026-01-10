@@ -1,9 +1,16 @@
 from pydantic import BaseModel
 
 
-class SubjectResponse(BaseModel):
+class Subject(BaseModel):
     id: int
     name: str
+
+
+class SubjectResponse(Subject):
+    pass
+
+    class Config:
+        from_attributes = True
 
 
 class SubjectCreate(BaseModel):

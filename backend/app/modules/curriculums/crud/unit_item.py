@@ -1,13 +1,21 @@
+from typing import List
+
 from app.modules.curriculums.models.unit_item import UnitItem
 from app.modules.curriculums.schemas.unit_item import (
     UnitItemCreate,
     UnitItemUpdate,
 )
-from sqlalchemy import update
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class UnitItemCRUD:
+    async def get_items(self, db: AsyncSession, unit_id: int) -> List[UnitItem]:
+        query_result = await db.execute(
+            select(UnitItem).where(UnitItem.unit_id == unit_id)
+        )
+        return list(query_result.scalars().all())
+
     async def create(self, db: AsyncSession, data: UnitItemCreate) -> UnitItem:
         item = UnitItem(
             title=data.title, type=data.type, content=data.content, unit_id=data.unit_id
@@ -19,7 +27,9 @@ class UnitItemCRUD:
 
     async def update(self, db: AsyncSession, id: int, data: UnitItemUpdate) -> None:
         updated_values = data.model_dump(exclude_unset=True)
-        await db.execute(update(UnitItem).where(UnitItem.id == id).values(**updated_values))
+        await db.execute(
+            update(UnitItem).where(UnitItem.id == id).values(**updated_values)
+        )
         await db.commit()
 
 

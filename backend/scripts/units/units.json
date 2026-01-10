@@ -52,5 +52,26 @@
         "content": "https://www.youtube.com/watch?v=b4i7j6U7Ul8"
       }
     ]
+  },
+  {
+    "id": 1003,
+    "subject_id": 1002,
+    "curriculum_id": 1002,
+    "title": "كتاب الصلاة",
+    "description": "وحدة أحكام الصلاة وشروطها",
+    "items": [
+      {
+        "id": 1007,
+        "title": "شروط وأركان الصلاة",
+        "type": "LESSON",
+        "content": "..."
+      },
+      {
+        "id": 1009,
+        "title": "فيديو تعليمي: صفة الصلاة الصحيحة",
+        "type": "VIDEO",
+        "content": "https://www.youtube.com/watch?v=b4i7j6U7Ul8"
+      }
+    ]
   }
 ]

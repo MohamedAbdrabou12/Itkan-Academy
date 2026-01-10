@@ -18,3 +18,6 @@ class UnitResponse(BaseModel):
     title: str
     description: str
     subject_id: int
+
+    class Config:
+        from_attributes = True
