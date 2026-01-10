@@ -5,6 +5,7 @@ class CurriculumCreate(BaseModel):
     name: str
     description: str = ""
     academic_year: str
+    is_active: bool = True
 
 
 class CurriculumResponse(BaseModel):

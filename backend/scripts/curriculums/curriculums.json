@@ -1,13 +1,36 @@
 [
   {
     "id": 1001,
-    "name": "الصف الأول",
+    "name": "المستوى الأول",
+    "description": "المستوى الأول من التعليم الأساسي",
     "academic_year": "2025/2026",
     "is_active": true
   },
   {
     "id": 1002,
-    "name": "الصف الثانى",
+    "name": "المستوى الثانى",
+    "description": "المستوى الثانى من التعليم الأساسي",
+    "academic_year": "2025/2026",
+    "is_active": true
+  },
+  {
+    "id": 1003,
+    "name": "المستوى الثالث",
+    "description": "المستوى الثالث من التعليم الأساسي",
+    "academic_year": "2025/2026",
+    "is_active": true
+  },
+  {
+    "id": 1004,
+    "name": "المستوى الرابع",
+    "description": "المستوى الرابع من التعليم الأساسي",
+    "academic_year": "2025/2026",
+    "is_active": true
+  },
+  {
+    "id": 1005,
+    "name": "المستوى الخامس",
+    "description": "المستوى الخامس من التعليم الأساسي",
     "academic_year": "2025/2026",
     "is_active": true
   }
