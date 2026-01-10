@@ -1,18 +1,19 @@
 from collections.abc import Sequence
-from typing import List
 
+from app.modules.classes.models import Class
 from app.modules.curriculums.models.unit import Unit, UnitItem
 from app.modules.curriculums.schemas.unit import UnitCreate, UnitUpdate
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.classes.models import Class
-
 
 class UnitCRUD:
     async def create(self, db: AsyncSession, data: UnitCreate) -> Unit:
         unit = Unit(
-            title=data.title, description=data.description, subject_id=data.subject_id
+            title=data.title,
+            description=data.description,
+            subject_id=data.subject_id,
+            curriculum_id=data.curriculum_id,
         )
         db.add(unit)
         await db.commit()
@@ -28,13 +29,12 @@ class UnitCRUD:
 
         return unit.items
 
-    async def get_units_by_class(self, db: AsyncSession, class_id: int) -> List[Unit]:
+    async def get_units_by_class(self, db: AsyncSession, class_id: int) -> list[Unit]:
         query = (
             select(Unit)
             .join(
                 Class,
-                (Unit.subject_id == Class.subject_id)
-                & (Unit.curriculum_id == Class.curriculum_id),
+                (Unit.subject_id == Class.subject_id) & (Unit.curriculum_id == Class.curriculum_id),
             )
             .where(Class.id == class_id)
         )

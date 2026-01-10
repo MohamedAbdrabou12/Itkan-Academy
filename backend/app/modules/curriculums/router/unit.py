@@ -32,6 +32,7 @@ async def create_unit(
         title=unit.title,
         description=unit.description,
         subject_id=unit.subject_id,
+        curriculum_id=unit.curriculum_id
     )
 
 
