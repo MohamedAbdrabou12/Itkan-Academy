@@ -1,8 +1,8 @@
 """20_create_curriculums
 
-Revision ID: d94896b31dc4
+Revision ID: 57e30d94daf0
 Revises: 690108e0a1f8
-Create Date: 2026-01-08 21:09:53.996017
+Create Date: 2026-01-10 10:59:26.376616
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'd94896b31dc4'
+revision = '57e30d94daf0'
 down_revision = '690108e0a1f8'
 branch_labels = None
 depends_on = None
@@ -31,14 +31,6 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_table('curriculum_subjects',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('curriculum_id', sa.Integer(), nullable=False),
-    sa.Column('subject_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['curriculum_id'], ['curriculums.id'], ondelete='CASCADE'),
-    sa.ForeignKeyConstraint(['subject_id'], ['subjects.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('units',
@@ -93,7 +85,6 @@ def downgrade() -> None:
     op.drop_table('student_progress')
     op.drop_table('unit_items')
     op.drop_table('units')
-    op.drop_table('curriculum_subjects')
     op.drop_table('subjects')
     op.drop_table('curriculums')
     # ### end Alembic commands ###

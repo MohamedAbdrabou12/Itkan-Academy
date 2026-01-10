@@ -1,3 +1,4 @@
+from app.modules.curriculums.schemas.unit import DetailedUnitResponse
 from pydantic import BaseModel
 
 
@@ -7,10 +8,12 @@ class Subject(BaseModel):
 
 
 class SubjectResponse(Subject):
-    pass
-
     class Config:
         from_attributes = True
+
+
+class DetailedSubjectResponse(SubjectResponse):
+    units: list[DetailedUnitResponse]
 
 
 class SubjectCreate(BaseModel):

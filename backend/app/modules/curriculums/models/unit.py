@@ -6,6 +6,7 @@ from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 if TYPE_CHECKING:
+    from app.modules.curriculums.models.curriculum import Curriculum
     from app.modules.curriculums.models.subject import Subject
 
 
@@ -23,6 +24,6 @@ class Unit(Base):
     )
 
     subject: Mapped["Subject"] = relationship("Subject", back_populates="units", lazy="selectin")
-    items: Mapped[list[UnitItem]] = relationship(
-        "UnitItem", back_populates="unit", lazy="selectin"
-    )
+    curriculum: Mapped["Curriculum"] = relationship("Curriculum", lazy="selectin")
+
+    items: Mapped[list[UnitItem]] = relationship("UnitItem", back_populates="unit", lazy="selectin")

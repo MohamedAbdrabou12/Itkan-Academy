@@ -1,19 +1,13 @@
-from collections.abc import Sequence
-from typing import Optional
-
-from fastapi_pagination import Page
-
 from app.modules.curriculums.models.curriculum import Curriculum
-from app.modules.curriculums.models.subject import Subject
 from app.modules.curriculums.schemas.curriculum import (
     CurriculumCreate,
     CurriculumResponse,
     CurriculumUpdate,
 )
-from sqlalchemy import select, update
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import asc, desc
+from fastapi_pagination import Page
 from fastapi_pagination.ext.sqlalchemy import paginate as sqlalchemy_paginate
+from sqlalchemy import asc, desc, select, update
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class CurriculumCRUD:
@@ -32,9 +26,9 @@ class CurriculumCRUD:
     async def get_all(
         self,
         db: AsyncSession,
-        search: Optional[str] = None,
-        sort_by: Optional[str] = "id",
-        sort_order: Optional[str] = "asc",
+        search: str | None = None,
+        sort_by: str | None = "id",
+        sort_order: str | None = "asc",
     ) -> Page[CurriculumResponse]:
         query = select(Curriculum)
         if search:
@@ -56,24 +50,12 @@ class CurriculumCRUD:
         else:
             query = query.order_by(asc(sort_column))
 
-        result = await sqlalchemy_paginate(db, query)
-
-        return result
-
-    async def get_subjects(self, db: AsyncSession, id: int) -> Sequence[Subject] | None:
-        query_result = await db.execute(select(Curriculum).where(Curriculum.id == id))
-        curriculum = query_result.scalar_one_or_none()
-        if curriculum is None:
-            return None
-
-        return [link.subject for link in curriculum.subject_links]
+        return await sqlalchemy_paginate(db, query)
 
     async def update(self, db: AsyncSession, id: int, data: CurriculumUpdate) -> None:
         updated_curriculum_values = data.model_dump(exclude_unset=True)
         await db.execute(
-            update(Curriculum)
-            .where(Curriculum.id == id)
-            .values(**updated_curriculum_values)
+            update(Curriculum).where(Curriculum.id == id).values(**updated_curriculum_values)
         )
         await db.commit()
 

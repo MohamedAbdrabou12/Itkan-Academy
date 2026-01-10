@@ -1,4 +1,4 @@
-from typing import Annotated, Optional
+from typing import Annotated
 
 from app.core.authorization import require_permission
 from app.db.session import get_db
@@ -8,9 +8,8 @@ from app.modules.curriculums.schemas.curriculum import (
     CurriculumResponse,
     CurriculumUpdate,
 )
-from app.modules.curriculums.schemas.subject import SubjectResponse
 from app.modules.permissions.permissions import PermissionCode
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, Query, status
 from fastapi_pagination import Page
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -42,31 +41,11 @@ async def create_curriculum(
 )
 async def get_curriculums(
     db: Annotated[AsyncSession, Depends(get_db)],
-    search: Optional[str] = Query(None),
-    sort_by: Optional[str] = Query("id"),
-    sort_order: Optional[str] = Query("asc"),
+    search: Annotated[str | None, Query()] = None,
+    sort_by: Annotated[str | None, Query()] = "id",
+    sort_order: Annotated[str | None, Query()] = "asc",
 ) -> Page[CurriculumResponse]:
     return await curriculum_crud.get_all(db, search, sort_by, sort_order)
-
-
-@curriculums_router.get(
-    "/{id}/subjects",
-    status_code=status.HTTP_200_OK,
-    dependencies=[
-        Depends(require_permission(PermissionCode.ACADEMIC_EDUCATIONAL_CONTENT_VIEW))
-    ],
-)
-async def get_curriculum_subjects(
-    db: Annotated[AsyncSession, Depends(get_db)], id: int
-) -> list[SubjectResponse]:
-    subjects = await curriculum_crud.get_subjects(db, id)
-    if subjects is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Curriculum with ID {id} not found",
-        )
-
-    return [SubjectResponse(id=subject.id, name=subject.name) for subject in subjects]
 
 
 @curriculums_router.put(

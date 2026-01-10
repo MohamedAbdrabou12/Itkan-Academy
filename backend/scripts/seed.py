@@ -7,7 +7,6 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 from app.core.config import settings
 from scripts.branches import add_branches
 from scripts.classes import add_classes
-from scripts.curriculum_subjects.curriculum_subjects import add_curriculum_subjects
 from scripts.curriculums import add_curriculums
 from scripts.evaluations import add_evaluations
 from scripts.parent_students import add_parent_students
@@ -51,7 +50,6 @@ async def seed_data():
         await add_teachers(db)
         await add_curriculums(db)
         await add_subjects(db)
-        await add_curriculum_subjects(db)
         await add_units(db)
         await add_classes(db)
         await add_students_classes(db)
