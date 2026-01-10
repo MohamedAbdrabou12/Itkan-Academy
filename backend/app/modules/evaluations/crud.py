@@ -19,7 +19,9 @@ class DailyEvaluationCRUD:
     async def get_all(
         self, db: AsyncSession, recorded_by_user_id: int, date: date | None = None
     ) -> Sequence[Evaluation]:
-        query = select(Evaluation).where(Evaluation.recorded_by_user_id == recorded_by_user_id)
+        query = select(Evaluation).where(
+            Evaluation.recorded_by_user_id == recorded_by_user_id
+        )
 
         if date is not None:
             query = query.where(Evaluation.date == date)
@@ -49,6 +51,7 @@ class DailyEvaluationCRUD:
                 student_id=student_id,
                 class_id=bulk_data.class_id,
                 branch_id=branch_id,
+                unit_item_id=bulk_data.unit_item_id,
                 date=eval_date,
                 recorded_by_user_id=current_user.id,
                 attendance_status=eval_data.attendance_status,

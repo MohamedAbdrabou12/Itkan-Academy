@@ -1,6 +1,6 @@
 from typing import List
 
-from app.modules.curriculums.models.unit_item import UnitItem
+from app.modules.curriculums.models.unit_item import UnitItem, UnitItemType
 from app.modules.curriculums.schemas.unit_item import (
     UnitItemCreate,
     UnitItemUpdate,
@@ -10,9 +10,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class UnitItemCRUD:
-    async def get_items(self, db: AsyncSession, unit_id: int) -> List[UnitItem]:
+    async def get_lesson_items(self, db: AsyncSession, unit_id: int) -> List[UnitItem]:
         query_result = await db.execute(
-            select(UnitItem).where(UnitItem.unit_id == unit_id)
+            select(UnitItem).where(
+                UnitItem.unit_id == unit_id, UnitItem.type == UnitItemType.LESSON
+            )
         )
         return list(query_result.scalars().all())
 
