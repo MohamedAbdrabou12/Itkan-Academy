@@ -34,23 +34,6 @@ async def list_branches(
     )
 
 
-# @branch_router.get(
-#     "/{branch_id}",
-#     response_model=BranchRead,
-#     dependencies=[
-#         Depends(get_current_user),
-#         Depends(require_permission("branch:view")),
-#     ],
-# )
-# async def get_branch(
-#     branch_id: int, request: Request, db: AsyncSession = Depends(get_db)
-# ):
-#     branch = await branch_crud.get_by_id(db, branch_id, request=request)
-#     if not branch:
-#         raise HTTPException(status_code=404, detail="Branch not found")
-#     return branch
-
-
 @branch_router.post(
     "/",
     response_model=BranchRead,

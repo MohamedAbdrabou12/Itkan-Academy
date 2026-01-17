@@ -244,3 +244,9 @@ class PermissionCode(str, Enum):
 
     # Communication Receive Messages
     COMMUNICATION_RECEIVE_MESSAGES = "communication.receive_messages"
+
+    # Attendance Management
+    STAFF_ATTENDANCE_CHECKIN = "staff_attendance.staff.checkin"
+    STAFF_ATTENDANCE_VIEW = "staff_attendance.staff.view"
+    STAFF_ATTENDANCE_EDIT = "staff_attendance.staff.edit"
+    STAFF_ATTENDANCE_CALENDAR_MANAGE = "staff_attendance.calendar.management"

@@ -1199,5 +1199,37 @@
     "name_ar": "حذف بنك الاسئلة",
     "description": "Delete question bank information",
     "description_ar": "حذف بيانات بنك الاسئلة"
+  },
+  {
+    "id": 1212,
+    "code": "staff_attendance.staff.checkin",
+    "name": "Staff Attendance Checkin",
+    "name_ar": "الحضور والغياب للموظفين",
+    "description": "Staff Attendance Checkin",
+    "description_ar": "الحضور والغياب للموظفين"
+  },
+  {
+    "id": 1213,
+    "code": "staff_attendance.staff.view",
+    "name": "View Staff Attendance",
+    "name_ar": "عرض الحضور والغياب للموظفين",
+    "description": "View staff attendance",
+    "description_ar": "عرض الحضور والغياب للموظفين"
+  },
+  {
+    "id": 1214,
+    "code": "staff_attendance.staff.edit",
+    "name": "Edit Staff Attendance",
+    "name_ar": "تعديل الحضور والغياب للموظفين",
+    "description": "Edit staff attendance",
+    "description_ar": "تعديل الحضور والغياب للموظفين"
+  },
+  {
+    "id": 1215,
+    "code": "staff_attendance.calendar.management",
+    "name": "Staff Attendance Calendar Management",
+    "name_ar": "إدارة تقويم الحضور والغياب للموظفين",
+    "description": "Staff Attendance Calendar Management",
+    "description_ar": "إدارة تقويم الحضور والغياب للموظفين"
   }
 ]

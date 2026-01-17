@@ -10,6 +10,11 @@ import sqlalchemy as sa
 if TYPE_CHECKING:
     from app.modules.classes.models import Class
     from app.modules.users.models import User, UserBranch
+    from app.modules.attendance.models import (
+        SchoolCalendar,
+        AttendanceLog,
+        AttendanceDaily,
+    )
 
 
 class BranchStatus(Enum):
@@ -55,4 +60,13 @@ class Branch(Base):
     # Convenience many-to-many relationship to users using the association table
     users_m2m: Mapped[List[User]] = relationship(
         "User", secondary="user_branches", back_populates="branches", viewonly=True
+    )
+    calendars: Mapped[List["SchoolCalendar"]] = relationship(
+        "SchoolCalendar", back_populates="branch", cascade="all, delete-orphan"
+    )
+    attendance_logs: Mapped[List["AttendanceLog"]] = relationship(
+        "AttendanceLog", back_populates="branch", cascade="all, delete-orphan"
+    )
+    attendance_daily: Mapped[List["AttendanceDaily"]] = relationship(
+        "AttendanceDaily", back_populates="branch", cascade="all, delete-orphan"
     )

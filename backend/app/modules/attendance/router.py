@@ -1,0 +1,342 @@
+from datetime import date, datetime
+from typing import List, Optional
+
+from app.core.auth import get_current_user
+from app.core.authorization import require_permission
+from app.db.session import get_db
+from app.modules.attendance.crud import (
+    attendance_source_crud,
+    calendar_crud,
+    calendar_holiday_crud,
+    calendar_working_day_crud,
+    staff_work_schedule_crud,
+)
+from app.modules.attendance.schemas import (
+    AttendanceSourceCreate,
+    AttendanceSourceRead,
+    CalendarHolidayCreate,
+    CalendarHolidayRead,
+    CalendarWorkingDayCreate,
+    CalendarWorkingDayRead,
+    CheckInRequest,
+    CheckInResponse,
+    CheckOutRequest,
+    CheckOutResponse,
+    SchoolCalendarCreate,
+    SchoolCalendarRead,
+    StaffWorkScheduleCreate,
+    StaffWorkScheduleRead,
+)
+from app.modules.attendance.service import AttendanceService
+from app.modules.permissions.permissions import PermissionCode
+from app.modules.users.models import User
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from sqlalchemy.ext.asyncio import AsyncSession
+
+attendance_router = APIRouter(prefix="/attendance", tags=["Attendance"])
+
+
+# ========== Calendar Management ==========
+@attendance_router.post(
+    "/calendars",
+    response_model=SchoolCalendarRead,
+    status_code=201,
+    dependencies=[
+        Depends(require_permission(PermissionCode.STAFF_ATTENDANCE_CALENDAR_MANAGE))
+    ],
+)
+async def create_calendar(
+    calendar_in: SchoolCalendarCreate,
+    db: AsyncSession = Depends(get_db),
+):
+    """Create a new school calendar."""
+    calendar_data = calendar_in.dict(exclude={"working_days"})
+    calendar = await calendar_crud.create(db, calendar_data)
+
+    # Create working days if provided
+    if calendar_in.working_days:
+        await calendar_working_day_crud.create_bulk(
+            db, calendar.id, [wd.dict() for wd in calendar_in.working_days]
+        )
+
+    await db.refresh(calendar)
+    return SchoolCalendarRead.from_orm(calendar)
+
+
+@attendance_router.get(
+    "/calendars",
+    response_model=List[SchoolCalendarRead],
+    dependencies=[
+        Depends(require_permission(PermissionCode.STAFF_ATTENDANCE_CALENDAR_MANAGE))
+    ],
+)
+async def list_calendars(
+    branch_id: Optional[int] = Query(None),
+    is_active: Optional[bool] = Query(None),
+    db: AsyncSession = Depends(get_db),
+):
+    """List school calendars."""
+    if branch_id:
+        calendars = await calendar_crud.get_by_branch_id(db, branch_id, is_active)
+    else:
+        # Get all calendars (admin only)
+        from app.modules.attendance.models import SchoolCalendar
+        from sqlalchemy import select
+        from sqlalchemy.orm import selectinload
+
+        stmt = (
+            select(SchoolCalendar)
+            .options(
+                selectinload(SchoolCalendar.working_days),
+                selectinload(SchoolCalendar.holidays),
+            )
+        )
+        if is_active is not None:
+            stmt = stmt.where(SchoolCalendar.is_active == is_active)
+        result = await db.execute(stmt)
+        calendars = list(result.scalars().all())
+
+    return [SchoolCalendarRead.from_orm(c) for c in calendars]
+
+
+@attendance_router.get(
+    "/calendars/{calendar_id}/working-days",
+    response_model=List[CalendarWorkingDayRead],
+    dependencies=[
+        Depends(require_permission(PermissionCode.STAFF_ATTENDANCE_CALENDAR_MANAGE))
+    ],
+)
+async def get_working_days(
+    calendar_id: int,
+    db: AsyncSession = Depends(get_db),
+):
+    """Get working days for a calendar."""
+    calendar = await calendar_crud.get_by_id(db, calendar_id)
+    if not calendar:
+        raise HTTPException(status_code=404, detail="Calendar not found")
+
+    working_days = await calendar_working_day_crud.get_by_calendar_id(db, calendar_id)
+    return [CalendarWorkingDayRead.from_orm(wd) for wd in working_days]
+
+
+@attendance_router.post(
+    "/calendars/{calendar_id}/working-days",
+    response_model=List[CalendarWorkingDayRead],
+    dependencies=[
+        Depends(require_permission(PermissionCode.STAFF_ATTENDANCE_CALENDAR_MANAGE))
+    ],
+)
+async def set_working_days(
+    calendar_id: int,
+    working_days: List[CalendarWorkingDayCreate],
+    db: AsyncSession = Depends(get_db),
+):
+    """Set working days for a calendar."""
+    calendar = await calendar_crud.get_by_id(db, calendar_id)
+    if not calendar:
+        raise HTTPException(status_code=404, detail="Calendar not found")
+
+    wd_list = await calendar_working_day_crud.create_bulk(
+        db, calendar_id, [wd.dict() for wd in working_days]
+    )
+    return [CalendarWorkingDayRead.from_orm(wd) for wd in wd_list]
+
+
+@attendance_router.post(
+    "/calendars/{calendar_id}/holidays",
+    response_model=CalendarHolidayRead,
+    status_code=201,
+    dependencies=[
+        Depends(require_permission(PermissionCode.STAFF_ATTENDANCE_CALENDAR_MANAGE))
+    ],
+)
+async def create_holiday(
+    calendar_id: int,
+    holiday_in: CalendarHolidayCreate,
+    db: AsyncSession = Depends(get_db),
+):
+    """Create a holiday for a calendar."""
+    calendar = await calendar_crud.get_by_id(db, calendar_id)
+    if not calendar:
+        raise HTTPException(status_code=404, detail="Calendar not found")
+
+    holiday_data = holiday_in.dict()
+    holiday_data["calendar_id"] = calendar_id
+    holiday = await calendar_holiday_crud.create(db, holiday_data)
+    return CalendarHolidayRead.from_orm(holiday)
+
+
+@attendance_router.get(
+    "/calendars/{calendar_id}/holidays",
+    response_model=List[CalendarHolidayRead],
+    dependencies=[
+        Depends(require_permission(PermissionCode.STAFF_ATTENDANCE_CALENDAR_MANAGE))
+    ],
+)
+async def list_holidays(
+    calendar_id: int,
+    db: AsyncSession = Depends(get_db),
+):
+    """List holidays for a calendar."""
+    holidays = await calendar_holiday_crud.get_by_calendar_id(db, calendar_id)
+    return [CalendarHolidayRead.from_orm(h) for h in holidays]
+
+
+# ========== Work Schedule Management ==========
+@attendance_router.post(
+    "/work-schedules",
+    response_model=StaffWorkScheduleRead,
+    status_code=201,
+    dependencies=[
+        Depends(require_permission(PermissionCode.STAFF_ATTENDANCE_CALENDAR_MANAGE))
+    ],
+)
+async def create_work_schedule(
+    schedule_in: StaffWorkScheduleCreate,
+    db: AsyncSession = Depends(get_db),
+):
+    """Create a work schedule for a user."""
+    schedule_data = schedule_in.dict()
+    schedule = await staff_work_schedule_crud.create(db, schedule_data)
+    return StaffWorkScheduleRead.from_orm(schedule)
+
+
+@attendance_router.get(
+    "/work-schedules/{user_id}",
+    response_model=Optional[StaffWorkScheduleRead],
+    dependencies=[Depends(require_permission(PermissionCode.STAFF_ATTENDANCE_VIEW))],
+)
+async def get_work_schedule(
+    user_id: int,
+    calendar_id: Optional[int] = Query(None),
+    db: AsyncSession = Depends(get_db),
+):
+    """Get work schedule for a user."""
+    schedule = await staff_work_schedule_crud.get_by_user_id(db, user_id, calendar_id)
+    return StaffWorkScheduleRead.from_orm(schedule) if schedule else None
+
+
+# ========== Attendance Logging ==========
+@attendance_router.post(
+    "/check-in",
+    response_model=CheckInResponse,
+    dependencies=[Depends(require_permission(PermissionCode.STAFF_ATTENDANCE_CHECKIN))],
+)
+async def check_in(
+    request: CheckInRequest,
+    req: Request,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Check in for attendance."""
+    user_id = request.user_id or current_user.id
+    branch_id = request.branch_id
+    if not branch_id:
+        branch_id = getattr(req.state, "active_branch_id", None)
+    if not branch_id:
+        raise HTTPException(status_code=400, detail="Branch ID is required")
+
+    timestamp = request.timestamp or datetime.utcnow()
+
+    return await AttendanceService.check_in(
+        db,
+        user_id=user_id,
+        branch_id=branch_id,
+        timestamp=timestamp,
+        source_type=request.source,
+        device_id=request.device_id,
+    )
+
+
+@attendance_router.post(
+    "/check-out",
+    response_model=CheckOutResponse,
+    dependencies=[Depends(require_permission(PermissionCode.STAFF_ATTENDANCE_CHECKIN))],
+)
+async def check_out(
+    request: CheckOutRequest,
+    req: Request,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Check out from attendance."""
+    user_id = request.user_id or current_user.id
+    branch_id = request.branch_id
+    if not branch_id:
+        branch_id = getattr(req.state, "active_branch_id", None)
+    if not branch_id:
+        raise HTTPException(status_code=400, detail="Branch ID is required")
+
+    timestamp = request.timestamp or datetime.utcnow()
+
+    return await AttendanceService.check_out(
+        db,
+        user_id=user_id,
+        branch_id=branch_id,
+        timestamp=timestamp,
+        source_type=request.source,
+        device_id=request.device_id,
+    )
+
+
+# ========== Daily Summary & Reports ==========
+@attendance_router.get(
+    "/daily",
+    dependencies=[Depends(require_permission(PermissionCode.STAFF_ATTENDANCE_VIEW))],
+)
+async def get_daily_attendance(
+    date: Optional[date] = Query(None, description="Date (default: today)"),
+    user_id: Optional[int] = Query(None),
+    branch_id: Optional[int] = Query(None),
+    req: Request = None,
+    db: AsyncSession = Depends(get_db),
+):
+    """Get daily attendance records."""
+    if not branch_id:
+        branch_id = getattr(req.state, "active_branch_id", None) if req else None
+
+    records = await AttendanceService.get_daily_attendance(
+        db, user_id=user_id, branch_id=branch_id, check_date=date
+    )
+    return records
+
+
+@attendance_router.get(
+    "/user/{user_id}",
+    dependencies=[Depends(require_permission(PermissionCode.STAFF_ATTENDANCE_VIEW))],
+)
+async def get_user_attendance(
+    user_id: int,
+    from_date: date = Query(..., description="Start date"),
+    to_date: date = Query(..., description="End date"),
+    branch_id: Optional[int] = Query(None),
+    req: Request = None,
+    db: AsyncSession = Depends(get_db),
+):
+    """Get attendance records for a user in a date range."""
+    if not branch_id:
+        branch_id = getattr(req.state, "active_branch_id", None) if req else None
+
+    records = await AttendanceService.get_user_attendance_range(
+        db, user_id, branch_id, from_date, to_date
+    )
+    return records
+
+
+# ========== Attendance Sources ==========
+@attendance_router.post(
+    "/sources",
+    response_model=AttendanceSourceRead,
+    status_code=201,
+    dependencies=[
+        Depends(require_permission(PermissionCode.STAFF_ATTENDANCE_CALENDAR_MANAGE))
+    ],
+)
+async def create_attendance_source(
+    source_in: AttendanceSourceCreate,
+    db: AsyncSession = Depends(get_db),
+):
+    """Create an attendance source."""
+    source_data = source_in.dict()
+    source = await attendance_source_crud.create(db, source_data)
+    return AttendanceSourceRead.from_orm(source)

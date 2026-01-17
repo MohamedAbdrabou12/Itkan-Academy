@@ -16,6 +16,12 @@ if TYPE_CHECKING:
     from app.modules.students.models import Student
     from app.modules.teachers.models import Teacher
     from app.modules.parents.models import Parent
+    from app.modules.exams.models.exam import Exam
+    from app.modules.attendance.models import (
+        AttendanceLog,
+        AttendanceDaily,
+        StaffWorkSchedule,
+    )
 
 
 class UserStatus(str, Enum):
@@ -106,6 +112,18 @@ class User(Base):
     )
     parent: Mapped[Optional["Parent"]] = relationship(
         "Parent", back_populates="user", uselist=False
+    )
+    created_exams: Mapped[List["Exam"]] = relationship(
+        "Exam", back_populates="creator", cascade="all, delete-orphan"
+    )
+    attendance_logs: Mapped[List["AttendanceLog"]] = relationship(
+        "AttendanceLog", back_populates="user", cascade="all, delete-orphan"
+    )
+    attendance_daily: Mapped[List["AttendanceDaily"]] = relationship(
+        "AttendanceDaily", back_populates="user", cascade="all, delete-orphan"
+    )
+    work_schedules: Mapped[List["StaffWorkSchedule"]] = relationship(
+        "StaffWorkSchedule", back_populates="user", cascade="all, delete-orphan"
     )
 
     @property
