@@ -13,7 +13,7 @@ from app.modules.permissions.permissions import PermissionCode
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-units_router = APIRouter(prefix="/units", tags=["Subject Units"])
+units_router = APIRouter(prefix="/units", tags=["Units"])
 
 
 @units_router.post(

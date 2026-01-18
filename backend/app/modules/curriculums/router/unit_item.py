@@ -16,10 +16,14 @@ unit_items_router = APIRouter(prefix="/unit-items", tags=["Unit Items"])
 
 
 @unit_items_router.get(
-    "/{unit_id}", status_code=status.HTTP_200_OK, response_model=list[UnitItemResponse]
+    "/{unit_id}/lessons",
+    status_code=status.HTTP_200_OK,
+    response_model=list[UnitItemResponse],
 )
-async def get_unit_items(db: Annotated[AsyncSession, Depends(get_db)], unit_id: int):
-    return await unit_item_crud.get_items(db, unit_id)
+async def get_unit_items_lessons(
+    db: Annotated[AsyncSession, Depends(get_db)], unit_id: int
+):
+    return await unit_item_crud.get_lesson_items(db, unit_id)
 
 
 @unit_items_router.post(
