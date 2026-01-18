@@ -2,54 +2,63 @@
   {
     "id": 1001,
     "student_id": 1001,
+    "status": "PASSED",
     "unit_item_id": 1002,
     "evaluation_id": 1001
   },
   {
     "id": 1002,
     "student_id": 1002,
+    "status": "PASSED",
     "unit_item_id": 1002,
     "evaluation_id": 1002
   },
   {
     "id": 1003,
     "student_id": 1003,
+    "status": "FAILED",
     "unit_item_id": 1002,
     "evaluation_id": 1003
   },
   {
     "id": 1004,
     "student_id": 1001,
+    "status": "FAILED",
     "unit_item_id": 1001,
     "evaluation_id": 1004
   },
   {
     "id": 1005,
     "student_id": 1002,
+    "status": "PASSED",
     "unit_item_id": 1001,
     "evaluation_id": 1005
   },
   {
     "id": 1006,
     "student_id": 1003,
+    "status": "PASSED",
     "unit_item_id": 1001,
     "evaluation_id": 1007
   },
   {
     "id": 1007,
     "student_id": 1010,
+    "status": "PASSED",
     "unit_item_id": 1003,
     "evaluation_id": 1007
   },
   {
     "id": 1008,
     "student_id": 1011,
+    "status": "FAILED",
     "unit_item_id": 1003,
     "evaluation_id": 1008
   },
   {
     "id": 1009,
     "student_id": 1012,
+    "status": "PASSED",
     "unit_item_id": 1003,
     "evaluation_id": 1009
   }

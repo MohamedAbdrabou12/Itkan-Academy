@@ -1,8 +1,8 @@
 """20_create_curriculums
 
-Revision ID: 57e30d94daf0
+Revision ID: 08167dbec82f
 Revises: 690108e0a1f8
-Create Date: 2026-01-10 10:59:26.376616
+Create Date: 2026-01-17 14:53:15.078110
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '57e30d94daf0'
+revision = '08167dbec82f'
 down_revision = '690108e0a1f8'
 branch_labels = None
 depends_on = None
@@ -55,6 +55,7 @@ def upgrade() -> None:
     op.create_table('student_progress',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('student_id', sa.Integer(), nullable=False),
+    sa.Column('status', sa.Enum('PASSED', 'FAILED', name='studentprogressstatus'), nullable=False),
     sa.Column('unit_item_id', sa.Integer(), nullable=False),
     sa.Column('evaluation_id', sa.Integer(), nullable=True),
     sa.Column('exam_attempt_id', sa.Integer(), nullable=True),
@@ -67,8 +68,8 @@ def upgrade() -> None:
     )
     op.add_column('classes', sa.Column('curriculum_id', sa.Integer(), nullable=False))
     op.add_column('classes', sa.Column('subject_id', sa.Integer(), nullable=False))
-    op.create_foreign_key(None, 'classes', 'curriculums', ['curriculum_id'], ['id'])
     op.create_foreign_key(None, 'classes', 'subjects', ['subject_id'], ['id'])
+    op.create_foreign_key(None, 'classes', 'curriculums', ['curriculum_id'], ['id'])
     op.add_column('daily_evaluations', sa.Column('unit_item_id', sa.Integer(), nullable=False))
     op.create_foreign_key(None, 'daily_evaluations', 'unit_items', ['unit_item_id'], ['id'], ondelete='CASCADE')
     # ### end Alembic commands ###
