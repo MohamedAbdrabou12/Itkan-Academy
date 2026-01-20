@@ -9,6 +9,7 @@ from app.modules.attendance.models import (
     AttendanceStatus,
     Weekday,
 )
+from app.modules.users.schemas import UserRead
 
 
 # Calendar Schemas
@@ -131,6 +132,11 @@ class StaffWorkScheduleRead(StaffWorkScheduleBase):
 
     class Config:
         from_attributes = True
+
+
+class StaffWorkScheduleReadWithDetails(StaffWorkScheduleRead):
+    user: Optional[UserRead] = None
+    calendar: Optional[SchoolCalendarRead] = None
 
 
 # Attendance Log Schemas

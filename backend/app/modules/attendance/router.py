@@ -26,6 +26,8 @@ from app.modules.attendance.schemas import (
     SchoolCalendarRead,
     StaffWorkScheduleCreate,
     StaffWorkScheduleRead,
+    StaffWorkScheduleReadWithDetails,
+    StaffWorkScheduleUpdate,
 )
 from app.modules.attendance.service import AttendanceService
 from app.modules.permissions.permissions import PermissionCode
@@ -84,12 +86,9 @@ async def list_calendars(
         from sqlalchemy import select
         from sqlalchemy.orm import selectinload
 
-        stmt = (
-            select(SchoolCalendar)
-            .options(
-                selectinload(SchoolCalendar.working_days),
-                selectinload(SchoolCalendar.holidays),
-            )
+        stmt = select(SchoolCalendar).options(
+            selectinload(SchoolCalendar.working_days),
+            selectinload(SchoolCalendar.holidays),
         )
         if is_active is not None:
             stmt = stmt.where(SchoolCalendar.is_active == is_active)
@@ -200,20 +199,45 @@ async def create_work_schedule(
     schedule = await staff_work_schedule_crud.create(db, schedule_data)
     return StaffWorkScheduleRead.from_orm(schedule)
 
+    return StaffWorkScheduleRead.from_orm(schedule) if schedule else None
+
 
 @attendance_router.get(
-    "/work-schedules/{user_id}",
-    response_model=Optional[StaffWorkScheduleRead],
+    "/work-schedules",
+    response_model=list[StaffWorkScheduleReadWithDetails],
     dependencies=[Depends(require_permission(PermissionCode.STAFF_ATTENDANCE_VIEW))],
 )
-async def get_work_schedule(
-    user_id: int,
+async def list_work_schedules(
+    user_id: Optional[int] = Query(None),
     calendar_id: Optional[int] = Query(None),
     db: AsyncSession = Depends(get_db),
 ):
-    """Get work schedule for a user."""
-    schedule = await staff_work_schedule_crud.get_by_user_id(db, user_id, calendar_id)
-    return StaffWorkScheduleRead.from_orm(schedule) if schedule else None
+    """List work schedules."""
+    schedules = await staff_work_schedule_crud.list(db, user_id, calendar_id)
+    return [StaffWorkScheduleReadWithDetails.from_orm(s) for s in schedules]
+
+
+@attendance_router.put(
+    "/work-schedules/{schedule_id}",
+    response_model=StaffWorkScheduleRead,
+    dependencies=[
+        Depends(require_permission(PermissionCode.STAFF_ATTENDANCE_CALENDAR_MANAGE))
+    ],
+)
+async def update_work_schedule(
+    schedule_id: int,
+    schedule_in: StaffWorkScheduleUpdate,
+    db: AsyncSession = Depends(get_db),
+):
+    """Update a work schedule."""
+    schedule = await staff_work_schedule_crud.get_by_id(db, schedule_id)
+    if not schedule:
+        raise HTTPException(status_code=404, detail="Work schedule not found")
+
+    updated_schedule = await staff_work_schedule_crud.update(
+        db, schedule, schedule_in.dict(exclude_unset=True)
+    )
+    return StaffWorkScheduleRead.from_orm(updated_schedule)
 
 
 # ========== Attendance Logging ==========

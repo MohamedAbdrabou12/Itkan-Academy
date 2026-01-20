@@ -14,6 +14,7 @@ from app.modules.attendance.models import (
     SchoolCalendar,
     StaffWorkSchedule,
 )
+from app.modules.users.models import User
 
 
 class CalendarCRUD:
@@ -210,6 +211,13 @@ class StaffWorkScheduleCRUD:
         await db.refresh(schedule)
         return schedule
 
+    async def get_by_id(
+        self, db: AsyncSession, schedule_id: int
+    ) -> Optional[StaffWorkSchedule]:
+        stmt = select(StaffWorkSchedule).where(StaffWorkSchedule.id == schedule_id)
+        result = await db.execute(stmt)
+        return result.scalar_one_or_none()
+
     async def get_by_user_id(
         self, db: AsyncSession, user_id: int, calendar_id: Optional[int] = None
     ) -> Optional[StaffWorkSchedule]:
@@ -219,6 +227,30 @@ class StaffWorkScheduleCRUD:
         stmt = stmt.options(joinedload(StaffWorkSchedule.calendar))
         result = await db.execute(stmt)
         return result.scalar_one_or_none()
+
+    async def list(
+        self,
+        db: AsyncSession,
+        user_id: Optional[int] = None,
+        calendar_id: Optional[int] = None,
+    ) -> List[StaffWorkSchedule]:
+        stmt = select(StaffWorkSchedule)
+        if user_id:
+            stmt = stmt.where(StaffWorkSchedule.user_id == user_id)
+        if calendar_id:
+            stmt = stmt.where(StaffWorkSchedule.calendar_id == calendar_id)
+        stmt = stmt.options(
+            joinedload(StaffWorkSchedule.calendar).selectinload(
+                SchoolCalendar.working_days
+            ),
+            joinedload(StaffWorkSchedule.calendar).selectinload(
+                SchoolCalendar.holidays
+            ),
+            joinedload(StaffWorkSchedule.user).joinedload(User.role),
+            joinedload(StaffWorkSchedule.user).selectinload(User.branches),
+        )
+        result = await db.execute(stmt)
+        return list(result.scalars().all())
 
     async def update(
         self, db: AsyncSession, schedule: StaffWorkSchedule, data: dict
