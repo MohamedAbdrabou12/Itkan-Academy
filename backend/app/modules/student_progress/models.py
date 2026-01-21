@@ -1,10 +1,8 @@
 from datetime import datetime
-from enum import Enum
 from typing import TYPE_CHECKING
 
 from app.db.base import Base
 from sqlalchemy import DateTime, ForeignKey
-from sqlalchemy import Enum as SQLEnum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 if TYPE_CHECKING:
@@ -14,20 +12,12 @@ if TYPE_CHECKING:
     from app.modules.students.models import Student
 
 
-class StudentProgressStatus(Enum):
-    PASSED = "passed"
-    FAILED = "failed"
-
-
 class StudentProgress(Base):
     __tablename__ = "student_progress"
 
     id: Mapped[int] = mapped_column(primary_key=True, nullable=False)
     student_id: Mapped[int] = mapped_column(
         ForeignKey("students.id", ondelete="CASCADE"), nullable=False
-    )
-    status: Mapped[StudentProgressStatus] = mapped_column(
-        SQLEnum(StudentProgressStatus), nullable=False
     )
     unit_item_id: Mapped[int] = mapped_column(
         ForeignKey("unit_items.id", ondelete="CASCADE"), nullable=False

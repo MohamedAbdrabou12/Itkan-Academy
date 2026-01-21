@@ -3,6 +3,9 @@ from app.modules.curriculums.models.curriculum import Curriculum
 from app.modules.curriculums.models.subject import Subject
 from app.modules.curriculums.models.unit import Unit
 from app.modules.curriculums.models.unit_item import UnitItem
+from app.modules.evaluations.constants import MAX_GRADE
+from app.modules.evaluations.models import AttendanceStatus, Evaluation
+from app.modules.exams.models.exam_attempt import ExamAttempt
 from app.modules.student_progress.models import StudentProgress
 from app.modules.student_progress.schemas import (
     StudentProgressByStudentList,
@@ -11,6 +14,7 @@ from app.modules.student_progress.schemas import (
     StudentProgressEvaluationInfo,
     StudentProgressExamAttemptInfo,
     StudentProgressExamInfo,
+    StudentProgressStatus,
     StudentProgressStudentInfo,
     StudentProgressUnitInfo,
     StudentProgressUnitItemInfo,
@@ -22,23 +26,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 
-def hash_student_subject_curriculum_id(stud: int, subj: int, curr: int) -> int:
-    full_hash = stud
-    full_hash <<= 32
-    full_hash += subj
-    full_hash <<= 32
-    full_hash += curr
-    return full_hash
-
-
-def hash_subject_curriculum_id(subj: int, curr: int) -> int:
-    full_hash = subj
-    full_hash <<= 32
-    full_hash += curr
-    return full_hash
-
-
 class StudentProgressCRUD:
+    def hash_subject_curriculum_id(self, subj: int, curr: int) -> int:
+        full_hash = subj
+        full_hash <<= 32
+        full_hash += curr
+        return full_hash
+
     async def get_user(self, db: AsyncSession, user_id: int) -> User:
         return (
             await db.execute(
@@ -54,7 +48,7 @@ class StudentProgressCRUD:
         student_id: int,
     ) -> list[StudentProgressBySubjectList]:
         query = (
-            select(StudentProgress, Subject.name, Subject.id, Curriculum.id)
+            select(StudentProgress, Subject.name, Subject.id, Curriculum.name, Curriculum.id)
             .select_from(StudentProgress)
             .join(StudentClass, StudentClass.student_id == student_id)
             .join(Class, Class.id == StudentClass.class_id)
@@ -71,14 +65,15 @@ class StudentProgressCRUD:
         # hashes to aid in differentiating between subjects when curriculums differ
         subject_curriculum_hashes: set[int] = set()
 
-        # map subject curriculum hash -> (subject name, unit items)
-        subject_info_map: dict[int, tuple[str, list[UnitItem]]] = {}
+        # map subject curriculum hash -> (subject name, curriculum name, unit items)
+        subject_info_map: dict[int, tuple[str, str, list[UnitItem]]] = {}
         for entry in entries:
             subject_name: str = entry[1]
             subject_id: int = entry[2]
-            curriculum_id: int = entry[3]
+            curriculum_name: str = entry[3]
+            curriculum_id: int = entry[4]
 
-            full_hash = hash_subject_curriculum_id(subject_id, curriculum_id)
+            full_hash = self.hash_subject_curriculum_id(subject_id, curriculum_id)
 
             if subject_info_map.get(full_hash) is None:
                 query = (
@@ -87,28 +82,24 @@ class StudentProgressCRUD:
                     .where(Unit.subject_id == subject_id)
                 )
                 result = await db.execute(query)
-                subject_info_map[full_hash] = (subject_name, result.scalars().all())
+                subject_info_map[full_hash] = (
+                    subject_name,
+                    curriculum_name,
+                    result.scalars().all(),
+                )
 
             subject_curriculum_hashes.add(full_hash)
 
         for i, full_hash in enumerate(subject_curriculum_hashes):
-            subject_name, unit_items = subject_info_map[full_hash]
+            subject_name, curriculum_name, unit_items = subject_info_map[full_hash]
 
             progress_response.append(
                 StudentProgressBySubjectList(
                     subject_id=subject_id,
+                    curriculum_name=curriculum_name,
                     subject_name=subject_name,
                     unit_items_info=[
-                        StudentProgressUnitItemInfo(
-                            id=unit_item.id,
-                            title=unit_item.title,
-                            type=unit_item.type,
-                            unit_info=StudentProgressUnitInfo(
-                                id=unit_item.unit_id,
-                                title=unit_item.unit.title,
-                            ),
-                        )
-                        for unit_item in unit_items
+                        self.serialize_unit_item(unit_item) for unit_item in unit_items
                     ],
                     items=[],
                 )
@@ -118,49 +109,7 @@ class StudentProgressCRUD:
                 if entry[2] == subject_id:
                     progress: StudentProgress = entry[0]
                     progress_response[i].items.append(
-                        StudentProgressBySubjectEntry(
-                            id=progress.id,
-                            student_info=StudentProgressStudentInfo(
-                                id=progress.student_id,
-                                name=progress.student.user.full_name,
-                            ),
-                            status=progress.status,
-                            unit_item_info=StudentProgressUnitItemInfo(
-                                id=progress.unit_item_id,
-                                title=progress.unit_item.title,
-                                type=progress.unit_item.type,
-                                unit_info=StudentProgressUnitInfo(
-                                    id=progress.unit_item.unit_id,
-                                    title=progress.unit_item.unit.title,
-                                ),
-                            ),
-                            evaluation_info=StudentProgressEvaluationInfo(
-                                id=progress.evaluation_id,
-                                attendance_status=progress.evaluation.attendance_status,
-                                evaluation_grades=progress.evaluation.evaluation_grades,
-                                date=progress.evaluation.date,
-                            )
-                            if progress.evaluation_id is not None
-                            else None,
-                            exam_attempt_info=StudentProgressExamAttemptInfo(
-                                id=progress.exam_attempt_id,
-                                exam_info=StudentProgressExamInfo(
-                                    id=progress.exam_attempt.exam_id,
-                                    title=progress.exam_attempt.exam.title,
-                                    duration_minutes=progress.exam_attempt.exam.duration_minutes,
-                                    start_time=progress.exam_attempt.exam.start_time,
-                                    end_time=progress.exam_attempt.exam.end_time,
-                                    total_marks=progress.exam_attempt.exam.total_marks,
-                                ),
-                                status=progress.exam_attempt.status,
-                                start_time=progress.exam_attempt.start_time,
-                                end_time=progress.exam_attempt.end_time,
-                                score=progress.exam_attempt.score,
-                            )
-                            if progress.exam_attempt_id is not None
-                            else None,
-                            created_at=progress.created_at,
-                        )
+                        self.serialize_progress_subject_entry(progress)
                     )
 
         return progress_response
@@ -171,7 +120,7 @@ class StudentProgressCRUD:
         student_ids: list[int],
     ) -> list[StudentProgressByStudentList]:
         query = (
-            select(StudentProgress, Subject.name, Subject.id, Curriculum.id)
+            select(StudentProgress, Subject.name, Subject.id, Curriculum.name, Curriculum.id)
             .select_from(StudentProgress)
             .distinct()
             .join(StudentClass, StudentClass.student_id.in_(student_ids))
@@ -189,18 +138,17 @@ class StudentProgressCRUD:
         # map student id -> (student name, student id, subject curriculum hash set)
         students_map: dict[int, tuple[str, int, set[int]]] = {}
 
-        # map subject curriculum hash -> (subject name, unit items)
-        subject_info_map: dict[int, tuple[str, list[UnitItem]]] = {}
+        # map subject curriculum hash -> (subject name, curriculum, unit items)
+        subject_info_map: dict[int, tuple[str, str, list[UnitItem]]] = {}
 
         for entry in entries:
             progress: StudentProgress = entry[0]
             subject_name: str = entry[1]
             subject_id: int = entry[2]
-            curriculum_id: int = entry[3]
+            curriculum_name: str = entry[3]
+            curriculum_id: int = entry[4]
 
-            full_hash = hash_student_subject_curriculum_id(
-                progress.student_id, subject_id, curriculum_id
-            )
+            full_hash = self.hash_subject_curriculum_id(subject_id, curriculum_id)
 
             if subject_info_map.get(full_hash) is None:
                 query = (
@@ -211,6 +159,7 @@ class StudentProgressCRUD:
                 result = await db.execute(query)
                 subject_info_map[full_hash] = (
                     subject_name,
+                    curriculum_name,
                     result.scalars().all(),
                 )
 
@@ -233,23 +182,15 @@ class StudentProgressCRUD:
             )
 
             for j, full_hash in enumerate(subject_curriculum_hash_set):
-                subject_name, unit_items = subject_info_map[full_hash]
+                subject_name, curriculum_name, unit_items = subject_info_map[full_hash]
 
                 progress_response[i].groups.append(
                     StudentProgressBySubjectList(
                         subject_id=subject_id,
                         subject_name=subject_name,
+                        curriculum_name=curriculum_name,
                         unit_items_info=[
-                            StudentProgressUnitItemInfo(
-                                id=unit_item.id,
-                                title=unit_item.title,
-                                type=unit_item.type,
-                                unit_info=StudentProgressUnitInfo(
-                                    id=unit_item.unit_id,
-                                    title=unit_item.unit.title,
-                                ),
-                            )
-                            for unit_item in unit_items
+                            self.serialize_unit_item(unit_item) for unit_item in unit_items
                         ],
                         items=[],
                     )
@@ -259,52 +200,96 @@ class StudentProgressCRUD:
                     if entry[0].student_id == student_id and entry[2] == subject_id:
                         progress: StudentProgress = entry[0]
                         progress_response[i].groups[j].items.append(
-                            StudentProgressBySubjectEntry(
-                                id=progress.id,
-                                student_info=StudentProgressStudentInfo(
-                                    id=progress.student_id,
-                                    name=progress.student.user.full_name,
-                                ),
-                                status=progress.status,
-                                unit_item_info=StudentProgressUnitItemInfo(
-                                    id=progress.unit_item_id,
-                                    title=progress.unit_item.title,
-                                    type=progress.unit_item.type,
-                                    unit_info=StudentProgressUnitInfo(
-                                        id=progress.unit_item.unit_id,
-                                        title=progress.unit_item.unit.title,
-                                    ),
-                                ),
-                                evaluation_info=StudentProgressEvaluationInfo(
-                                    id=progress.evaluation_id,
-                                    attendance_status=progress.evaluation.attendance_status,
-                                    evaluation_grades=progress.evaluation.evaluation_grades,
-                                    date=progress.evaluation.date,
-                                )
-                                if progress.evaluation_id is not None
-                                else None,
-                                exam_attempt_info=StudentProgressExamAttemptInfo(
-                                    id=progress.exam_attempt_id,
-                                    exam_info=StudentProgressExamInfo(
-                                        id=progress.exam_attempt.exam_id,
-                                        title=progress.exam_attempt.exam.title,
-                                        duration_minutes=progress.exam_attempt.exam.duration_minutes,
-                                        start_time=progress.exam_attempt.exam.start_time,
-                                        end_time=progress.exam_attempt.exam.end_time,
-                                        total_marks=progress.exam_attempt.exam.total_marks,
-                                    ),
-                                    status=progress.exam_attempt.status,
-                                    start_time=progress.exam_attempt.start_time,
-                                    end_time=progress.exam_attempt.end_time,
-                                    score=progress.exam_attempt.score,
-                                )
-                                if progress.exam_attempt_id is not None
-                                else None,
-                                created_at=progress.created_at,
-                            )
+                            self.serialize_progress_subject_entry(progress)
                         )
 
         return progress_response
+
+    def serialize_unit_item(self, unit_item: UnitItem) -> StudentProgressUnitItemInfo:
+        return StudentProgressUnitItemInfo(
+            id=unit_item.id,
+            title=unit_item.title,
+            type=unit_item.type,
+            unit_info=StudentProgressUnitInfo(
+                id=unit_item.unit_id,
+                title=unit_item.unit.title,
+            ),
+        )
+
+    def evaluation_progress_status(self, evaluation: Evaluation) -> StudentProgressStatus:
+        arrived = (
+            evaluation.attendance_status != AttendanceStatus.ABSENT != AttendanceStatus.EXCUSED
+        )
+
+        grade_requirement_fullfilled = sum(ev["grade"] for ev in evaluation.evaluation_grades) >= (
+            MAX_GRADE * len(evaluation.evaluation_grades) / 2
+        )
+
+        return (
+            StudentProgressStatus.PASSED
+            if arrived and grade_requirement_fullfilled
+            else StudentProgressStatus.FAILED
+        )
+
+    def exam_attempt_progress_status(self, exam_attempt: ExamAttempt) -> StudentProgressStatus:
+        score_requirement_fullfilled = exam_attempt.score >= (exam_attempt.exam.total_marks / 2)
+        return (
+            StudentProgressStatus.PASSED
+            if score_requirement_fullfilled
+            else StudentProgressStatus.FAILED
+        )
+
+    def serialize_progress_subject_entry(
+        self, progress: StudentProgress
+    ) -> StudentProgressBySubjectEntry:
+        status = StudentProgressStatus.PASSED
+        status_checks = [
+            (progress.evaluation, self.evaluation_progress_status),
+            (progress.exam_attempt, self.exam_attempt_progress_status),
+        ]
+
+        for item, func in status_checks:
+            if item:
+                status = func(item)
+
+            if status == StudentProgressStatus.FAILED:
+                break
+
+        return StudentProgressBySubjectEntry(
+            id=progress.id,
+            student_info=StudentProgressStudentInfo(
+                id=progress.student_id,
+                name=progress.student.user.full_name,
+            ),
+            status=status,
+            unit_item_info=self.serialize_unit_item(progress.unit_item),
+            evaluation_info=StudentProgressEvaluationInfo(
+                id=progress.evaluation_id,
+                attendance_status=progress.evaluation.attendance_status,
+                evaluation_grades=progress.evaluation.evaluation_grades,
+                date=progress.evaluation.date,
+            )
+            if progress.evaluation_id is not None
+            else None,
+            exam_attempt_info=StudentProgressExamAttemptInfo(
+                id=progress.exam_attempt_id,
+                exam_info=StudentProgressExamInfo(
+                    id=progress.exam_attempt.exam_id,
+                    title=progress.exam_attempt.exam.title,
+                    duration_minutes=progress.exam_attempt.exam.duration_minutes,
+                    start_time=progress.exam_attempt.exam.start_time,
+                    end_time=progress.exam_attempt.exam.end_time,
+                    total_marks=progress.exam_attempt.exam.total_marks,
+                ),
+                status=progress.exam_attempt.status,
+                start_time=progress.exam_attempt.start_time,
+                end_time=progress.exam_attempt.end_time,
+                score=progress.exam_attempt.score,
+            )
+            if progress.exam_attempt_id is not None
+            else None,
+            created_at=progress.created_at,
+        )
 
 
 student_progress_crud = StudentProgressCRUD()

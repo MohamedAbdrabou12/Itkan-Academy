@@ -12,6 +12,7 @@ from app.modules.classes.schemas import (
     ClassStudentsResponse,
     ClassUpdate,
 )
+from app.modules.curriculums.schemas.subject import Subject
 from app.modules.permissions.permissions import PermissionCode
 from app.modules.students.models import Student, StudentClass
 from app.modules.teachers.models import Teacher
@@ -150,7 +151,22 @@ async def get_classes_by_branchs(
     classes = await class_crud.get_class_by_branch(db, branch_ids=branch_ids)
     if not classes:
         raise HTTPException(status_code=404, detail="No classes found for this branch")
-    return [ClassRead.from_orm(c) for c in classes]
+    return [
+        ClassRead(
+            id=c.id,
+            branch_id=c.branch_id,
+            curriculum_id=c.curriculum_id,
+            subject_id=c.subject_id,
+            name=c.name,
+            schedule=c.schedule,
+            evaluation_config=c.evaluation_config,
+            created_at=c.created_at,
+            updated_at=c.updated_at,
+            status=c.status,
+            subject=Subject(id=c.subject_id, name=c.subject.name),
+        )
+        for c in classes
+    ]
 
 
 @classes_router.get("/{class_id}", response_model=ClassRead)

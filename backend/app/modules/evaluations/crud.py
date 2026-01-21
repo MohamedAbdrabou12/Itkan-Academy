@@ -19,9 +19,7 @@ class DailyEvaluationCRUD:
     async def get_all(
         self, db: AsyncSession, recorded_by_user_id: int, date: date | None = None
     ) -> Sequence[Evaluation]:
-        query = select(Evaluation).where(
-            Evaluation.recorded_by_user_id == recorded_by_user_id
-        )
+        query = select(Evaluation).where(Evaluation.recorded_by_user_id == recorded_by_user_id)
 
         if date is not None:
             query = query.where(Evaluation.date == date)
@@ -39,7 +37,7 @@ class DailyEvaluationCRUD:
         branch_id: int,
         bulk_data: BulkEvaluationCreate,
     ) -> int:
-        evaluations_to_create = []
+        evaluations_to_create: list[Evaluation] = []
 
         # Ensure grades are within range and create evaluation objects
         for student_id, eval_data in bulk_data.records.items():
@@ -61,19 +59,18 @@ class DailyEvaluationCRUD:
             evaluations_to_create.append(evaluation)
 
         if evaluations_to_create:
-            db.add_all(evaluations_to_create)
-            await db.commit()
-
-            progress_to_create = []
-            for evaluation in evaluations_to_create:
-                await db.refresh(evaluation)
-                progress_to_create.append(
-                    StudentProgress(
-                        student_id=evaluation.student_id,
-                        unit_item_id=bulk_data.unit_item_id,
-                        evaluation_id=evaluation.id,
-                    )
+            progress_to_create = [
+                StudentProgress(
+                    student_id=evaluation.student_id,
+                    unit_item_id=bulk_data.unit_item_id,
+                    evaluation_id=evaluation.id,
                 )
+                for evaluation in evaluations_to_create
+            ]
+
+            db.add_all(evaluations_to_create)
+            db.add_all(progress_to_create)
+            await db.commit()
 
         return len(evaluations_to_create)
 

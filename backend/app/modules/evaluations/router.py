@@ -120,12 +120,13 @@ async def bulk_create_evaluations(
             bulk_data=bulk_data,
         )
         await db.commit()
-    except Exception:
+    except Exception as error:
         await db.rollback()
+        print(error)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="خطأ في إنشاء التقييمات",
-        )
+        ) from error
 
     return {
         "message": "تم تقييم الطلاب بنجاح",

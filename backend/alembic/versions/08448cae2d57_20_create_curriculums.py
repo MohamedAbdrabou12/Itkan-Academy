@@ -1,8 +1,8 @@
 """20_create_curriculums
 
-Revision ID: 08167dbec82f
+Revision ID: 08448cae2d57
 Revises: 690108e0a1f8
-Create Date: 2026-01-17 14:53:15.078110
+Create Date: 2026-01-20 12:31:00.256416
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '08167dbec82f'
+revision = '08448cae2d57'
 down_revision = '690108e0a1f8'
 branch_labels = None
 depends_on = None
@@ -55,7 +55,6 @@ def upgrade() -> None:
     op.create_table('student_progress',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('student_id', sa.Integer(), nullable=False),
-    sa.Column('status', sa.Enum('PASSED', 'FAILED', name='studentprogressstatus'), nullable=False),
     sa.Column('unit_item_id', sa.Integer(), nullable=False),
     sa.Column('evaluation_id', sa.Integer(), nullable=True),
     sa.Column('exam_attempt_id', sa.Integer(), nullable=True),

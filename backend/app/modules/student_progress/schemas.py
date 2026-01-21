@@ -1,9 +1,9 @@
 from datetime import date, datetime
+from enum import Enum
 
 from app.modules.curriculums.models.unit_item import UnitItemType
 from app.modules.evaluations.models import AttendanceStatus
 from app.modules.exams.models.exam_attempt import ExamAttemptStatus
-from app.modules.student_progress.models import StudentProgressStatus
 from pydantic import BaseModel
 
 
@@ -40,6 +40,11 @@ class StudentProgressExamInfo(BaseModel):
     total_marks: int
 
 
+class StudentProgressStatus(Enum):
+    PASSED = "passed"
+    FAILED = "failed"
+
+
 class StudentProgressExamAttemptInfo(BaseModel):
     id: int
     exam_info: StudentProgressExamInfo
@@ -62,6 +67,7 @@ class StudentProgressBySubjectEntry(BaseModel):
 class StudentProgressBySubjectList(BaseModel):
     subject_id: int
     subject_name: str
+    curriculum_name: str
     unit_items_info: list[StudentProgressUnitItemInfo]
     items: list[StudentProgressBySubjectEntry]
 
