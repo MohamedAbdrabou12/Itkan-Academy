@@ -24,6 +24,7 @@ from app.modules.attendance.schemas import (
     CheckOutResponse,
     SchoolCalendarCreate,
     SchoolCalendarRead,
+    SchoolCalendarUpdate,
     StaffWorkScheduleCreate,
     StaffWorkScheduleRead,
     StaffWorkScheduleReadWithDetails,
@@ -98,6 +99,65 @@ async def list_calendars(
     return [SchoolCalendarRead.from_orm(c) for c in calendars]
 
 
+@attendance_router.put(
+    "/calendars/{calendar_id}",
+    response_model=SchoolCalendarRead,
+    dependencies=[
+        Depends(require_permission(PermissionCode.STAFF_ATTENDANCE_CALENDAR_MANAGE))
+    ],
+)
+async def update_calendar(
+    calendar_id: int,
+    calendar_in: SchoolCalendarUpdate,
+    db: AsyncSession = Depends(get_db),
+):
+    """Update a school calendar."""
+    calendar = await calendar_crud.get_by_id(db, calendar_id)
+    if not calendar:
+        raise HTTPException(status_code=404, detail="التقويم غير موجود")
+
+    updated_calendar = await calendar_crud.update(
+        db, calendar, calendar_in.dict(exclude_unset=True)
+    )
+    return SchoolCalendarRead.from_orm(updated_calendar)
+
+
+@attendance_router.delete(
+    "/calendars/{calendar_id}",
+    dependencies=[
+        Depends(require_permission(PermissionCode.STAFF_ATTENDANCE_CALENDAR_MANAGE))
+    ],
+)
+async def delete_calendar(
+    calendar_id: int,
+    db: AsyncSession = Depends(get_db),
+):
+    """Delete a school calendar."""
+    calendar = await calendar_crud.get_by_id(db, calendar_id)
+    if not calendar:
+        raise HTTPException(status_code=404, detail="Calendar not found")
+
+    # Check for linked work schedules
+    from app.modules.attendance.models import StaffWorkSchedule
+    from sqlalchemy import select, func
+
+    stmt = (
+        select(func.count())
+        .select_from(StaffWorkSchedule)
+        .where(StaffWorkSchedule.calendar_id == calendar_id)
+    )
+    result = await db.execute(stmt)
+    count = result.scalar()
+    if count > 0:
+        raise HTTPException(
+            status_code=400,
+            detail="لا يمكن حذف التقويم لأنه مرتبط بجداول عمل.",
+        )
+
+    await calendar_crud.delete(db, calendar_id)
+    return {"detail": "تم حذف التقويم بنجاح"}
+
+
 @attendance_router.get(
     "/calendars/{calendar_id}/working-days",
     response_model=List[CalendarWorkingDayRead],
@@ -112,7 +172,7 @@ async def get_working_days(
     """Get working days for a calendar."""
     calendar = await calendar_crud.get_by_id(db, calendar_id)
     if not calendar:
-        raise HTTPException(status_code=404, detail="Calendar not found")
+        raise HTTPException(status_code=404, detail="التقويم غير موجود")
 
     working_days = await calendar_working_day_crud.get_by_calendar_id(db, calendar_id)
     return [CalendarWorkingDayRead.from_orm(wd) for wd in working_days]
@@ -238,6 +298,25 @@ async def update_work_schedule(
         db, schedule, schedule_in.dict(exclude_unset=True)
     )
     return StaffWorkScheduleRead.from_orm(updated_schedule)
+
+
+@attendance_router.delete(
+    "/work-schedules/{schedule_id}",
+    dependencies=[
+        Depends(require_permission(PermissionCode.STAFF_ATTENDANCE_CALENDAR_MANAGE))
+    ],
+)
+async def delete_work_schedule(
+    schedule_id: int,
+    db: AsyncSession = Depends(get_db),
+):
+    """Delete a work schedule."""
+    schedule = await staff_work_schedule_crud.get_by_id(db, schedule_id)
+    if not schedule:
+        raise HTTPException(status_code=404, detail="Work schedule not found")
+
+    await staff_work_schedule_crud.delete(db, schedule_id)
+    return {"detail": "تم حذف جدول العمل بنجاح"}
 
 
 # ========== Attendance Logging ==========
