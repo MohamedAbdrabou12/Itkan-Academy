@@ -44,14 +44,12 @@ class Exam(Base):
     created_by: Mapped[int] = mapped_column(ForeignKey("users.id"))
 
     # Relationships
-    class_: Mapped["Class"] = relationship(lazy="selectin")
-    branch: Mapped["Branch"] = relationship(lazy="selectin")
-    creator: Mapped["User"] = relationship(lazy="selectin")
+    class_: Mapped["Class"] = relationship(back_populates="exams")
+    creator: Mapped["User"] = relationship(back_populates="created_exams")
     questions: Mapped[List["ExamQuestion"]] = relationship(
         "ExamQuestion",
         back_populates="exam",
         cascade="all, delete-orphan",
-        lazy="selectin",
     )
     attempts: Mapped[List["ExamAttempt"]] = relationship(
         "ExamAttempt", back_populates="exam", cascade="all, delete-orphan"

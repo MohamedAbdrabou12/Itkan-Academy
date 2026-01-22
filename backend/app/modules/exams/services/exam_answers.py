@@ -13,6 +13,7 @@ from app.modules.exams.schemas.exam_answer import (
     ExamAnswerBulkItemSubmit,
 )
 from app.modules.exams.crud.exam_answer import exam_answer_crud
+from app.modules.question_bank.models import QuestionType
 
 
 class ExamAnswerService:
@@ -26,7 +27,7 @@ class ExamAnswerService:
         attempt = await exam_attempt_crud.get_with_user(db, attempt_id, user)
 
         if not attempt:
-            raise HTTPException(status_code=404, detail="Exam attempt not found")
+            raise HTTPException(status_code=404, detail="حدث خطأ اثناء تسجيل الامتحان")
         if attempt.student_id != user.id:
             raise HTTPException(
                 status_code=403,
@@ -35,38 +36,37 @@ class ExamAnswerService:
         if attempt.status != ExamAttemptStatus.STARTED:
             raise HTTPException(
                 status_code=400,
-                detail="Cannot submit answers for an exam that is not in progress",
+                detail="قمت بتسليم هذا الامتحان من قبل",
             )
 
         # check if the exam exists
-        exam = await exam_crud.get(db, attempt.exam_id, user)
+        exam = await exam_crud.get_exam_by_id(db, attempt.exam_id)
         if not exam:
-            raise HTTPException(status_code=404, detail="Exam not found")
+            raise HTTPException(status_code=404, detail="الامتحان غير موجود")
 
         # check if the exam answer is not submitted after the end date of the exam
         exam_end_time = exam.end_time
         if exam_end_time is None:
             raise HTTPException(
                 status_code=400,
-                detail="Exam end time is not set. Cannot submit answers.",
+                detail="حدث خطأ : لايمكن تحديد وقت انتهاء الامتحان",
             )
         if exam_end_time < datetime.now(timezone.utc):
             raise HTTPException(
                 status_code=400,
-                detail="Cannot submit answers after the exam end time",
+                detail="لا يمكن تسليم الامحان بعد انتهاء الوقت",
             )
 
         # Validate that all questions in the bulk submission belong to the exam of this attempt
-        exam_questions = await exam_question_crud.get_multi_by_exam(
-            db, exam_id=attempt.exam_id
-        )
-        exam_question_ids = {q.question_id for q in exam_questions}
+        exam_questions = exam.questions
+
+        exam_question_ids = {q.id for q in exam_questions}
 
         for answer_item in answers_in.answers:
             if answer_item.question_id not in exam_question_ids:
                 raise HTTPException(
                     status_code=400,
-                    detail=f"Question ID {answer_item.question_id} does not belong to this exam.",
+                    detail="لا يمكن تسليم اسئلة غير موجودة بالامتحان",
                 )
 
         # in the mcq question, check if it's value is one of the options
@@ -75,12 +75,21 @@ class ExamAnswerService:
                 (q for q in exam_questions if q.question_id == answer_item.question_id),
                 None,
             )
-            if question and question.question.type == "mcq":
-                options = question.question.options or []
+            if question and (
+                question.question.type == QuestionType.MCQ
+                or question.question.type == QuestionType.TRUE_FALSE
+            ):
+                options = []
+                for option in question.question.options or []:
+                    if option:
+                        key = option.get("key")
+                        if key:
+                            options.append(key)
+
                 if answer_item.selected_option not in options:
                     raise HTTPException(
                         status_code=400,
-                        detail=f"Selected option '{answer_item.selected_option}' is not valid for question ID {answer_item.question_id}.",
+                        detail=f"الاختيار {answer_item.selected_option} غير موجود بين الخيارات للسؤال {question.question_id}",
                     )
 
         # change exam_attempt status to submitted and set the end-time
@@ -95,10 +104,13 @@ class ExamAnswerService:
         # set the marks if the question type is mcq and has the correct answer
         for answer in answers:
             question = next(
-                (q for q in exam_questions if q.question_id == answer.question_id),
+                (q for q in exam_questions if q.id == answer.question_id),
                 None,
             )
-            if question and question.question.type == "mcq":
+            if question and (
+                question.question.type == QuestionType.MCQ
+                or question.question.type == QuestionType.TRUE_FALSE
+            ):
                 if (
                     question.question.correct_answer is not None
                     and answer.selected_option == question.question.correct_answer

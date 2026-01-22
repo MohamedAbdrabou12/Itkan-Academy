@@ -11,12 +11,14 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 # Avoid circular imports
 if TYPE_CHECKING:
-    from app.modules.branches.models import Branch
     from app.modules.curriculums.models.curriculum import Curriculum
     from app.modules.curriculums.models.subject import Subject
-    from app.modules.evaluations.models import Evaluation
-    from app.modules.students.models import Student, StudentClass
-    from app.modules.teachers.models import Teacher, TeacherClass
+
+    from backend.backend.app.modules.branches.models import Branch
+    from backend.backend.app.modules.evaluations.models import Evaluation
+    from backend.backend.app.modules.exams.models.exam import Exam
+    from backend.backend.app.modules.students.models import Student, StudentClass
+    from backend.backend.app.modules.teachers.models import Teacher, TeacherClass
 
 
 class ClassStatus(Enum):
@@ -77,3 +79,4 @@ class Class(Base):
         back_populates="class_",
         cascade="all, delete-orphan",
     )
+    exams: Mapped[list["Exam"]] = relationship("Exam", back_populates="class_")

@@ -46,9 +46,7 @@ class QuestionBank(Base):
         String(20), default=QuestionDifficulty.MEDIUM
     )
 
-    options: Mapped[Optional[Dict[QuestionOptions, str]]] = mapped_column(
-        JSON, nullable=True
-    )
+    options: Mapped[Optional[list[dict[str, str]]]] = mapped_column(JSON, nullable=True)
     correct_answer: Mapped[Optional[QuestionOptions]] = mapped_column(
         String(20), nullable=True
     )
@@ -74,5 +72,5 @@ class QuestionBank(Base):
     )
 
     # Relationships
-    branch: Mapped[Branch] = relationship("Branch", lazy="selectin")
-    creator: Mapped[Optional[User]] = relationship("User", lazy="selectin")
+    branch: Mapped[Branch] = relationship("Branch")
+    creator: Mapped[Optional[User]] = relationship("User")
