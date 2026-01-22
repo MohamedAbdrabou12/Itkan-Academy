@@ -10,6 +10,7 @@ from app.modules.users.crud import user_crud
 from app.modules.users.models import User, UserBranch, UserStatus
 from app.modules.users.schemas import (
     BranchInfo,
+    UserCreate,
 )
 from app.services.notification_service.workrs.worker import send_notification_task
 from fastapi import HTTPException
@@ -162,7 +163,7 @@ class StudentService:
         role_res = await db.execute(select(Role).where(Role.name.ilike("student")))
         student_role = role_res.scalar_one_or_none()
 
-        user_payload = UserCreateSchema(
+        user_payload = UserCreate(
             full_name=student_in.full_name,
             email=student_in.email,
             phone=student_in.phone,

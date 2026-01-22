@@ -2,6 +2,7 @@ from datetime import date
 from typing import Union
 
 from app.modules.classes.models import Class
+from app.modules.curriculums.models.unit_item import UnitItem, UnitItemType
 from app.modules.evaluations.constants import MAX_GRADE, MIN_GRADE
 from app.modules.evaluations.models import AttendanceStatus
 from app.modules.evaluations.schemas import (
@@ -55,7 +56,8 @@ def check_evaluation_grades(
     return evaluation_grades
 
 
-def validate_evaluations_common(
+async def validate_evaluations_common(
+    db: AsyncSession,
     bulk_data: Union[BulkEvaluationCreate, BulkEvaluationUpdate],
     current_user: User,
     eval_date: date,
@@ -133,12 +135,6 @@ def validate_evaluations_common(
                 detail=f"لا يوجد صلاحية لهذا الفصل. المعلم لديه صلاحية للفصول: {teacher_class_names}، الفصل المطلوب: {class_obj.name}",
             )
 
-    # For other non-supervisor roles, deny access
-    elif role != "branch supervisor":
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="صلاحيات غير كافية"
-        )
-
     # Verify all students in the request belong to the class
     student_ids_in_class = {student.id for student in class_obj.students}
     unknown_students = []
@@ -158,3 +154,22 @@ def validate_evaluations_common(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"الطالب {student.user.full_name} لم يفعل.",
             )
+
+    # Validate evaluations only for lesson unit items
+    unit_item = await db.execute(
+        select(UnitItem).where(UnitItem.id == bulk_data.unit_item_id)
+    )
+    unit_item = unit_item.scalar_one_or_none()
+
+    if unit_item is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="الدرس غير موجود"
+        )
+
+    if unit_item.type != UnitItemType.LESSON:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="يمكن تقييم الدروس فقط",
+        )
+
+    return student_ids_in_class
