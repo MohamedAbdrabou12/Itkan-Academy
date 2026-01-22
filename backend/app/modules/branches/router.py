@@ -1,5 +1,6 @@
-from typing import Optional
+from typing import Annotated, Optional
 
+from app.core.auth import get_current_user_id
 from app.core.authorization import require_permission
 from app.db.session import get_db
 from app.modules.branches.crud import branch_crud
@@ -32,6 +33,25 @@ async def list_branches(
         sort_by=sort_by,
         sort_order=sort_order,
     )
+
+
+@branch_router.get("/me")
+async def get_current_user_branches(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    user_id: Annotated[int, Depends(get_current_user_id)],
+) -> list[BranchRead]:
+    return [
+        BranchRead(
+            id=branch.id,
+            name=branch.name,
+            email=branch.email,
+            phone=branch.phone,
+            address=branch.address,
+            status=branch.status,
+            created_at=branch.created_at,
+        )
+        for branch in await branch_crud.get_user_branches(db, user_id)
+    ]
 
 
 # @branch_router.get(
