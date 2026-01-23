@@ -4,6 +4,8 @@ from typing import Optional
 
 from app.modules.exams.models.exam_attempt import ExamAttemptStatus
 from app.modules.question_bank.models import QuestionType
+from app.modules.question_bank.schemas import QuestionOption
+from app.modules.exams.schemas.exam import ExamBase
 
 
 class ExamAttemptBase(BaseModel):
@@ -24,11 +26,12 @@ class ExamQuestionWithDetails(BaseModel):
     id: int
     marks: int
     title: str
-    options: dict
+    options: Optional[list[QuestionOption]]
     selected_option: Optional[str] = None
     answer_text: Optional[str] = None
     marks_obtained: Optional[int] = None
     type: QuestionType
+    correct_answer: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -40,19 +43,27 @@ class ExamQuestionWithDetails(BaseModel):
             question_details = data.question
             return {
                 "id": data.id,
-                "marks": data.question.marks,
+                "marks": question_details.marks,
                 "title": question_details.question.title,
                 "options": question_details.question.options,
                 "type": question_details.question.type,
                 "selected_option": data.selected_option,
                 "answer_text": data.answer_text,
                 "marks_obtained": data.marks_obtained,
+                "correct_answer": question_details.question.correct_answer,
             }
         return data
 
 
+class StudentInfo(BaseModel):
+    id: int
+    full_name: str
+    email: str
+    phone: Optional[str] = None
+
+
 class ExamAttemptRead(ExamAttemptBase):
-    student_id: int
+    student: StudentInfo
     id: int
     status: ExamAttemptStatus
     start_time: datetime
@@ -63,8 +74,70 @@ class ExamAttemptRead(ExamAttemptBase):
         from_attributes = True
 
 
+class ExamQuestionWithDetailsForCreator(BaseModel):
+    id: int
+    marks: int
+    title: str
+    options: Optional[list[QuestionOption]]
+    type: QuestionType
+    correct_answer: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+    @model_validator(mode="before")
+    @classmethod
+    def flatten_from_orm(cls, data):
+        if hasattr(data, "question"):
+            return {
+                "id": data.id,
+                "marks": data.marks,
+                "title": data.question.title,
+                "options": data.question.options,
+                "type": data.question.type,
+                "correct_answer": data.question.correct_answer,
+            }
+        return data
+
+
+class ExamWithQuestionInfo(BaseModel):
+    title: str
+    duration_minutes: int
+    questions: list[ExamQuestionWithDetailsForCreator]
+
+    class Config:
+        from_attributes = True
+
+
 class ExamAttemptResponse(ExamAttemptRead):
     answers: list[ExamQuestionWithDetails]
+
+
+class AttemptsAnswerForCreator(BaseModel):
+    question_id: int
+    selected_option: Optional[str] = None
+    answer_text: Optional[str] = None
+    marks_obtained: Optional[int] = None
+
+    class Config:
+        from_attributes = True
+
+    @model_validator(mode="before")
+    @classmethod
+    def flatten_from_orm(cls, data):
+        if hasattr(data, "question"):
+            return {
+                "question_id": data.question_id,
+                "selected_option": data.selected_option,
+                "answer_text": data.answer_text,
+                "marks_obtained": data.marks_obtained,
+            }
+        return data
+
+
+class ExamAttemptResponseForCreator(ExamAttemptRead):
+    answers: list[AttemptsAnswerForCreator]
+    exam: ExamWithQuestionInfo
 
 
 class ExamQuestionAnswers(BaseModel):
@@ -94,6 +167,11 @@ class ExamQuestionAnswers(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class ExamGradeRequest(BaseModel):
+    question_id: int
+    marks_obtained: int
 
 
 class ExamAttemptTeacherResponse(ExamAttemptRead):

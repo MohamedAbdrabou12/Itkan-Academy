@@ -2,7 +2,9 @@
   {
     "id": 1001,
     "branch_id": 1001,
-    "name": "الصف الأول - الفرع الرئيسي",
+    "curriculum_id": 1001,
+    "subject_id": 1001,
+    "name": "الصف الأول قرآن - الفرع الرئيسي",
     "schedule": {
       "sunday": ["08:00"],
       "tuesday": ["08:00"],
@@ -14,19 +16,9 @@
   {
     "id": 1002,
     "branch_id": 1001,
-    "name": "الصف الثاني - الفرع الرئيسي",
-    "schedule": {
-      "sunday": ["09:30"],
-      "tuesday": ["08:00"],
-      "thursday": ["09:30"]
-    },
-    "status": "active",
-    "evaluation_config": ["حفظ", "مراجعة", "سلوك"]
-  },
-  {
-    "id": 1003,
-    "branch_id": 1002,
-    "name": "الصف الأول - فرع حي غرب",
+    "curriculum_id": 1001,
+    "subject_id": 1002,
+    "name": "الصف الأول عربى - الفرع الرئيسي",
     "schedule": {
       "sunday": ["08:00"],
       "tuesday": ["08:00"],
@@ -36,9 +28,25 @@
     "evaluation_config": ["حفظ", "مراجعة", "سلوك"]
   },
   {
+    "id": 1003,
+    "curriculum_id": 1002,
+    "subject_id": 1001,
+    "branch_id": 1001,
+    "name": "الصف الثانى قرآن - الفرع الرئيسي",
+    "schedule": {
+      "sunday": ["09:30"],
+      "tuesday": ["08:00"],
+      "thursday": ["09:30"]
+    },
+    "status": "active",
+    "evaluation_config": ["حفظ", "مراجعة", "سلوك"]
+  },
+  {
     "id": 1004,
-    "branch_id": 1002,
-    "name": "الصف الثاني - فرع حي غرب",
+    "curriculum_id": 1002,
+    "subject_id": 1002,
+    "branch_id": 1001,
+    "name": "الصف الثانى عربى - الفرع الرئيسي",
     "schedule": {
       "sunday": ["09:30"],
       "tuesday": ["08:00"],
@@ -49,32 +57,66 @@
   },
   {
     "id": 1005,
-    "branch_id": 1003,
-    "name": "الصف الأول - فرع حي شرق",
+    "curriculum_id": 1001,
+    "subject_id": 1001,
+    "branch_id": 1002,
+    "name": "الصف الأول قرآن - فرع حي غرب",
     "schedule": {
-      "saturday": ["08:00"],
-      "monday": ["08:00"],
-      "wednesday": ["08:00"]
+      "sunday": ["08:00"],
+      "tuesday": ["08:00"],
+      "thursday": ["08:00"]
     },
     "status": "active",
     "evaluation_config": ["حفظ", "مراجعة", "سلوك"]
   },
   {
     "id": 1006,
-    "branch_id": 1004,
-    "name": "الصف الأول - فرع مدينة ناصر",
+    "curriculum_id": 1001,
+    "subject_id": 1002,
+    "branch_id": 1002,
+    "name": "الصف الأول عربى - فرع حي غرب",
     "schedule": {
-      "saturday": ["08:00"],
-      "monday": ["08:00"],
-      "wednesday": ["08:00"]
+      "sunday": ["08:00"],
+      "tuesday": ["08:00"],
+      "thursday": ["08:00"]
     },
     "status": "active",
     "evaluation_config": ["حفظ", "مراجعة", "سلوك"]
   },
   {
     "id": 1007,
-    "branch_id": 1005,
-    "name": "الصف الأول - فرع حي الأربعين",
+    "curriculum_id": 1002,
+    "subject_id": 1001,
+    "branch_id": 1002,
+    "name": "الصف الثاني قرآن - فرع حي غرب",
+    "schedule": {
+      "sunday": ["09:30"],
+      "tuesday": ["08:00"],
+      "thursday": ["09:30"]
+    },
+    "status": "active",
+    "evaluation_config": ["حفظ", "مراجعة", "سلوك"]
+  },
+  {
+    "id": 1008,
+    "curriculum_id": 1002,
+    "subject_id": 1002,
+    "branch_id": 1002,
+    "name": "الصف الثاني عربى - فرع حي غرب",
+    "schedule": {
+      "sunday": ["09:30"],
+      "tuesday": ["08:00"],
+      "thursday": ["09:30"]
+    },
+    "status": "active",
+    "evaluation_config": ["حفظ", "مراجعة", "سلوك"]
+  },
+  {
+    "id": 1009,
+    "curriculum_id": 1001,
+    "subject_id": 1001,
+    "branch_id": 1003,
+    "name": "الصف الأول قرآن - فرع حي شرق",
     "schedule": {
       "saturday": ["08:00"],
       "monday": ["08:00"],
@@ -84,9 +126,81 @@
     "evaluation_config": ["حفظ", "مراجعة", "سلوك"]
   },
   {
-    "id": 1008,
+    "id": 1010,
+    "curriculum_id": 1001,
+    "subject_id": 1002,
+    "branch_id": 1003,
+    "name": "الصف الأول عربى - فرع حي شرق",
+    "schedule": {
+      "saturday": ["08:00"],
+      "monday": ["08:00"],
+      "wednesday": ["08:00"]
+    },
+    "status": "active",
+    "evaluation_config": ["حفظ", "مراجعة", "سلوك"]
+  },
+  {
+    "id": 1011,
+    "curriculum_id": 1001,
+    "subject_id": 1001,
+    "branch_id": 1004,
+    "name": "الصف الأول قرآن - فرع مدينة ناصر",
+    "schedule": {
+      "saturday": ["08:00"],
+      "monday": ["08:00"],
+      "wednesday": ["08:00"]
+    },
+    "status": "active",
+    "evaluation_config": ["حفظ", "مراجعة", "سلوك"]
+  },
+  {
+    "id": 1012,
+    "curriculum_id": 1001,
+    "subject_id": 1002,
+    "branch_id": 1004,
+    "name": "الصف الأول عربى - فرع مدينة ناصر",
+    "schedule": {
+      "saturday": ["08:00"],
+      "monday": ["08:00"],
+      "wednesday": ["08:00"]
+    },
+    "status": "active",
+    "evaluation_config": ["حفظ", "مراجعة", "سلوك"]
+  },
+  {
+    "id": 1013,
+    "curriculum_id": 1001,
+    "subject_id": 1001,
+    "branch_id": 1005,
+    "name": "الصف الأول قرآن - فرع حي الأربعين",
+    "schedule": {
+      "saturday": ["08:00"],
+      "monday": ["08:00"],
+      "wednesday": ["08:00"]
+    },
+    "status": "active",
+    "evaluation_config": ["حفظ", "مراجعة", "سلوك"]
+  },
+  {
+    "id": 1014,
+    "curriculum_id": 1001,
+    "subject_id": 1002,
+    "branch_id": 1005,
+    "name": "الصف الأول عربى - فرع حي الأربعين",
+    "schedule": {
+      "saturday": ["08:00"],
+      "monday": ["08:00"],
+      "wednesday": ["08:00"]
+    },
+    "status": "active",
+    "evaluation_config": ["حفظ", "مراجعة", "سلوك"]
+  },
+  {
+    "id": 1015,
+    "curriculum_id": 1001,
+    "subject_id": 1001,
     "branch_id": 1006,
-    "name": "الصف الأول - فرع بني سويف الجديدة",
+    "name": "الصف الأول قرآن - فرع بني سويف الجديدة",
     "schedule": {
       "sunday": ["08:00"],
       "monday": ["08:00"],
@@ -96,9 +210,39 @@
     "evaluation_config": ["حفظ", "مراجعة", "سلوك"]
   },
   {
-    "id": 1009,
+    "id": 1016,
+    "curriculum_id": 1001,
+    "subject_id": 1002,
+    "branch_id": 1006,
+    "name": "الصف الأول عربى - فرع بني سويف الجديدة",
+    "schedule": {
+      "sunday": ["08:00"],
+      "monday": ["08:00"],
+      "wednesday": ["08:00"]
+    },
+    "status": "active",
+    "evaluation_config": ["حفظ", "مراجعة", "سلوك"]
+  },
+  {
+    "id": 1017,
+    "curriculum_id": 1002,
+    "subject_id": 1001,
     "branch_id": 1004,
-    "name": "الصف الثاني - فرع مدينة ناصر",
+    "name": "الصف الثاني قرآن - فرع مدينة ناصر",
+    "schedule": {
+      "sunday": ["09:30"],
+      "tuesday": ["08:00"],
+      "thursday": ["09:30"]
+    },
+    "status": "active",
+    "evaluation_config": ["حفظ", "المظهر العام", "سلوك"]
+  },
+  {
+    "id": 1018,
+    "curriculum_id": 1002,
+    "subject_id": 1002,
+    "branch_id": 1006,
+    "name": "الصف الثاني عربى - فرع مدينة ناصر",
     "schedule": {
       "sunday": ["09:30"],
       "tuesday": ["08:00"],

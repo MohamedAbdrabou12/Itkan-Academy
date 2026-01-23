@@ -16,22 +16,6 @@
     "description_ar": "الوصول لعرض المنهج والجدول الزمني"
   },
   {
-    "id": 1003,
-    "code": "academic.performance.*",
-    "name": "Full Performance Management",
-    "name_ar": "إدارة الأداء الكاملة",
-    "description": "Complete control over performance reports",
-    "description_ar": "التحكم الكامل في تقارير الأداء"
-  },
-  {
-    "id": 1004,
-    "code": "academic.performance.view",
-    "name": "View Performance Reports",
-    "name_ar": "عرض تقارير الأداء",
-    "description": "View memorization, revision and performance reports",
-    "description_ar": "عرض تقارير الحفظ والمراجعة والأداء"
-  },
-  {
     "id": 1005,
     "code": "financial.invoices.*",
     "name": "Full Invoice Management",
@@ -1202,6 +1186,46 @@
   },
   {
     "id": 1212,
+    "code": "academic.educational_content.*",
+    "name": "Full Educational Content Management",
+    "name_ar": "إدارة المحتوى الدراسى الكاملة",
+    "description": "Complete control over all educational content operations",
+    "description_ar": "التحكم الكامل فى المحتوى الدراسى"
+  },
+  {
+    "id": 1213,
+    "code": "academic.educational_content.view",
+    "name": "View Educational Content",
+    "name_ar": "عرض المحتوى الدراسى",
+    "description": "Access to view educational content",
+    "description_ar": "القدرة على عرض المحتوى الدراسى"
+  },
+  {
+    "id": 1214,
+    "code": "academic.educational_content.add",
+    "name": "Add Educational Content",
+    "name_ar": "إضافة للمحتوى الدراسى",
+    "description": "Access to add educational content",
+    "description_ar": "القدرة على إضافة للمحتوى الدراسى"
+  },
+  {
+    "id": 1215,
+    "code": "academic.educational_content.edit",
+    "name": "Edit Educational Content",
+    "name_ar": "التعديل على المحتوى الدراسى",
+    "description": "Access to edit educational content",
+    "description_ar": "القدرة على التعديل على المحتوى الدراسى"
+  },
+  {
+    "id": 1216,
+    "code": "academic.educational_content.delete",
+    "name": "Delete Educational Content",
+    "name_ar": "حذف من المحتوى الدراسى",
+    "description": "Access to delete educational content",
+    "description_ar": "القدرة على حذف من المحتوى الدراسى"
+  },
+  {
+    "id": 1217,
     "code": "staff_attendance.staff.checkin",
     "name": "Staff Attendance Checkin",
     "name_ar": "الحضور والغياب للموظفين",
@@ -1209,7 +1233,7 @@
     "description_ar": "الحضور والغياب للموظفين"
   },
   {
-    "id": 1213,
+    "id": 1218,
     "code": "staff_attendance.staff.view",
     "name": "View Staff Attendance",
     "name_ar": "عرض الحضور والغياب للموظفين",
@@ -1217,7 +1241,7 @@
     "description_ar": "عرض الحضور والغياب للموظفين"
   },
   {
-    "id": 1214,
+    "id": 1219,
     "code": "staff_attendance.staff.edit",
     "name": "Edit Staff Attendance",
     "name_ar": "تعديل الحضور والغياب للموظفين",
@@ -1225,7 +1249,7 @@
     "description_ar": "تعديل الحضور والغياب للموظفين"
   },
   {
-    "id": 1215,
+    "id": 1220,
     "code": "staff_attendance.calendar.management",
     "name": "Staff Attendance Calendar Management",
     "name_ar": "إدارة تقويم الحضور والغياب للموظفين",

@@ -1,4 +1,5 @@
 from typing import Any, Dict, List, Optional
+from collections.abc import Sequence
 
 from app.modules.branches.models import Branch, BranchStatus
 from app.modules.branches.schemas import BranchCreate, BranchUpdate
@@ -58,6 +59,26 @@ class BranchCRUD:
         result = await sqlalchemy_paginate(db, query)
 
         return result
+
+    async def get_user_branches(
+        self, db: AsyncSession, user_id: int
+    ) -> Sequence[Branch]:
+        branches = (
+            (
+                await db.execute(
+                    select(Branch)
+                    .join(UserBranch, UserBranch.branch_id == Branch.id)
+                    .where(UserBranch.user_id == user_id)
+                )
+            )
+            .scalars()
+            .all()
+        )
+
+        if len(branches) == 0:
+            branches = (await db.execute(select(Branch))).scalars().all()
+
+        return branches
 
     async def get_by_id(
         self, db: AsyncSession, branch_id: int, request: Optional[Request] = None

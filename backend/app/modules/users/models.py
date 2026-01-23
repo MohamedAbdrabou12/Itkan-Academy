@@ -93,7 +93,6 @@ class User(Base):
         "Branch",
         secondary="user_branches",
         back_populates="users_m2m",
-        viewonly=True,
     )
 
     notifications: Mapped[List["Notification"]] = relationship(

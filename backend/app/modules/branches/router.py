@@ -1,6 +1,6 @@
-from typing import List, Optional
+from typing import Annotated, List, Optional
 
-from app.core.auth import get_current_user
+from app.core.auth import get_current_user, get_current_user_id
 from app.core.authorization import require_permission
 from app.db.session import get_db
 from app.modules.branches.crud import branch_crud
@@ -36,6 +36,42 @@ async def list_branches(
         sort_by=sort_by,
         sort_order=sort_order,
     )
+
+
+@branch_router.get("/me")
+async def get_current_user_branches(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    user_id: Annotated[int, Depends(get_current_user_id)],
+) -> list[BranchRead]:
+    return [
+        BranchRead(
+            id=branch.id,
+            name=branch.name,
+            email=branch.email,
+            phone=branch.phone,
+            address=branch.address,
+            status=branch.status,
+            created_at=branch.created_at,
+        )
+        for branch in await branch_crud.get_user_branches(db, user_id)
+    ]
+
+
+# @branch_router.get(
+#     "/{branch_id}",
+#     response_model=BranchRead,
+#     dependencies=[
+#         Depends(get_current_user),
+#         Depends(require_permission("branch:view")),
+#     ],
+# )
+# async def get_branch(
+#     branch_id: int, request: Request, db: AsyncSession = Depends(get_db)
+# ):
+#     branch = await branch_crud.get_by_id(db, branch_id, request=request)
+#     if not branch:
+#         raise HTTPException(status_code=404, detail="Branch not found")
+#     return branch
 
 
 @branch_router.post(

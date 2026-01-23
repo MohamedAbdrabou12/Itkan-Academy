@@ -45,6 +45,8 @@ async def list_evaluations(
             class_id=evaluation.class_id,
             branch_id=evaluation.branch_id,
             date=evaluation.date.isoformat(),
+            unit_item_id=evaluation.unit_item_id,
+            unit_item_title=evaluation.unit_item.title,
             attendance_status=evaluation.attendance_status.value,
             evaluation_grades=evaluation.evaluation_grades,
             notes=evaluation.notes,
@@ -64,7 +66,6 @@ async def bulk_create_evaluations(
     db: AsyncSession = Depends(get_db),
     user_id: int = Depends(get_current_user_id),
 ):
-    print("user_id", user_id)
     stmt = (
         select(User)
         .where(User.id == user_id)
@@ -78,7 +79,22 @@ async def bulk_create_evaluations(
     current_user = result.scalars().unique().one()
 
     eval_date, class_obj = await get_date_and_class(db, bulk_data)
-    validate_evaluations_common(bulk_data, current_user, eval_date, class_obj)
+    student_ids_in_class = await validate_evaluations_common(db, bulk_data, current_user, eval_date, class_obj)
+
+    # Verify previous evaluated unit item
+    result = await db.execute(
+        select(Evaluation.student_id).where(
+            Evaluation.student_id.in_(student_ids_in_class),
+            Evaluation.unit_item_id == bulk_data.unit_item_id,
+        )
+    )
+    already_completed_ids = result.scalars().all()
+
+    if already_completed_ids:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"بعض الطلاب تم تقييمهم بالفعل في هذا الدرس: {already_completed_ids}",
+        )
 
     # Check for existing evaluations for this class and date
     existing_evals = await evaluations_crud.get_all(db, current_user.id, eval_date)
@@ -104,12 +120,13 @@ async def bulk_create_evaluations(
             bulk_data=bulk_data,
         )
         await db.commit()
-    except Exception:
+    except Exception as error:
         await db.rollback()
+        print(error)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="خطأ في إنشاء التقييمات",
-        )
+        ) from error
 
     return {
         "message": "تم تقييم الطلاب بنجاح",
@@ -126,11 +143,30 @@ async def bulk_create_evaluations(
 async def bulk_update_evaluations(
     bulk_data: BulkEvaluationUpdate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    user_id: int = Depends(get_current_user_id),
 ):
+    stmt = (
+        select(User)
+        .where(User.id == user_id)
+        .options(
+            selectinload(User.branches),
+            selectinload(User.teacher).selectinload(Teacher.classes),
+        )
+    )
+    result = await db.execute(stmt)
+    current_user = result.scalars().first()
+
+    if not current_user:
+        raise HTTPException(status_code=404, detail="User not found")
+
     eval_date, class_obj = await get_date_and_class(db, bulk_data)
-    validate_evaluations_common(
-        bulk_data, current_user, eval_date, class_obj, partial_evaluation_config=True
+    await validate_evaluations_common(
+        db,
+        bulk_data,
+        current_user,
+        eval_date,
+        class_obj,
+        partial_evaluation_config=True,
     )
 
     existing_eval_query = select(Evaluation).where(
