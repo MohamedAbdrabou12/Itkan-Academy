@@ -11,6 +11,7 @@ from app.modules.users.models import User, UserBranch, UserStatus
 from app.modules.users.schemas import (
     BranchInfo,
     UserCreate,
+    UserUpdate,
 )
 from app.services.notification_service.workrs.worker import send_notification_task
 from fastapi import HTTPException

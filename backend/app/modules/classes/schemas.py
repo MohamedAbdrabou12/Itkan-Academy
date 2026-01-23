@@ -20,8 +20,6 @@ class ClassCreate(ClassBase):
 
 class ClassUpdate(BaseModel):
     branch_id: int | None = None
-    curriculum_id: int | None = None
-    subject_id: int | None = None
     name: str | None = None
     schedule: dict | None = None
     evaluation_config: list[str] | None = None

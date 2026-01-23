@@ -4,10 +4,9 @@ from app.core.auth import get_current_user_id
 from app.db.session import get_db
 from app.modules.student_progress.crud import student_progress_crud
 from app.modules.student_progress.schemas import (
-    StudentProgressByStudentList,
-    StudentProgressBySubjectList,
+    StudentProgressClassGroup,
+    StudentProgressStudentGroupResponse,
 )
-from app.modules.users.models import User
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -20,8 +19,8 @@ student_progress_router = APIRouter(prefix="/student-progress", tags=["Student P
 )
 async def get_student_progress_as_student(
     db: Annotated[AsyncSession, Depends(get_db)],
-    user_id: Annotated[User, Depends(get_current_user_id)],
-) -> list[StudentProgressBySubjectList]:
+    user_id: Annotated[int, Depends(get_current_user_id)],
+) -> list[StudentProgressClassGroup]:
     user = await student_progress_crud.get_user(db, user_id)
 
     if user is None:
@@ -39,8 +38,8 @@ async def get_student_progress_as_student(
 @student_progress_router.get("/as-parent", status_code=status.HTTP_200_OK)
 async def get_student_progress_as_parent(
     db: Annotated[AsyncSession, Depends(get_db)],
-    user_id: Annotated[User, Depends(get_current_user_id)],
-) -> list[StudentProgressByStudentList]:
+    user_id: Annotated[int, Depends(get_current_user_id)],
+) -> list[StudentProgressStudentGroupResponse]:
     user = await student_progress_crud.get_user(db, user_id)
 
     if user is None:

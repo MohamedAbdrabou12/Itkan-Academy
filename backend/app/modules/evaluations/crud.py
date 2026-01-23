@@ -29,6 +29,26 @@ class DailyEvaluationCRUD:
         result = await db.execute(query)
         return result.scalars().all()
 
+    async def get_evaluations_for_class(
+        self,
+        db: AsyncSession,
+        class_id: int,
+        recorded_by_user_id: int | None = None,
+        date: date | None = None,
+    ) -> Sequence[Evaluation]:
+        query = select(Evaluation).where(Evaluation.class_id == class_id)
+
+        if recorded_by_user_id is not None:
+            query = query.where(Evaluation.recorded_by_user_id == recorded_by_user_id)
+
+        if date is not None:
+            query = query.where(Evaluation.date == date)
+
+        query = query.order_by(Evaluation.date)
+
+        result = await db.execute(query)
+        return result.scalars().all()
+
     async def create_bulk(
         self,
         db: AsyncSession,
@@ -59,6 +79,9 @@ class DailyEvaluationCRUD:
             evaluations_to_create.append(evaluation)
 
         if evaluations_to_create:
+            db.add_all(evaluations_to_create)
+            await db.flush(evaluations_to_create)
+
             progress_to_create = [
                 StudentProgress(
                     student_id=evaluation.student_id,
@@ -68,7 +91,6 @@ class DailyEvaluationCRUD:
                 for evaluation in evaluations_to_create
             ]
 
-            db.add_all(evaluations_to_create)
             db.add_all(progress_to_create)
             await db.commit()
 

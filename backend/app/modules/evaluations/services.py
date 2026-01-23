@@ -1,5 +1,4 @@
 from datetime import date
-from typing import Union
 
 from app.modules.classes.models import Class
 from app.modules.curriculums.models.unit_item import UnitItem, UnitItemType
@@ -13,13 +12,13 @@ from app.modules.evaluations.schemas import (
 )
 from app.modules.users.models import User, UserStatus
 from fastapi import HTTPException, status
-from sqlalchemy import select
+from sqlalchemy import asc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 
 async def get_date_and_class(
-    db: AsyncSession, bulk_data: Union[BulkEvaluationCreate, BulkEvaluationUpdate]
+    db: AsyncSession, bulk_data: BulkEvaluationCreate | BulkEvaluationUpdate
 ) -> tuple[date, Class]:
     eval_date = date.fromisoformat(bulk_data.date)
 
@@ -32,22 +31,19 @@ async def get_date_and_class(
     class_obj = class_result.scalar_one_or_none()
 
     if not class_obj:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="الفصل غير موجود"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="الفصل غير موجود")
 
     return eval_date, class_obj
 
 
 def check_evaluation_grades(
-    evaluations: list[Union[EvaluationGradeCreate, EvaluationGradeUpdate]],
-):
-    evaluation_grades = [
-        {"name": grade.name, "grade": grade.grade} for grade in evaluations
-    ]
+    evaluations: list[EvaluationGradeCreate | EvaluationGradeUpdate],
+) -> list[dict[str, str | int]]:
+    evaluation_grades = [{"name": grade.name, "grade": grade.grade} for grade in evaluations]
 
     for grade_data in evaluation_grades:
-        if not (MIN_GRADE <= grade_data["grade"] <= MAX_GRADE):
+        grade: int = grade_data["grade"]  # pyright: ignore[reportAssignmentType]
+        if not (MIN_GRADE <= grade <= MAX_GRADE):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"التقييم لـ {grade_data['name']} يجب أن يكون بين {MIN_GRADE} و {MAX_GRADE}",
@@ -58,18 +54,16 @@ def check_evaluation_grades(
 
 async def validate_evaluations_common(
     db: AsyncSession,
-    bulk_data: Union[BulkEvaluationCreate, BulkEvaluationUpdate],
+    bulk_data: BulkEvaluationCreate | BulkEvaluationUpdate,
     current_user: User,
     eval_date: date,
     class_obj: Class,
     partial_evaluation_config: bool = False,
-):
+) -> set[int]:
     role = current_user.role_name.lower() if current_user.role_name else None
 
     # Check branch access for all roles - USING THE CONVENIENCE RELATIONSHIP
-    has_branch_access = any(
-        branch.id == class_obj.branch_id for branch in current_user.branches
-    )
+    has_branch_access = any(branch.id == class_obj.branch_id for branch in current_user.branches)
 
     if not has_branch_access:
         user_branch_names = [branch.name for branch in current_user.branches]
@@ -90,7 +84,7 @@ async def validate_evaluations_common(
     ]
 
     weekday = weekday_list[eval_date.weekday()]
-    if weekday not in class_obj.schedule.keys():
+    if weekday not in class_obj.schedule:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"{weekday.capitalize()} ليس ضمن جدول الفصل",
@@ -110,9 +104,7 @@ async def validate_evaluations_common(
                     )
                 continue
 
-            evaluation_types = map(
-                lambda evaluation: evaluation.name, record.evaluations
-            )
+            evaluation_types = (evaluation.name for evaluation in record.evaluations)
             for evaluation in class_obj.evaluation_config:
                 if evaluation not in evaluation_types:
                     raise HTTPException(
@@ -122,14 +114,10 @@ async def validate_evaluations_common(
 
     # For teachers, also check class access
     if role == "teacher" and current_user.teacher:
-        has_class_access = any(
-            class_.id == class_obj.id for class_ in current_user.teacher.classes
-        )
+        has_class_access = any(class_.id == class_obj.id for class_ in current_user.teacher.classes)
 
         if not has_class_access:
-            teacher_class_names = [
-                class_.name for class_ in current_user.teacher.classes
-            ]
+            teacher_class_names = [class_.name for class_ in current_user.teacher.classes]
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail=f"لا يوجد صلاحية لهذا الفصل. المعلم لديه صلاحية للفصول: {teacher_class_names}، الفصل المطلوب: {class_obj.name}",
@@ -137,10 +125,9 @@ async def validate_evaluations_common(
 
     # Verify all students in the request belong to the class
     student_ids_in_class = {student.id for student in class_obj.students}
-    unknown_students = []
-    for student_id in bulk_data.records.keys():
-        if student_id not in student_ids_in_class:
-            unknown_students.append(student_id)
+    unknown_students = [
+        student_id for student_id in bulk_data.records if student_id not in student_ids_in_class
+    ]
 
     if unknown_students:
         raise HTTPException(
@@ -157,14 +144,12 @@ async def validate_evaluations_common(
 
     # Validate evaluations only for lesson unit items
     unit_item = await db.execute(
-        select(UnitItem).where(UnitItem.id == bulk_data.unit_item_id)
+        select(UnitItem).where(UnitItem.id == bulk_data.unit_item_id).order_by(asc(UnitItem.id))
     )
     unit_item = unit_item.scalar_one_or_none()
 
     if unit_item is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="الدرس غير موجود"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="الدرس غير موجود")
 
     if unit_item.type != UnitItemType.LESSON:
         raise HTTPException(
