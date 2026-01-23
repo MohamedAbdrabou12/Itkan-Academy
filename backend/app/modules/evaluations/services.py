@@ -94,10 +94,14 @@ async def validate_evaluations_common(
     if not partial_evaluation_config:
         for record in bulk_data.records.values():
             if record.evaluations is None or len(record.evaluations) == 0:
-                if record.attendance_status not in [
-                    AttendanceStatus.ABSENT,
-                    AttendanceStatus.EXCUSED,
-                ]:
+                if (
+                    record.attendance_status
+                    not in [
+                        AttendanceStatus.ABSENT,
+                        AttendanceStatus.EXCUSED,
+                    ]
+                    and len(class_obj.evaluation_config) != 0
+                ):
                     raise HTTPException(
                         status_code=status.HTTP_400_BAD_REQUEST,
                         detail="لا توجد تقييمات للطالب رغم عدم كونه غائب أو معذور",
