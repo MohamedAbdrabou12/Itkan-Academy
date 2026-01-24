@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date as dt_date, datetime
 from typing import List, Optional
 
 from app.core.auth import get_current_user
@@ -11,11 +11,13 @@ from app.modules.attendance.crud import (
     calendar_working_day_crud,
     staff_work_schedule_crud,
 )
+from app.modules.attendance.models import CalendarHoliday, StaffWorkSchedule
 from app.modules.attendance.schemas import (
     AttendanceSourceCreate,
     AttendanceSourceRead,
     CalendarHolidayCreate,
     CalendarHolidayRead,
+    CalendarHolidayUpdate,
     CalendarWorkingDayCreate,
     CalendarWorkingDayRead,
     CheckInRequest,
@@ -62,16 +64,13 @@ async def create_calendar(
             db, calendar.id, [wd.dict() for wd in calendar_in.working_days]
         )
 
-    await db.refresh(calendar)
+    calendar = await calendar_crud.get_by_id(db, calendar.id)
     return SchoolCalendarRead.from_orm(calendar)
 
 
 @attendance_router.get(
     "/calendars",
     response_model=List[SchoolCalendarRead],
-    dependencies=[
-        Depends(require_permission(PermissionCode.STAFF_ATTENDANCE_CALENDAR_MANAGE))
-    ],
 )
 async def list_calendars(
     branch_id: Optional[int] = Query(None),
@@ -138,7 +137,6 @@ async def delete_calendar(
         raise HTTPException(status_code=404, detail="Calendar not found")
 
     # Check for linked work schedules
-    from app.modules.attendance.models import StaffWorkSchedule
     from sqlalchemy import select, func
 
     stmt = (
@@ -161,9 +159,6 @@ async def delete_calendar(
 @attendance_router.get(
     "/calendars/{calendar_id}/working-days",
     response_model=List[CalendarWorkingDayRead],
-    dependencies=[
-        Depends(require_permission(PermissionCode.STAFF_ATTENDANCE_CALENDAR_MANAGE))
-    ],
 )
 async def get_working_days(
     calendar_id: int,
@@ -225,12 +220,53 @@ async def create_holiday(
     return CalendarHolidayRead.from_orm(holiday)
 
 
-@attendance_router.get(
-    "/calendars/{calendar_id}/holidays",
-    response_model=List[CalendarHolidayRead],
+@attendance_router.put(
+    "/calendars/{calendar_id}/holidays/{holiday_id}",
+    response_model=CalendarHolidayRead,
     dependencies=[
         Depends(require_permission(PermissionCode.STAFF_ATTENDANCE_CALENDAR_MANAGE))
     ],
+)
+async def update_holiday(
+    calendar_id: int,
+    holiday_id: int,
+    holiday_in: CalendarHolidayUpdate,
+    db: AsyncSession = Depends(get_db),
+):
+    """Update a holiday for a calendar."""
+    holiday = await db.get(CalendarHoliday, holiday_id)
+    if not holiday or holiday.calendar_id != calendar_id:
+        raise HTTPException(status_code=404, detail="Holiday not found")
+
+    updated_holiday = await calendar_holiday_crud.update(
+        db, holiday, holiday_in.dict(exclude_unset=True)
+    )
+    return CalendarHolidayRead.from_orm(updated_holiday)
+
+
+@attendance_router.delete(
+    "/calendars/{calendar_id}/holidays/{holiday_id}",
+    dependencies=[
+        Depends(require_permission(PermissionCode.STAFF_ATTENDANCE_CALENDAR_MANAGE))
+    ],
+)
+async def delete_holiday(
+    calendar_id: int,
+    holiday_id: int,
+    db: AsyncSession = Depends(get_db),
+):
+    """Delete a holiday for a calendar."""
+    holiday = await db.get(CalendarHoliday, holiday_id)
+    if not holiday or holiday.calendar_id != calendar_id:
+        raise HTTPException(status_code=404, detail="Holiday not found")
+
+    await calendar_holiday_crud.delete(db, holiday_id)
+    return {"detail": "تم حذف العطلة بنجاح"}
+
+
+@attendance_router.get(
+    "/calendars/{calendar_id}/holidays",
+    response_model=List[CalendarHolidayRead],
 )
 async def list_holidays(
     calendar_id: int,
@@ -388,7 +424,7 @@ async def check_out(
     dependencies=[Depends(require_permission(PermissionCode.STAFF_ATTENDANCE_VIEW))],
 )
 async def get_daily_attendance(
-    date: Optional[date] = Query(None, description="Date (default: today)"),
+    date: Optional[dt_date] = Query(None, description="Date (default: today)"),
     user_id: Optional[int] = Query(None),
     branch_id: Optional[int] = Query(None),
     req: Request = None,
@@ -410,8 +446,8 @@ async def get_daily_attendance(
 )
 async def get_user_attendance(
     user_id: int,
-    from_date: date = Query(..., description="Start date"),
-    to_date: date = Query(..., description="End date"),
+    from_date: dt_date = Query(..., description="Start date"),
+    to_date: dt_date = Query(..., description="End date"),
     branch_id: Optional[int] = Query(None),
     req: Request = None,
     db: AsyncSession = Depends(get_db),

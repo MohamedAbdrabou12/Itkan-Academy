@@ -1,6 +1,5 @@
 from typing import Any, Dict, List, Optional
 from collections.abc import Sequence
-
 from app.modules.branches.models import Branch, BranchStatus
 from app.modules.branches.schemas import BranchCreate, BranchUpdate
 from app.modules.classes.models import Class, ClassStatus

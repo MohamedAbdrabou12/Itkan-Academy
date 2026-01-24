@@ -1,8 +1,7 @@
-from datetime import date, datetime, time, timedelta
+from datetime import date, datetime, timedelta
 from typing import Dict, List, Optional
 
 from fastapi import HTTPException
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.attendance.crud import (
@@ -16,7 +15,6 @@ from app.modules.attendance.crud import (
 )
 from app.modules.attendance.models import (
     AttendanceDaily,
-    AttendanceLog,
     AttendanceLogType,
     AttendanceSourceType,
     AttendanceStatus,
@@ -28,8 +26,6 @@ from app.modules.attendance.schemas import (
     CheckInResponse,
     CheckOutResponse,
 )
-from app.modules.branches.models import Branch
-from app.modules.users.models import User
 
 
 class AttendanceService:
@@ -61,9 +57,7 @@ class AttendanceService:
     ) -> bool:
         """Check if a date is a working day."""
         # Check if it's a holiday
-        is_holiday = await calendar_holiday_crud.is_holiday(
-            db, calendar_id, check_date
-        )
+        is_holiday = await calendar_holiday_crud.is_holiday(db, calendar_id, check_date)
         if is_holiday:
             return False
 
@@ -106,6 +100,27 @@ class AttendanceService:
 
         check_date = timestamp.date()
 
+        # Get active calendar
+        calendar = await AttendanceService._get_active_calendar(db, branch_id)
+        if not calendar:
+            raise HTTPException(status_code=400, detail="لا يوجد تقويم نشط لهذا الفرع")
+
+        # Ensure it's a working day
+        is_working = await AttendanceService._is_working_day(
+            db, calendar.id, check_date
+        )
+        if not is_working:
+            raise HTTPException(
+                status_code=400, detail="اليوم ليس يوم عمل في هذا التقويم"
+            )
+
+        # Ensure user has a schedule
+        schedule = await AttendanceService._get_user_schedule(db, user_id, branch_id)
+        if not schedule:
+            raise HTTPException(
+                status_code=400, detail="المستخدم ليس لديه جدول عمل لهذا الفرع"
+            )
+
         # Get or create attendance source
         source = await attendance_source_crud.get_or_create_by_type(
             db, source_type.value, source_type.value.title()
@@ -119,7 +134,7 @@ class AttendanceService:
             latest = existing_logs[-1]
             return CheckInResponse(
                 success=False,
-                message="Already checked in today",
+                message="لقد قمت بتسجيل الحضور بالفعل اليوم",
                 attendance_log=AttendanceLogRead.from_orm(latest),
                 is_late=False,
             )
@@ -137,24 +152,21 @@ class AttendanceService:
 
         # Check if late
         is_late = False
-        schedule = await AttendanceService._get_user_schedule(db, user_id, branch_id)
-        if schedule:
-            check_in_time = timestamp.time()
-            grace_time = timedelta(minutes=schedule.grace_minutes)
-            expected_time = datetime.combine(check_date, schedule.start_time)
-            late_threshold = expected_time + grace_time
+        grace_time = timedelta(minutes=schedule.grace_minutes)
+        expected_time = datetime.combine(check_date, schedule.start_time)
+        late_threshold = expected_time + grace_time
 
-            if timestamp > late_threshold:
-                is_late = True
+        if timestamp > late_threshold:
+            is_late = True
 
-        # Calculate daily attendance (will be recalculated at end of day or checkout)
+        # Calculate daily attendance
         await AttendanceService._calculate_daily_attendance(
             db, user_id, branch_id, check_date
         )
 
         return CheckInResponse(
             success=True,
-            message="Checked in successfully",
+            message="تم تسجيل الحضور بنجاح",
             attendance_log=AttendanceLogRead.from_orm(log),
             is_late=is_late,
         )
@@ -174,13 +186,40 @@ class AttendanceService:
 
         check_date = timestamp.date()
 
+        # Get active calendar
+        calendar = await AttendanceService._get_active_calendar(db, branch_id)
+        if not calendar:
+            raise HTTPException(status_code=400, detail="لا يوجد تقويم نشط لهذا الفرع")
+
+        # Ensure it's a working day
+        is_working = await AttendanceService._is_working_day(
+            db, calendar.id, check_date
+        )
+        if not is_working:
+            raise HTTPException(
+                status_code=400, detail="اليوم ليس يوم عمل في هذا التقويم"
+            )
+
         # Verify check-in exists
         check_in_log = await attendance_log_crud.get_latest_check_in(
             db, user_id, branch_id, check_date
         )
         if not check_in_log:
             raise HTTPException(
-                status_code=400, detail="Cannot check out without checking in first"
+                status_code=400, detail="لا يمكن تسجيل الخروج بدون تسجيل الحضور أولاً"
+            )
+
+        # Check if already checked out today
+        existing_checkouts = await attendance_log_crud.get_by_user_and_date(
+            db, user_id, branch_id, check_date, "check_out"
+        )
+        if existing_checkouts:
+            latest = existing_checkouts[-1]
+            return CheckOutResponse(
+                success=False,
+                message="لقد قمت بتسجيل الخروج بالفعل اليوم",
+                attendance_log=AttendanceLogRead.from_orm(latest),
+                daily_summary=None,
             )
 
         # Get or create attendance source
@@ -206,7 +245,7 @@ class AttendanceService:
 
         return CheckOutResponse(
             success=True,
-            message="Checked out successfully",
+            message="تم تسجيل الخروج بنجاح",
             attendance_log=AttendanceLogRead.from_orm(log),
             daily_summary=AttendanceDailyRead.from_orm(daily) if daily else None,
         )
@@ -261,7 +300,9 @@ class AttendanceService:
                         else:
                             # Check if half day
                             if check_out_time:
-                                check_in_dt = datetime.combine(check_date, check_in_time)
+                                check_in_dt = datetime.combine(
+                                    check_date, check_in_time
+                                )
                                 check_out_dt = datetime.combine(
                                     check_date, check_out_time
                                 )

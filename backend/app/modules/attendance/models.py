@@ -61,7 +61,6 @@ class SchoolCalendar(Base):
         ForeignKey("branches.id", ondelete="CASCADE"), nullable=False, index=True
     )
     name: Mapped[str] = mapped_column(String(100), nullable=False)
-    timezone: Mapped[str] = mapped_column(String(50), default="UTC", nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
     created_at: Mapped[datetime] = mapped_column(
@@ -93,7 +92,9 @@ class CalendarWorkingDay(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     calendar_id: Mapped[int] = mapped_column(
-        ForeignKey("school_calendars.id", ondelete="CASCADE"), nullable=False, index=True
+        ForeignKey("school_calendars.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
     )
     weekday: Mapped[Weekday] = mapped_column(String(10), nullable=False)
     is_working: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
@@ -117,7 +118,9 @@ class CalendarHoliday(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     calendar_id: Mapped[int] = mapped_column(
-        ForeignKey("school_calendars.id", ondelete="CASCADE"), nullable=False, index=True
+        ForeignKey("school_calendars.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
     )
     date: Mapped[date] = mapped_column(Date, nullable=False)
     name: Mapped[str] = mapped_column(String(200), nullable=False)

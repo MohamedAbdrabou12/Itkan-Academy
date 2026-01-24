@@ -1,4 +1,4 @@
-from datetime import date, datetime, time
+from datetime import date as dt_date, datetime, time
 from typing import List, Optional
 
 from pydantic import BaseModel, Field
@@ -32,7 +32,7 @@ class CalendarWorkingDayRead(CalendarWorkingDayBase):
 
 
 class CalendarHolidayBase(BaseModel):
-    date: date
+    date: dt_date
     name: str = Field(..., max_length=200)
     is_paid: bool = True
 
@@ -42,7 +42,7 @@ class CalendarHolidayCreate(CalendarHolidayBase):
 
 
 class CalendarHolidayUpdate(BaseModel):
-    date: Optional[date] = None
+    date: Optional[dt_date] = None
     name: Optional[str] = Field(None, max_length=200)
     is_paid: Optional[bool] = None
 
@@ -59,7 +59,6 @@ class CalendarHolidayRead(CalendarHolidayBase):
 
 class SchoolCalendarBase(BaseModel):
     name: str = Field(..., max_length=100)
-    timezone: str = Field(default="UTC", max_length=50)
     is_active: bool = True
 
 
@@ -70,7 +69,6 @@ class SchoolCalendarCreate(SchoolCalendarBase):
 
 class SchoolCalendarUpdate(BaseModel):
     name: Optional[str] = Field(None, max_length=100)
-    timezone: Optional[str] = Field(None, max_length=50)
     is_active: Optional[bool] = None
 
 
@@ -181,7 +179,7 @@ class CheckOutRequest(BaseModel):
 
 # Daily Attendance Summary Schemas
 class AttendanceDailyBase(BaseModel):
-    date: date
+    date: dt_date
     status: AttendanceStatus
     check_in_time: Optional[time] = None
     check_out_time: Optional[time] = None
