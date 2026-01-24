@@ -407,3 +407,238 @@ class AttendanceService:
             db, user_id, branch_id, from_date, to_date
         )
         return [AttendanceDailyRead.from_orm(r).dict() for r in records]
+
+    # ========== Calendar Management ==========
+    @staticmethod
+    async def create_calendar(db: AsyncSession, calendar_in, user=None):
+        """Create a new school calendar with working days."""
+        from app.modules.attendance.schemas import SchoolCalendarRead
+
+        calendar_data = calendar_in.dict(exclude={"working_days"})
+        calendar = await calendar_crud.create(db, calendar_data)
+
+        # Create working days if provided
+        if calendar_in.working_days:
+            await calendar_working_day_crud.create_bulk(
+                db, calendar.id, [wd.dict() for wd in calendar_in.working_days]
+            )
+
+        calendar = await calendar_crud.get_by_id(db, calendar.id)
+        return SchoolCalendarRead.from_orm(calendar)
+
+    @staticmethod
+    async def list_calendars(
+        db: AsyncSession,
+        branch_id: Optional[int] = None,
+        is_active: Optional[bool] = None,
+    ):
+        """List school calendars with optional filters."""
+        from app.modules.attendance.schemas import SchoolCalendarRead
+        from app.modules.attendance.models import SchoolCalendar
+        from sqlalchemy import select
+        from sqlalchemy.orm import selectinload
+
+        if branch_id:
+            calendars = await calendar_crud.get_by_branch_id(db, branch_id, is_active)
+        else:
+            # Get all calendars (admin only)
+            stmt = select(SchoolCalendar).options(
+                selectinload(SchoolCalendar.working_days),
+                selectinload(SchoolCalendar.holidays),
+            )
+            if is_active is not None:
+                stmt = stmt.where(SchoolCalendar.is_active == is_active)
+            result = await db.execute(stmt)
+            calendars = list(result.scalars().all())
+
+        return [SchoolCalendarRead.from_orm(c) for c in calendars]
+
+    @staticmethod
+    async def get_calendar(db: AsyncSession, calendar_id: int):
+        """Get a calendar by ID."""
+        calendar = await calendar_crud.get_by_id(db, calendar_id)
+        if not calendar:
+            raise HTTPException(status_code=404, detail="التقويم غير موجود")
+        return calendar
+
+    @staticmethod
+    async def update_calendar(db: AsyncSession, calendar_id: int, calendar_in):
+        """Update a school calendar."""
+        from app.modules.attendance.schemas import SchoolCalendarRead
+
+        calendar = await calendar_crud.get_by_id(db, calendar_id)
+        if not calendar:
+            raise HTTPException(status_code=404, detail="التقويم غير موجود")
+
+        updated_calendar = await calendar_crud.update(
+            db, calendar, calendar_in.dict(exclude_unset=True)
+        )
+        return SchoolCalendarRead.from_orm(updated_calendar)
+
+    @staticmethod
+    async def delete_calendar(db: AsyncSession, calendar_id: int):
+        """Delete a school calendar with validation."""
+        from app.modules.attendance.models import StaffWorkSchedule
+        from sqlalchemy import select, func
+
+        calendar = await calendar_crud.get_by_id(db, calendar_id)
+        if not calendar:
+            raise HTTPException(status_code=404, detail="Calendar not found")
+
+        # Check for linked work schedules
+        stmt = (
+            select(func.count())
+            .select_from(StaffWorkSchedule)
+            .where(StaffWorkSchedule.calendar_id == calendar_id)
+        )
+        result = await db.execute(stmt)
+        count = result.scalar()
+        if count > 0:
+            raise HTTPException(
+                status_code=400,
+                detail="لا يمكن حذف التقويم لأنه مرتبط بجداول عمل.",
+            )
+
+        await calendar_crud.delete(db, calendar_id)
+        return {"detail": "تم حذف التقويم بنجاح"}
+
+    # ========== Working Days Management ==========
+    @staticmethod
+    async def get_working_days(db: AsyncSession, calendar_id: int):
+        """Get working days for a calendar."""
+        from app.modules.attendance.schemas import CalendarWorkingDayRead
+
+        calendar = await calendar_crud.get_by_id(db, calendar_id)
+        if not calendar:
+            raise HTTPException(status_code=404, detail="التقويم غير موجود")
+
+        working_days = await calendar_working_day_crud.get_by_calendar_id(
+            db, calendar_id
+        )
+        return [CalendarWorkingDayRead.from_orm(wd) for wd in working_days]
+
+    @staticmethod
+    async def set_working_days(db: AsyncSession, calendar_id: int, working_days):
+        """Set working days for a calendar."""
+        from app.modules.attendance.schemas import CalendarWorkingDayRead
+
+        calendar = await calendar_crud.get_by_id(db, calendar_id)
+        if not calendar:
+            raise HTTPException(status_code=404, detail="Calendar not found")
+
+        wd_list = await calendar_working_day_crud.create_bulk(
+            db, calendar_id, [wd.dict() for wd in working_days]
+        )
+        return [CalendarWorkingDayRead.from_orm(wd) for wd in wd_list]
+
+    # ========== Holidays Management ==========
+    @staticmethod
+    async def create_holiday(db: AsyncSession, calendar_id: int, holiday_in):
+        """Create a holiday for a calendar."""
+        from app.modules.attendance.schemas import CalendarHolidayRead
+
+        calendar = await calendar_crud.get_by_id(db, calendar_id)
+        if not calendar:
+            raise HTTPException(status_code=404, detail="Calendar not found")
+
+        holiday_data = holiday_in.dict()
+        holiday_data["calendar_id"] = calendar_id
+        holiday = await calendar_holiday_crud.create(db, holiday_data)
+        return CalendarHolidayRead.from_orm(holiday)
+
+    @staticmethod
+    async def list_holidays(db: AsyncSession, calendar_id: int):
+        """List holidays for a calendar."""
+        from app.modules.attendance.schemas import CalendarHolidayRead
+
+        holidays = await calendar_holiday_crud.get_by_calendar_id(db, calendar_id)
+        return [CalendarHolidayRead.from_orm(h) for h in holidays]
+
+    @staticmethod
+    async def update_holiday(
+        db: AsyncSession, calendar_id: int, holiday_id: int, holiday_in
+    ):
+        """Update a holiday for a calendar."""
+        from app.modules.attendance.schemas import CalendarHolidayRead
+        from app.modules.attendance.models import CalendarHoliday
+
+        holiday = await db.get(CalendarHoliday, holiday_id)
+        if not holiday or holiday.calendar_id != calendar_id:
+            raise HTTPException(status_code=404, detail="Holiday not found")
+
+        updated_holiday = await calendar_holiday_crud.update(
+            db, holiday, holiday_in.dict(exclude_unset=True)
+        )
+        return CalendarHolidayRead.from_orm(updated_holiday)
+
+    @staticmethod
+    async def delete_holiday(db: AsyncSession, calendar_id: int, holiday_id: int):
+        """Delete a holiday for a calendar."""
+        from app.modules.attendance.models import CalendarHoliday
+
+        holiday = await db.get(CalendarHoliday, holiday_id)
+        if not holiday or holiday.calendar_id != calendar_id:
+            raise HTTPException(status_code=404, detail="Holiday not found")
+
+        await calendar_holiday_crud.delete(db, holiday_id)
+        return {"detail": "تم حذف العطلة بنجاح"}
+
+    # ========== Work Schedules Management ==========
+    @staticmethod
+    async def create_work_schedule(db: AsyncSession, schedule_in):
+        """Create a work schedule for a user."""
+        from app.modules.attendance.schemas import StaffWorkScheduleRead
+
+        schedule_data = schedule_in.dict()
+        schedule = await staff_work_schedule_crud.create(db, schedule_data)
+        return StaffWorkScheduleRead.from_orm(schedule)
+
+    @staticmethod
+    async def list_work_schedules(
+        db: AsyncSession,
+        user_id: Optional[int] = None,
+        calendar_id: Optional[int] = None,
+    ):
+        """List work schedules with optional filters."""
+        from app.modules.attendance.schemas import StaffWorkScheduleReadWithDetails
+
+        schedules = await staff_work_schedule_crud.list(db, user_id, calendar_id)
+        return [StaffWorkScheduleReadWithDetails.from_orm(s) for s in schedules]
+
+    @staticmethod
+    async def update_work_schedule(db: AsyncSession, schedule_id: int, schedule_in):
+        """Update a work schedule."""
+        from app.modules.attendance.schemas import StaffWorkScheduleRead
+
+        schedule = await staff_work_schedule_crud.get_by_id(db, schedule_id)
+        if not schedule:
+            raise HTTPException(status_code=404, detail="Work schedule not found")
+
+        updated_schedule = await staff_work_schedule_crud.update(
+            db, schedule, schedule_in.dict(exclude_unset=True)
+        )
+        return StaffWorkScheduleRead.from_orm(updated_schedule)
+
+    @staticmethod
+    async def delete_work_schedule(db: AsyncSession, schedule_id: int):
+        """Delete a work schedule."""
+        schedule = await staff_work_schedule_crud.get_by_id(db, schedule_id)
+        if not schedule:
+            raise HTTPException(status_code=404, detail="Work schedule not found")
+
+        await staff_work_schedule_crud.delete(db, schedule_id)
+        return {"detail": "تم حذف جدول العمل بنجاح"}
+
+    # ========== Attendance Sources Management ==========
+    @staticmethod
+    async def create_attendance_source(db: AsyncSession, source_in):
+        """Create an attendance source."""
+        from app.modules.attendance.schemas import AttendanceSourceRead
+
+        source_data = source_in.dict()
+        source = await attendance_source_crud.create(db, source_data)
+        return AttendanceSourceRead.from_orm(source)
+
+
+# Create singleton instance
+attendance_service = AttendanceService()

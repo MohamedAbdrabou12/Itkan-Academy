@@ -91,16 +91,6 @@ class CalendarWorkingDayCRUD:
         await db.commit()
 
         # Create new working days
-        result = await db.execute(
-            select(CalendarWorkingDay).where(
-                CalendarWorkingDay.calendar_id == calendar_id
-            )
-        )
-        existing = result.scalars().all()
-        for wd in existing:
-            await db.delete(wd)
-
-        # Create new working days
         new_working_days = [
             CalendarWorkingDay(calendar_id=calendar_id, **wd) for wd in working_days
         ]
