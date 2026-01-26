@@ -328,11 +328,18 @@ class AttendanceDailyCRUD:
         branch_id: int,
         check_date: date,
     ) -> Optional[AttendanceDaily]:
-        stmt = select(AttendanceDaily).where(
-            and_(
-                AttendanceDaily.user_id == user_id,
-                AttendanceDaily.branch_id == branch_id,
-                AttendanceDaily.date == check_date,
+        stmt = (
+            select(AttendanceDaily)
+            .options(
+                joinedload(AttendanceDaily.user),
+                joinedload(AttendanceDaily.branch),
+            )
+            .where(
+                and_(
+                    AttendanceDaily.user_id == user_id,
+                    AttendanceDaily.branch_id == branch_id,
+                    AttendanceDaily.date == check_date,
+                )
             )
         )
         result = await db.execute(stmt)

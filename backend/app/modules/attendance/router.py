@@ -116,6 +116,7 @@ async def get_working_days(
     return await attendance_service.get_working_days(db, calendar_id)
 
 
+# revied
 @attendance_router.post(
     "/calendars/{calendar_id}/working-days",
     response_model=List[CalendarWorkingDayRead],
@@ -132,6 +133,7 @@ async def set_working_days(
     return await attendance_service.set_working_days(db, calendar_id, working_days)
 
 
+# revied
 @attendance_router.post(
     "/calendars/{calendar_id}/holidays",
     response_model=CalendarHolidayRead,
@@ -149,6 +151,7 @@ async def create_holiday(
     return await attendance_service.create_holiday(db, calendar_id, holiday_in)
 
 
+# revied
 @attendance_router.put(
     "/calendars/{calendar_id}/holidays/{holiday_id}",
     response_model=CalendarHolidayRead,
@@ -168,6 +171,7 @@ async def update_holiday(
     )
 
 
+# revied
 @attendance_router.delete(
     "/calendars/{calendar_id}/holidays/{holiday_id}",
     dependencies=[
@@ -183,6 +187,7 @@ async def delete_holiday(
     return await attendance_service.delete_holiday(db, calendar_id, holiday_id)
 
 
+# revied
 @attendance_router.get(
     "/calendars/{calendar_id}/holidays",
     response_model=List[CalendarHolidayRead],
@@ -274,7 +279,7 @@ async def check_in(
     if not branch_id:
         branch_id = getattr(req.state, "active_branch_id", None)
     if not branch_id:
-        raise HTTPException(status_code=400, detail="Branch ID is required")
+        raise HTTPException(status_code=400, detail="لم يتم تحديد الفرع")
 
     timestamp = request.timestamp or datetime.utcnow()
 
@@ -290,7 +295,6 @@ async def check_in(
 
 @attendance_router.post(
     "/check-out",
-    response_model=CheckOutResponse,
     dependencies=[Depends(require_permission(PermissionCode.STAFF_ATTENDANCE_CHECKIN))],
 )
 async def check_out(

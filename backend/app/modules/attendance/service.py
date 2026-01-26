@@ -1,4 +1,4 @@
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 from typing import Dict, List, Optional
 
 from fastapi import HTTPException
@@ -96,7 +96,7 @@ class AttendanceService:
     ) -> CheckInResponse:
         """Record a check-in event."""
         if timestamp is None:
-            timestamp = datetime.utcnow()
+            timestamp = datetime.now(timezone.utc)
 
         check_date = timestamp.date()
 
@@ -121,10 +121,12 @@ class AttendanceService:
                 status_code=400, detail="المستخدم ليس لديه جدول عمل لهذا الفرع"
             )
 
-        # Get or create attendance source
-        source = await attendance_source_crud.get_or_create_by_type(
-            db, source_type.value, source_type.value.title()
-        )
+        # check if the user tries to check in after the end of the day
+        print(timestamp.time(), schedule.start_time, branch_id, user_id, "🚨🚨🚨🚨")
+        if timestamp.time() > schedule.end_time:
+            raise HTTPException(
+                status_code=400, detail="لا يمكن تسجيل الحضور بعد انتهاء اليوم"
+            )
 
         # Check if already checked in today
         existing_logs = await attendance_log_crud.get_by_user_and_date(
@@ -138,6 +140,11 @@ class AttendanceService:
                 attendance_log=AttendanceLogRead.from_orm(latest),
                 is_late=False,
             )
+
+        # Get or create attendance source
+        source = await attendance_source_crud.get_or_create_by_type(
+            db, source_type.value, source_type.value.title()
+        )
 
         # Create attendance log
         log_data = {
@@ -306,12 +313,15 @@ class AttendanceService:
                                 check_out_dt = datetime.combine(
                                     check_date, check_out_time
                                 )
+                                schedule_work_minutes = (
+                                    schedule.end_time - schedule.start_time
+                                ).total_seconds() / 60
                                 worked_minutes = (
                                     check_out_dt - check_in_dt
                                 ).total_seconds() / 60
 
                                 # Consider half day if worked less than 4 hours
-                                if worked_minutes < 240:
+                                if worked_minutes < schedule_work_minutes * 0.75:
                                     status = AttendanceStatus.half_day
                                 else:
                                     status = AttendanceStatus.present
@@ -590,6 +600,14 @@ class AttendanceService:
         from app.modules.attendance.schemas import StaffWorkScheduleRead
 
         schedule_data = schedule_in.dict()
+        # check if there is a schedule for the user and calendar
+        schedule = await staff_work_schedule_crud.get_by_user_id(
+            db, schedule_data["user_id"], schedule_data["calendar_id"]
+        )
+        if schedule:
+            raise HTTPException(
+                status_code=400, detail="موعد العمل لهذا الموظف موجود بالفعل"
+            )
         schedule = await staff_work_schedule_crud.create(db, schedule_data)
         return StaffWorkScheduleRead.from_orm(schedule)
 
