@@ -104,9 +104,6 @@ async def delete_calendar(
 @attendance_router.get(
     "/calendars/{calendar_id}/working-days",
     response_model=List[CalendarWorkingDayRead],
-    dependencies=[
-        Depends(require_permission(PermissionCode.STAFF_ATTENDANCE_CALENDAR_MANAGE))
-    ],
 )
 async def get_working_days(
     calendar_id: int,
@@ -223,12 +220,16 @@ async def create_work_schedule(
     dependencies=[Depends(require_permission(PermissionCode.STAFF_ATTENDANCE_VIEW))],
 )
 async def list_work_schedules(
+    request: Request,
     user_id: Optional[int] = Query(None),
     calendar_id: Optional[int] = Query(None),
     db: AsyncSession = Depends(get_db),
 ):
     """List work schedules."""
-    return await attendance_service.list_work_schedules(db, user_id, calendar_id)
+    branch_id = getattr(request.state, "active_branch_id", None)
+    return await attendance_service.list_work_schedules(
+        db, user_id, calendar_id, branch_id
+    )
 
 
 @attendance_router.put(
@@ -326,7 +327,6 @@ async def check_out(
 # ========== Daily Summary & Reports ==========
 @attendance_router.get(
     "/daily",
-    dependencies=[Depends(require_permission(PermissionCode.STAFF_ATTENDANCE_VIEW))],
 )
 async def get_daily_attendance(
     date: Optional[dt_date] = Query(None, description="Date (default: today)"),

@@ -424,6 +424,12 @@ class AttendanceService:
         """Create a new school calendar with working days."""
         from app.modules.attendance.schemas import SchoolCalendarRead
 
+        calendar = await calendar_crud.get_by_name_and_branch_id(
+            db, calendar_in.name, calendar_in.branch_id
+        )
+        if calendar:
+            raise HTTPException(status_code=400, detail="التقويم موجود بالفعل")
+
         calendar_data = calendar_in.dict(exclude={"working_days"})
         calendar = await calendar_crud.create(db, calendar_data)
 
@@ -480,6 +486,12 @@ class AttendanceService:
         if not calendar:
             raise HTTPException(status_code=404, detail="التقويم غير موجود")
 
+        calendar = await calendar_crud.get_by_name_and_branch_id(
+            db, calendar_in.name, calendar.branch_id
+        )
+        if calendar:
+            raise HTTPException(status_code=400, detail="يوجد تقويم بهذا الاسم")
+
         updated_calendar = await calendar_crud.update(
             db, calendar, calendar_in.dict(exclude_unset=True)
         )
@@ -493,7 +505,7 @@ class AttendanceService:
 
         calendar = await calendar_crud.get_by_id(db, calendar_id)
         if not calendar:
-            raise HTTPException(status_code=404, detail="Calendar not found")
+            raise HTTPException(status_code=404, detail="التقويم غير موجود")
 
         # Check for linked work schedules
         stmt = (
@@ -616,11 +628,14 @@ class AttendanceService:
         db: AsyncSession,
         user_id: Optional[int] = None,
         calendar_id: Optional[int] = None,
+        branch_id: Optional[int] = None,
     ):
         """List work schedules with optional filters."""
         from app.modules.attendance.schemas import StaffWorkScheduleReadWithDetails
 
-        schedules = await staff_work_schedule_crud.list(db, user_id, calendar_id)
+        schedules = await staff_work_schedule_crud.list(
+            db, user_id, calendar_id, branch_id
+        )
         return [StaffWorkScheduleReadWithDetails.from_orm(s) for s in schedules]
 
     @staticmethod

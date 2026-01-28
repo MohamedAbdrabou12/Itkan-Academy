@@ -39,6 +39,15 @@ class CalendarCRUD:
         result = await db.execute(stmt)
         return result.scalar_one_or_none()
 
+    async def get_by_name_and_branch_id(
+        self, db: AsyncSession, name: str, branch_id: int
+    ) -> Optional[SchoolCalendar]:
+        stmt = select(SchoolCalendar).where(
+            and_(SchoolCalendar.name == name, SchoolCalendar.branch_id == branch_id)
+        )
+        result = await db.execute(stmt)
+        return result.scalar_one_or_none()
+
     async def get_by_branch_id(
         self, db: AsyncSession, branch_id: int, is_active: Optional[bool] = None
     ) -> List[SchoolCalendar]:
@@ -223,12 +232,22 @@ class StaffWorkScheduleCRUD:
         db: AsyncSession,
         user_id: Optional[int] = None,
         calendar_id: Optional[int] = None,
+        branch_id: Optional[int] = None,
     ) -> List[StaffWorkSchedule]:
         stmt = select(StaffWorkSchedule)
         if user_id:
             stmt = stmt.where(StaffWorkSchedule.user_id == user_id)
         if calendar_id:
             stmt = stmt.where(StaffWorkSchedule.calendar_id == calendar_id)
+        if branch_id:
+            stmt = stmt.where(
+                and_(
+                    StaffWorkSchedule.user.has(User.branches.any(id=branch_id)),
+                    StaffWorkSchedule.calendar.has(
+                        SchoolCalendar.branch_id == branch_id
+                    ),
+                )
+            )
         stmt = stmt.options(
             joinedload(StaffWorkSchedule.calendar).selectinload(
                 SchoolCalendar.working_days
