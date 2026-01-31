@@ -1255,5 +1255,77 @@
     "name_ar": "إدارة تقويم الحضور والغياب للموظفين",
     "description": "Staff Attendance Calendar Management",
     "description_ar": "إدارة تقويم الحضور والغياب للموظفين"
+  },
+  {
+    "id": 1221,
+    "code": "staff_evaluation.kpi.create",
+    "name": "staff evaluation kpi create",
+    "name_ar": "انشاء معيار تقييم",
+    "description": "staff evaluation kpi create",
+    "description_ar": "انشاء معيار تقييم"
+  },
+  {
+    "id": 1222,
+    "code": "staff_evaluation.kpi.edit",
+    "name": "staff evaluation kpi edit",
+    "name_ar": "تعديل معيار تقييم",
+    "description": "staff evaluation kpi edit",
+    "description_ar": "تعديل معيار تقييم"
+  },
+  {
+    "id": 1223,
+    "code": "staff_evaluation.kpi.view",
+    "name": "staff evaluation kpi view",
+    "name_ar": "عرض معيار تقييم",
+    "description": "staff evaluation kpi view",
+    "description_ar": "عرض معيار تقييم"
+  },
+  {
+    "id": 1224,
+    "code": "staff_evaluation.kpi.delete",
+    "name": "staff evaluation kpi delete",
+    "name_ar": "حذف معيار تقييم",
+    "description": "staff evaluation kpi delete",
+    "description_ar": "حذف معيار تقييم"
+  },
+  {
+    "id": 1225,
+    "code": "staff_evaluation.cycle.manage",
+    "name": "staff evaluation cycle manage",
+    "name_ar": "إدارة دورة التقييم",
+    "description": "staff evaluation cycle manage",
+    "description_ar": "إدارة دورة التقييم"
+  },
+  {
+    "id": 1226,
+    "code": "staff_evaluation.evaluation.create",
+    "name": "staff evaluation evaluation create",
+    "name_ar": "انشاء تقييم",
+    "description": "staff evaluation evaluation create",
+    "description_ar": "انشاء تقييم"
+  },
+  {
+    "id": 1227,
+    "code": "staff_evaluation.evaluation.view",
+    "name": "staff evaluation evaluation view",
+    "name_ar": "عرض تقييم",
+    "description": "staff evaluation evaluation view",
+    "description_ar": "عرض تقييم"
+  },
+  {
+    "id": 1228,
+    "code": "staff_evaluation.evaluation.submit",
+    "name": "staff evaluation evaluation submit",
+    "name_ar": "ارسال تقييم",
+    "description": "staff evaluation evaluation submit",
+    "description_ar": "ارسال تقييم"
+  },
+  {
+    "id": 1229,
+    "code": "staff_evaluation.evaluation.approve",
+    "name": "staff evaluation evaluation approve",
+    "name_ar": "اعتماد تقييم",
+    "description": "staff evaluation evaluation approve",
+    "description_ar": "اعتماد تقييم"
   }
 ]

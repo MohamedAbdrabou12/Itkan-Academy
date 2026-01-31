@@ -30,3 +30,4 @@ from app.modules.student_progress import models
 from app.modules.students import models
 from app.modules.teachers import models
 from app.modules.users import models
+from app.modules.staff_evaluations import models

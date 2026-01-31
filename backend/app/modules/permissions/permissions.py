@@ -253,3 +253,18 @@ class PermissionCode(str, Enum):
     STAFF_ATTENDANCE_VIEW = "staff_attendance.staff.view"
     STAFF_ATTENDANCE_EDIT = "staff_attendance.staff.edit"
     STAFF_ATTENDANCE_CALENDAR_MANAGE = "staff_attendance.calendar.management"
+
+    # Staff Evaluation KPIs
+    STAFF_EVALUATION_KPI_CREATE = "staff_evaluation.kpi.create"
+    STAFF_EVALUATION_KPI_EDIT = "staff_evaluation.kpi.edit"
+    STAFF_EVALUATION_KPI_VIEW = "staff_evaluation.kpi.view"
+    STAFF_EVALUATION_KPI_DELETE = "staff_evaluation.kpi.delete"
+
+    # Staff Evaluation Cycles
+    STAFF_EVALUATION_CYCLE_MANAGE = "staff_evaluation.cycle.manage"
+
+    # Staff Evaluations
+    STAFF_EVALUATION_CREATE = "staff_evaluation.evaluation.create"
+    STAFF_EVALUATION_VIEW = "staff_evaluation.evaluation.view"
+    STAFF_EVALUATION_SUBMIT = "staff_evaluation.evaluation.submit"
+    STAFF_EVALUATION_APPROVE = "staff_evaluation.evaluation.approve"
