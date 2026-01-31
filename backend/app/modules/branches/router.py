@@ -1,6 +1,6 @@
-from typing import Annotated, Optional
+from typing import Annotated, List, Optional
 
-from app.core.auth import get_current_user_id
+from app.core.auth import get_current_user, get_current_user_id
 from app.core.authorization import require_permission
 from app.db.session import get_db
 from app.modules.branches.crud import branch_crud
@@ -10,7 +10,10 @@ from app.modules.branches.schemas import (
     BranchUpdate,
 )
 from app.modules.permissions.permissions import PermissionCode
-from fastapi import APIRouter, Depends, Query, status
+from app.modules.users.crud import map_user_to_read
+from app.modules.users.models import User
+from app.modules.users.schemas import UserRead
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from fastapi_pagination import Page
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -95,3 +98,20 @@ async def update_branch(
     db: AsyncSession = Depends(get_db),
 ):
     return await branch_crud.update(db, branch_id, branch_in)
+
+
+@branch_router.get(
+    "/staff",
+    response_model=List[UserRead],
+)
+async def get_branch_staff(
+    req: Request,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    branch_id = getattr(req.state, "active_branch_id", None)
+
+    staff = await branch_crud.get_staff_by_branch(
+        db, branch_id, exclude_user_id=current_user.id
+    )
+    return [map_user_to_read(user) for user in staff]
