@@ -99,15 +99,23 @@ class StaffEvaluationService:
         # Create template
         template_data = {
             "name": template_in.name,
-            "is_global": template_in.is_global,
             "created_by_user_id": user.id,
         }
-        template = await kpi_template_crud.create(db, template_data)
 
-        # Create KPIs if provided
-        if template_in.kpis:
-            kpis_data = [kpi.model_dump() for kpi in template_in.kpis]
-            await kpi_crud.create_bulk(db, template.id, kpis_data)
+        try:
+            template = await kpi_template_crud.create(db, template_data, commit=False)
+
+            # Create KPIs if provided
+            if template_in.kpis:
+                kpis_data = [kpi.model_dump() for kpi in template_in.kpis]
+                await kpi_crud.create_bulk(db, template.id, kpis_data, commit=False)
+
+            await db.commit()
+        except Exception as e:
+            await db.rollback()
+            raise HTTPException(
+                status_code=500, detail=f"حدث خطأ أثناء إنشاء القالب: {str(e)}"
+            )
 
         # Reload with KPIs
         return await kpi_template_crud.get_by_id(db, template.id)
@@ -115,11 +123,10 @@ class StaffEvaluationService:
     async def list_templates(
         self,
         db: AsyncSession,
-        is_global: Optional[bool] = None,
         created_by_user_id: Optional[int] = None,
     ):
         """List KPI templates."""
-        return await kpi_template_crud.list(db, is_global, created_by_user_id)
+        return await kpi_template_crud.list(db, created_by_user_id)
 
     async def get_template(self, db: AsyncSession, template_id: int):
         """Get a specific template with KPIs."""
@@ -131,14 +138,71 @@ class StaffEvaluationService:
     async def update_template(
         self, db: AsyncSession, template_id: int, template_in: KPITemplateUpdate
     ):
-        """Update a KPI template."""
+        """Update a KPI template with optional KPI sync."""
         template = await self.get_template(db, template_id)
-        update_data = template_in.model_dump(exclude_unset=True)
-        return await kpi_template_crud.update(db, template, update_data)
+
+        # Validate total weight if KPIs are being updated
+        if template_in.kpis is not None:
+            total_weight = sum(kpi.weight for kpi in template_in.kpis)
+            if total_weight != Decimal("100"):
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"مجموع أوزان المؤشرات يجب أن يساوي 100، حالياً: {total_weight}",
+                )
+
+        update_data = template_in.model_dump(exclude={"kpis"}, exclude_unset=True)
+
+        try:
+            # Update template fields
+            if update_data:
+                await kpi_template_crud.update(db, template, update_data, commit=False)
+
+            # Sync KPIs if provided
+            if template_in.kpis is not None:
+                # Get existing KPIs
+                existing_kpis = await kpi_crud.get_by_template_id(db, template_id)
+                existing_ids = {kpi.id for kpi in existing_kpis}
+                incoming_ids = {
+                    kpi.id for kpi in template_in.kpis if kpi.id is not None
+                }
+
+                # 1. Delete KPIs not in input
+                to_delete = existing_ids - incoming_ids
+                for kpi_id in to_delete:
+                    await kpi_crud.delete(db, kpi_id, commit=False)
+
+                # 2. Update/Create KPIs
+                for kpi_item in template_in.kpis:
+                    if kpi_item.id and kpi_item.id in existing_ids:
+                        # Update
+                        kpi_obj = next(k for k in existing_kpis if k.id == kpi_item.id)
+                        await kpi_crud.update(
+                            db,
+                            kpi_obj,
+                            kpi_item.model_dump(exclude={"id"}),
+                            commit=False,
+                        )
+                    else:
+                        # Create
+                        kpi_data = {
+                            **kpi_item.model_dump(exclude={"id"}),
+                            "template_id": template_id,
+                        }
+                        await kpi_crud.create(db, kpi_data, commit=False)
+
+            await db.commit()
+            await db.refresh(template)
+        except Exception as e:
+            await db.rollback()
+            raise HTTPException(
+                status_code=500, detail=f"حدث خطأ أثناء تحديث القالب: {str(e)}"
+            )
+
+        return await kpi_template_crud.get_by_id(db, template_id)
 
     async def delete_template(self, db: AsyncSession, template_id: int):
         """Delete a KPI template."""
-        template = await self.get_template(db, template_id)
+        await self.get_template(db, template_id)
         # Check if template is used in any evaluations
         evaluations = await employee_evaluation_crud.list(db)
         for evaluation in evaluations:

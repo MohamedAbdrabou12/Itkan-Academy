@@ -67,11 +67,16 @@ class EvaluationCycleCRUD:
 
 
 class KPITemplateCRUD:
-    async def create(self, db: AsyncSession, template_data: dict) -> KPITemplate:
+    async def create(
+        self, db: AsyncSession, template_data: dict, commit: bool = True
+    ) -> KPITemplate:
         template = KPITemplate(**template_data)
         db.add(template)
-        await db.commit()
-        await db.refresh(template)
+        if commit:
+            await db.commit()
+            await db.refresh(template)
+        else:
+            await db.flush()
         return template
 
     async def get_by_id(
@@ -88,12 +93,9 @@ class KPITemplateCRUD:
     async def list(
         self,
         db: AsyncSession,
-        is_global: Optional[bool] = None,
         created_by_user_id: Optional[int] = None,
     ) -> List[KPITemplate]:
         stmt = select(KPITemplate).options(selectinload(KPITemplate.kpis))
-        if is_global is not None:
-            stmt = stmt.where(KPITemplate.is_global == is_global)
         if created_by_user_id is not None:
             stmt = stmt.where(KPITemplate.created_by_user_id == created_by_user_id)
         stmt = stmt.order_by(KPITemplate.created_at.desc())
@@ -101,13 +103,16 @@ class KPITemplateCRUD:
         return list(result.scalars().all())
 
     async def update(
-        self, db: AsyncSession, template: KPITemplate, data: dict
+        self, db: AsyncSession, template: KPITemplate, data: dict, commit: bool = True
     ) -> KPITemplate:
         for field, value in data.items():
             setattr(template, field, value)
         db.add(template)
-        await db.commit()
-        await db.refresh(template)
+        if commit:
+            await db.commit()
+            await db.refresh(template)
+        else:
+            await db.flush()
         return template
 
     async def delete(self, db: AsyncSession, template_id: int) -> bool:
@@ -120,21 +125,29 @@ class KPITemplateCRUD:
 
 
 class KPICRUD:
-    async def create(self, db: AsyncSession, kpi_data: dict) -> KPI:
+    async def create(
+        self, db: AsyncSession, kpi_data: dict, commit: bool = True
+    ) -> KPI:
         kpi = KPI(**kpi_data)
         db.add(kpi)
-        await db.commit()
-        await db.refresh(kpi)
+        if commit:
+            await db.commit()
+            await db.refresh(kpi)
+        else:
+            await db.flush()
         return kpi
 
     async def create_bulk(
-        self, db: AsyncSession, template_id: int, kpis: List[dict]
+        self, db: AsyncSession, template_id: int, kpis: List[dict], commit: bool = True
     ) -> List[KPI]:
         new_kpis = [KPI(template_id=template_id, **kpi) for kpi in kpis]
         db.add_all(new_kpis)
-        await db.commit()
-        for kpi in new_kpis:
-            await db.refresh(kpi)
+        if commit:
+            await db.commit()
+            for kpi in new_kpis:
+                await db.refresh(kpi)
+        else:
+            await db.flush()
         return new_kpis
 
     async def get_by_id(self, db: AsyncSession, kpi_id: int) -> Optional[KPI]:
@@ -158,19 +171,27 @@ class KPICRUD:
             total += kpi.weight
         return total
 
-    async def update(self, db: AsyncSession, kpi: KPI, data: dict) -> KPI:
+    async def update(
+        self, db: AsyncSession, kpi: KPI, data: dict, commit: bool = True
+    ) -> KPI:
         for field, value in data.items():
             setattr(kpi, field, value)
         db.add(kpi)
-        await db.commit()
-        await db.refresh(kpi)
+        if commit:
+            await db.commit()
+            await db.refresh(kpi)
+        else:
+            await db.flush()
         return kpi
 
-    async def delete(self, db: AsyncSession, kpi_id: int) -> bool:
+    async def delete(self, db: AsyncSession, kpi_id: int, commit: bool = True) -> bool:
         kpi = await self.get_by_id(db, kpi_id)
         if kpi:
             await db.delete(kpi)
-            await db.commit()
+            if commit:
+                await db.commit()
+            else:
+                await db.flush()
             return True
         return False
 

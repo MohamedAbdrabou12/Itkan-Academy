@@ -74,16 +74,19 @@ class KPIRead(KPIBase):
 
 class KPITemplateBase(BaseModel):
     name: str = Field(..., max_length=200)
-    is_global: bool = False
 
 
 class KPITemplateCreate(KPITemplateBase):
     kpis: Optional[List[KPICreate]] = None
 
 
+class KPIBatchItem(KPICreate):
+    id: Optional[int] = None
+
+
 class KPITemplateUpdate(BaseModel):
     name: Optional[str] = Field(None, max_length=200)
-    is_global: Optional[bool] = None
+    kpis: Optional[List[KPIBatchItem]] = None
 
 
 class KPITemplateRead(KPITemplateBase):

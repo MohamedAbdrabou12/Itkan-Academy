@@ -1,8 +1,8 @@
-"""22_staff_evaluations
+"""create_kpi_tables
 
-Revision ID: 41ab7556e9d7
+Revision ID: d1f3e8cb0185
 Revises: 36cee098f030
-Create Date: 2026-01-30 21:07:11.156021
+Create Date: 2026-01-31 15:05:32.435541
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '41ab7556e9d7'
+revision = 'd1f3e8cb0185'
 down_revision = '36cee098f030'
 branch_labels = None
 depends_on = None
@@ -33,7 +33,6 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=200), nullable=False),
     sa.Column('created_by_user_id', sa.Integer(), nullable=True),
-    sa.Column('is_global', sa.Boolean(), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
     sa.Column('updated_at', sa.DateTime(timezone=True), nullable=False),
     sa.ForeignKeyConstraint(['created_by_user_id'], ['users.id'], ondelete='SET NULL'),

@@ -118,14 +118,11 @@ async def create_template(
     response_model=List[KPITemplateRead],
 )
 async def list_templates(
-    is_global: Optional[bool] = Query(None),
     created_by_user_id: Optional[int] = Query(None),
     db: AsyncSession = Depends(get_db),
 ):
     """List KPI templates."""
-    return await staff_evaluation_service.list_templates(
-        db, is_global, created_by_user_id
-    )
+    return await staff_evaluation_service.list_templates(db, created_by_user_id)
 
 
 @staff_evaluations_router.get(
