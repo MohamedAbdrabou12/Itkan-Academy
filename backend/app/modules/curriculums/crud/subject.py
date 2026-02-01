@@ -3,7 +3,7 @@ from collections.abc import Sequence
 from app.modules.curriculums.models.subject import Subject
 from app.modules.curriculums.models.unit import Unit
 from app.modules.curriculums.schemas.subject import SubjectCreate, SubjectUpdate
-from sqlalchemy import select, update
+from sqlalchemy import asc, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -16,7 +16,7 @@ class SubjectCRUD:
         return subject
 
     async def get_all(self, db: AsyncSession) -> Sequence[Subject]:
-        query = await db.execute(select(Subject))
+        query = await db.execute(select(Subject).order_by(asc(Subject.id)))
         return query.scalars().all()
 
     async def get(self, db: AsyncSession, id: int) -> Subject | None:

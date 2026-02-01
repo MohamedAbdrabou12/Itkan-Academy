@@ -28,6 +28,7 @@ class StudentProgressEvaluationInfo(BaseModel):
     id: int
     attendance_status: AttendanceStatus
     evaluation_grades: list[dict]
+    notes: str | None
     date: date
 
 
@@ -51,10 +52,10 @@ class StudentProgressExamAttemptInfo(BaseModel):
     status: ExamAttemptStatus
     start_time: datetime
     end_time: datetime
-    score: int
+    score: float
 
 
-class StudentProgressBySubjectEntry(BaseModel):
+class StudentProgressEntry(BaseModel):
     id: int
     student_info: StudentProgressStudentInfo
     status: StudentProgressStatus
@@ -64,15 +65,23 @@ class StudentProgressBySubjectEntry(BaseModel):
     created_at: datetime
 
 
-class StudentProgressBySubjectList(BaseModel):
-    subject_id: int
+class StudentProgressClassGroup(BaseModel):
+    class_id: int
+    class_name: str
     subject_name: str
     curriculum_name: str
     unit_items_info: list[StudentProgressUnitItemInfo]
-    items: list[StudentProgressBySubjectEntry]
+    items: list[StudentProgressEntry]
 
 
-class StudentProgressByStudentList(BaseModel):
+class StudentProgressStudentGroupBase(BaseModel):
     student_id: int
     student_name: str
-    groups: list[StudentProgressBySubjectList]
+
+
+class StudentProgressStudentGroupResponse(StudentProgressStudentGroupBase):
+    groups: list[StudentProgressClassGroup]
+
+
+class StudentProgressStudentGroupInternal(StudentProgressStudentGroupBase):
+    groups: dict[int, StudentProgressClassGroup]

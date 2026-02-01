@@ -11,9 +11,9 @@
     "id": 1002,
     "code": "academic.curriculum.view",
     "name": "View Curriculum",
-    "name_ar": "عرض المنهج",
+    "name_ar": "عرض المستوى التعليمى",
     "description": "Access to view curriculum and timetable",
-    "description_ar": "الوصول لعرض المنهج والجدول الزمني"
+    "description_ar": "الوصول لعرض المستوى التعليمى والجدول الزمني"
   },
   {
     "id": 1005,
@@ -411,25 +411,25 @@
     "id": 1062,
     "code": "academic.curriculum.add",
     "name": "Add Curriculum",
-    "name_ar": "إضافة المنهج",
+    "name_ar": "إضافة المستوى التعليمى",
     "description": "Add new curriculum",
-    "description_ar": "إضافة منهج جديد"
+    "description_ar": "إضافة مستوى تعليمى جديد"
   },
   {
     "id": 1063,
     "code": "academic.curriculum.edit",
     "name": "Edit Curriculum",
-    "name_ar": "تعديل المنهج",
+    "name_ar": "تعديل المستوى التعليمى",
     "description": "Edit curriculum information",
-    "description_ar": "تعديل معلومات المنهج"
+    "description_ar": "تعديل معلومات المستوى التعليمى"
   },
   {
     "id": 1064,
     "code": "academic.curriculum.delete",
     "name": "Delete Curriculum",
-    "name_ar": "حذف المنهج",
+    "name_ar": "حذف المستوى التعليمى",
     "description": "Delete curriculum",
-    "description_ar": "حذف المنهج"
+    "description_ar": "حذف المستوى التعليمى"
   },
   {
     "id": 1065,
@@ -1223,5 +1223,37 @@
     "name_ar": "حذف من المحتوى الدراسى",
     "description": "Access to delete educational content",
     "description_ar": "القدرة على حذف من المحتوى الدراسى"
+  },
+  {
+    "id": 1217,
+    "code": "staff_attendance.staff.checkin",
+    "name": "Staff Attendance Checkin",
+    "name_ar": "الحضور والغياب للموظفين",
+    "description": "Staff Attendance Checkin",
+    "description_ar": "الحضور والغياب للموظفين"
+  },
+  {
+    "id": 1218,
+    "code": "staff_attendance.staff.view",
+    "name": "View Staff Attendance",
+    "name_ar": "عرض الحضور والغياب للموظفين",
+    "description": "View staff attendance",
+    "description_ar": "عرض الحضور والغياب للموظفين"
+  },
+  {
+    "id": 1219,
+    "code": "staff_attendance.staff.edit",
+    "name": "Edit Staff Attendance",
+    "name_ar": "تعديل الحضور والغياب للموظفين",
+    "description": "Edit staff attendance",
+    "description_ar": "تعديل الحضور والغياب للموظفين"
+  },
+  {
+    "id": 1220,
+    "code": "staff_attendance.calendar.management",
+    "name": "Staff Attendance Calendar Management",
+    "name_ar": "إدارة تقويم الحضور والغياب للموظفين",
+    "description": "Staff Attendance Calendar Management",
+    "description_ar": "إدارة تقويم الحضور والغياب للموظفين"
   }
 ]

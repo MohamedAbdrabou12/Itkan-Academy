@@ -55,28 +55,34 @@ async def get(db: Annotated[AsyncSession, Depends(get_db)], id: int) -> Detailed
     return DetailedSubjectResponse(
         id=subject.id,
         name=subject.name,
-        units=[
-            DetailedUnitResponse(
-                id=unit.id,
-                title=unit.title,
-                description=unit.description,
-                subject_id=unit.subject_id,
-                curriculum_id=unit.curriculum_id,
-                curriculum_name=unit.curriculum.name,
-                subject_name=unit.subject.name,
-                items=[
-                    UnitItemResponse(
-                        id=item.id,
-                        title=item.title,
-                        type=item.type,
-                        content=item.content,
-                        unit_id=item.unit_id,
-                    )
-                    for item in unit.items
-                ],
-            )
-            for unit in subject.units
-        ],
+        units=sorted(
+            [
+                DetailedUnitResponse(
+                    id=unit.id,
+                    title=unit.title,
+                    description=unit.description,
+                    subject_id=unit.subject_id,
+                    curriculum_id=unit.curriculum_id,
+                    curriculum_name=unit.curriculum.name,
+                    subject_name=unit.subject.name,
+                    items=sorted(
+                        [
+                            UnitItemResponse(
+                                id=item.id,
+                                title=item.title,
+                                type=item.type,
+                                content=item.content,
+                                unit_id=item.unit_id,
+                            )
+                            for item in unit.items
+                        ],
+                        key=lambda resp: resp.id,
+                    ),
+                )
+                for unit in subject.units
+            ],
+            key=lambda resp: resp.curriculum_id,
+        ),
     )
 
 

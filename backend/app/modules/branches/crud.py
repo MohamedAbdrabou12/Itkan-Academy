@@ -1,13 +1,12 @@
+from typing import Any, Dict, List, Optional
 from collections.abc import Sequence
-from typing import Any, Dict, Optional
-
 from app.modules.branches.models import Branch, BranchStatus
 from app.modules.branches.schemas import BranchCreate, BranchUpdate
 from app.modules.classes.models import Class, ClassStatus
 from app.modules.users.models import User, UserBranch
 from fastapi import HTTPException, Request
 from fastapi_pagination.ext.sqlalchemy import paginate as sqlalchemy_paginate
-from sqlalchemy import asc, desc, or_, update
+from sqlalchemy import and_, asc, desc, not_, or_, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
@@ -60,8 +59,9 @@ class BranchCRUD:
 
         return result
 
-
-    async def get_user_branches(self, db: AsyncSession, user_id: int) -> Sequence[Branch]:
+    async def get_user_branches(
+        self, db: AsyncSession, user_id: int
+    ) -> Sequence[Branch]:
         branches = (
             (
                 await db.execute(
@@ -169,6 +169,38 @@ class BranchCRUD:
             .values(status=ClassStatus.deactive.value)
         )
         await db.execute(class_update_stmt)
+
+    async def get_staff_by_branch(
+        self,
+        db: AsyncSession,
+        branch_id: int,
+        exclude_user_id: Optional[int] = None,
+    ) -> List[User]:
+        query = (
+            select(User)
+            .join(UserBranch)
+            .where(
+                and_(
+                    not_(User.student.has()),
+                    not_(User.parent.has()),
+                )
+            )
+            .options(
+                selectinload(User.role),
+                selectinload(User.branch_links).joinedload(UserBranch.branch),
+            )
+        )
+
+        if branch_id:
+            query = query.where(UserBranch.branch_id == branch_id)
+
+        if exclude_user_id:
+            query = query.where(User.id != exclude_user_id)
+
+        query = query.order_by(User.full_name)
+
+        result = await db.execute(query)
+        return list(result.scalars().all())
 
 
 branch_crud = BranchCRUD()

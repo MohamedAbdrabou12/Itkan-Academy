@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 from operator import and_
+from typing import Annotated
 
 from app.core.auth import get_current_user, get_current_user_id
 from app.core.authorization import require_permission
@@ -33,9 +34,9 @@ evaluations_router = APIRouter(prefix="/evaluations", tags=["Evaluations"])
     dependencies=[Depends(require_permission(PermissionCode.EVALUATION_STUDENT_VIEW))],
 )
 async def list_evaluations(
-    db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_current_user),
-):
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> list[ListEvaluationsResponseItem]:
     evaluations = await evaluations_crud.get_all(db, current_user.id)
 
     return [
@@ -63,9 +64,9 @@ async def list_evaluations(
 )
 async def bulk_create_evaluations(
     bulk_data: BulkEvaluationCreate,
-    db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_current_user_id),
-):
+    db: Annotated[AsyncSession, Depends(get_db)],
+    user_id: Annotated[int, Depends(get_current_user_id)],
+) -> dict[str, str | int]:
     stmt = (
         select(User)
         .where(User.id == user_id)
@@ -79,7 +80,9 @@ async def bulk_create_evaluations(
     current_user = result.scalars().unique().one()
 
     eval_date, class_obj = await get_date_and_class(db, bulk_data)
-    student_ids_in_class = await validate_evaluations_common(db, bulk_data, current_user, eval_date, class_obj)
+    student_ids_in_class = await validate_evaluations_common(
+        db, bulk_data, current_user, eval_date, class_obj
+    )
 
     # Verify previous evaluated unit item
     result = await db.execute(
@@ -97,13 +100,14 @@ async def bulk_create_evaluations(
         )
 
     # Check for existing evaluations for this class and date
-    existing_evals = await evaluations_crud.get_all(db, current_user.id, eval_date)
-    existing_student_ids = {eval.student_id for eval in existing_evals}
+    existing_evals = await evaluations_crud.get_evaluations_for_class(
+        db, class_obj.id, current_user.id, eval_date
+    )
+    existing_student_ids = {ev.student_id for ev in existing_evals}
 
-    already_evaluated_students = []
-    for student_id in bulk_data.records.keys():
-        if student_id in existing_student_ids:
-            already_evaluated_students.append(student_id)
+    already_evaluated_students = [
+        student_id for student_id in bulk_data.records if student_id in existing_student_ids
+    ]
 
     if already_evaluated_students:
         raise HTTPException(
@@ -142,9 +146,9 @@ async def bulk_create_evaluations(
 )
 async def bulk_update_evaluations(
     bulk_data: BulkEvaluationUpdate,
-    db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_current_user_id),
-):
+    db: Annotated[AsyncSession, Depends(get_db)],
+    user_id: Annotated[int, Depends(get_current_user_id)],
+) -> dict[str, str | int]:
     stmt = (
         select(User)
         .where(User.id == user_id)
@@ -184,10 +188,7 @@ async def bulk_update_evaluations(
             detail="لا يوجد تقييم لهذا الفصل ولهذا اليوم",
         )
 
-    if (
-        datetime.now(timezone.utc) - existing_eval.created_at
-        > EVALUATION_EDITING_TIMEFRAME
-    ):
+    if datetime.now(timezone.utc) - existing_eval.created_at > EVALUATION_EDITING_TIMEFRAME:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="لا يمكنك تعديل التقييمات بعد يومين",
@@ -196,12 +197,13 @@ async def bulk_update_evaluations(
     try:
         count = await evaluations_crud.update_bulk(db, eval_date, bulk_data.records)
         await db.commit()
-    except Exception:
+    except Exception as error:
         await db.rollback()
+        print(error)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="خطأ في تعديل التقييمات",
-        )
+        ) from error
 
     return {
         "message": "تم تعديل تقييمات الطلاب بنجاح",

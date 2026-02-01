@@ -3,6 +3,7 @@ from typing import Annotated
 from app.core.authorization import require_permission
 from app.db.session import get_db
 from app.modules.curriculums.crud.unit_item import unit_item_crud
+from app.modules.curriculums.models.unit_item import UnitItem
 from app.modules.curriculums.schemas.unit_item import (
     UnitItemCreate,
     UnitItemResponse,
@@ -22,7 +23,7 @@ unit_items_router = APIRouter(prefix="/unit-items", tags=["Unit Items"])
 )
 async def get_unit_items_lessons(
     db: Annotated[AsyncSession, Depends(get_db)], unit_id: int
-):
+) -> list[UnitItem]:
     return await unit_item_crud.get_lesson_items(db, unit_id)
 
 

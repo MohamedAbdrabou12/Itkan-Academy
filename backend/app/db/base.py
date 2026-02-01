@@ -7,6 +7,7 @@ class Base(DeclarativeBase):
 
 
 # Import all models so Alembic can detect them
+from app.modules.attendance import models
 from app.modules.audits import models
 from app.modules.audits.models import AuditLog
 from app.modules.branches import models
