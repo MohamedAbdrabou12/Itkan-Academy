@@ -26,7 +26,6 @@ if TYPE_CHECKING:
 
 class EvaluationStatus(str, Enum):
     draft = "draft"
-    submitted = "submitted"
     approved = "approved"
 
 

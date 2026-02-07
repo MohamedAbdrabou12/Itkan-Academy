@@ -375,23 +375,26 @@ class StaffEvaluationService:
         # Calculate final score
         final_score = await self._calculate_final_score(db, evaluation)
 
-        # Update evaluation
+        # Update evaluation - directly to approved status
         update_data = {
-            "status": EvaluationStatus.submitted,
+            "status": EvaluationStatus.approved,
             "final_score": final_score,
         }
         return await employee_evaluation_crud.update(db, evaluation, update_data)
 
     async def approve_evaluation(self, db: AsyncSession, evaluation_id: int):
-        """Approve a submitted evaluation."""
+        """Approve a draft evaluation (calculates final score and approves)."""
         evaluation = await self.get_evaluation(db, evaluation_id)
 
-        if evaluation.status != EvaluationStatus.submitted:
+        if evaluation.status != EvaluationStatus.draft:
             raise HTTPException(
-                status_code=400, detail="يمكن اعتماد التقييمات المرسلة فقط"
+                status_code=400, detail="يمكن اعتماد التقييمات المسودة فقط"
             )
 
-        update_data = {"status": EvaluationStatus.approved}
+        # Calculate final score
+        final_score = await self._calculate_final_score(db, evaluation)
+
+        update_data = {"status": EvaluationStatus.approved, "final_score": final_score}
         return await employee_evaluation_crud.update(db, evaluation, update_data)
 
     async def _calculate_final_score(self, db: AsyncSession, evaluation) -> Decimal:

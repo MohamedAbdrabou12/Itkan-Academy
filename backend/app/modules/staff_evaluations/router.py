@@ -253,7 +253,7 @@ async def start_evaluation(
 
 @staff_evaluations_router.get(
     "/evaluations",
-    response_model=List[EmployeeEvaluationReadWithDetails],
+    # response_model=List[EmployeeEvaluationReadWithDetails],
     dependencies=[Depends(require_permission(PermissionCode.STAFF_EVALUATION_VIEW))],
 )
 async def list_evaluations(
@@ -271,7 +271,7 @@ async def list_evaluations(
 
 @staff_evaluations_router.get(
     "/evaluations/{evaluation_id}",
-    response_model=EmployeeEvaluationReadWithDetails,
+    # response_model=EmployeeEvaluationReadWithDetails,
     dependencies=[Depends(require_permission(PermissionCode.STAFF_EVALUATION_VIEW))],
 )
 async def get_evaluation(
@@ -297,19 +297,6 @@ async def score_evaluation(
 
 
 @staff_evaluations_router.post(
-    "/evaluations/{evaluation_id}/submit",
-    response_model=EmployeeEvaluationRead,
-    dependencies=[Depends(require_permission(PermissionCode.STAFF_EVALUATION_SUBMIT))],
-)
-async def submit_evaluation(
-    evaluation_id: int,
-    db: AsyncSession = Depends(get_db),
-):
-    """Submit an evaluation. This calculates the final score."""
-    return await staff_evaluation_service.submit_evaluation(db, evaluation_id)
-
-
-@staff_evaluations_router.post(
     "/evaluations/{evaluation_id}/approve",
     response_model=EmployeeEvaluationRead,
     dependencies=[Depends(require_permission(PermissionCode.STAFF_EVALUATION_APPROVE))],
@@ -318,7 +305,7 @@ async def approve_evaluation(
     evaluation_id: int,
     db: AsyncSession = Depends(get_db),
 ):
-    """Approve a submitted evaluation."""
+    """Approve a draft evaluation. This calculates the final score and approves."""
     return await staff_evaluation_service.approve_evaluation(db, evaluation_id)
 
 
