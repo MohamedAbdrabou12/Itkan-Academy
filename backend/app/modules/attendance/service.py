@@ -118,11 +118,10 @@ class AttendanceService:
         schedule = await AttendanceService._get_user_schedule(db, user_id, branch_id)
         if not schedule:
             raise HTTPException(
-                status_code=400, detail="المستخدم ليس لديه جدول عمل لهذا الفرع"
+                status_code=400, detail="لم يتم اضافة جدول عمل قم بالتواصل مع المشرف"
             )
 
         # check if the user tries to check in after the end of the day
-        print(timestamp.time(), schedule.start_time, branch_id, user_id, "🚨🚨🚨🚨")
         if timestamp.time() > schedule.end_time:
             raise HTTPException(
                 status_code=400, detail="لا يمكن تسجيل الحضور بعد انتهاء اليوم"
