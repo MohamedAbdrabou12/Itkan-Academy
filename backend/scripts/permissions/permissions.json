@@ -1258,10 +1258,10 @@
   },
   {
     "id": 1221,
-    "code": "staff_evaluation.kpi.create",
-    "name": "staff evaluation kpi create",
+    "code": "staff_evaluation.kpi.add",
+    "name": "staff evaluation kpi add",
     "name_ar": "انشاء معيار تقييم",
-    "description": "staff evaluation kpi create",
+    "description": "staff evaluation kpi add",
     "description_ar": "انشاء معيار تقييم"
   },
   {
@@ -1298,10 +1298,10 @@
   },
   {
     "id": 1226,
-    "code": "staff_evaluation.evaluation.create",
-    "name": "staff evaluation evaluation create",
+    "code": "staff_evaluation.evaluation.add",
+    "name": "staff evaluation evaluation add",
     "name_ar": "انشاء تقييم",
-    "description": "staff evaluation evaluation create",
+    "description": "staff evaluation evaluation add",
     "description_ar": "انشاء تقييم"
   },
   {
@@ -1314,14 +1314,6 @@
   },
   {
     "id": 1228,
-    "code": "staff_evaluation.evaluation.submit",
-    "name": "staff evaluation evaluation submit",
-    "name_ar": "ارسال تقييم",
-    "description": "staff evaluation evaluation submit",
-    "description_ar": "ارسال تقييم"
-  },
-  {
-    "id": 1229,
     "code": "staff_evaluation.evaluation.approve",
     "name": "staff evaluation evaluation approve",
     "name_ar": "اعتماد تقييم",

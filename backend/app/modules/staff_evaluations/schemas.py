@@ -45,7 +45,7 @@ class KPIBase(BaseModel):
     name: str = Field(..., max_length=200)
     description: Optional[str] = None
     weight: Decimal = Field(..., ge=0, le=100, description="Weight percentage (0-100)")
-    max_score: int = Field(default=5, ge=1, le=10)
+    max_score: int = Field(default=5, ge=1)
 
 
 class KPICreate(KPIBase):
@@ -56,7 +56,7 @@ class KPIUpdate(BaseModel):
     name: Optional[str] = Field(None, max_length=200)
     description: Optional[str] = None
     weight: Optional[Decimal] = Field(None, ge=0, le=100)
-    max_score: Optional[int] = Field(None, ge=1, le=10)
+    max_score: Optional[int] = Field(None, ge=1)
 
 
 class KPIRead(KPIBase):
@@ -161,6 +161,7 @@ class EmployeeEvaluationBase(BaseModel):
     employee_user_id: int
     cycle_id: int
     template_id: int
+    branch_id: Optional[int] = None
 
 
 class StartEvaluationRequest(EmployeeEvaluationBase):

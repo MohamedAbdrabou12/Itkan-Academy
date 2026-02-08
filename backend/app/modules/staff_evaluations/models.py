@@ -131,6 +131,9 @@ class EmployeeEvaluation(Base):
     template_id: Mapped[int] = mapped_column(
         ForeignKey("kpi_templates.id", ondelete="RESTRICT"), nullable=False, index=True
     )
+    branch_id: Mapped[int] = mapped_column(
+        ForeignKey("branches.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     status: Mapped[EvaluationStatus] = mapped_column(
         String(20), default=EvaluationStatus.draft, nullable=False
     )
@@ -167,7 +170,10 @@ class EmployeeEvaluation(Base):
 
     __table_args__ = (
         UniqueConstraint(
-            "employee_user_id", "cycle_id", name="uq_employee_evaluation_per_cycle"
+            "employee_user_id",
+            "cycle_id",
+            "branch_id",
+            name="uq_employee_evaluation_per_cycle",
         ),
     )
 

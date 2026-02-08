@@ -282,7 +282,7 @@ class StaffEvaluationService:
 
         # Validate no duplicate evaluation for same employee in same cycle
         existing = await employee_evaluation_crud.get_by_employee_and_cycle(
-            db, request.employee_user_id, request.cycle_id
+            db, request.employee_user_id, request.cycle_id, request.branch_id
         )
         if existing:
             raise HTTPException(
@@ -296,6 +296,7 @@ class StaffEvaluationService:
             "evaluator_user_id": evaluator.id,
             "cycle_id": request.cycle_id,
             "template_id": request.template_id,
+            "branch_id": request.branch_id,
             "status": EvaluationStatus.draft,
         }
         evaluation = await employee_evaluation_crud.create(db, evaluation_data)
@@ -323,10 +324,11 @@ class StaffEvaluationService:
         employee_user_id: Optional[int] = None,
         evaluator_user_id: Optional[int] = None,
         status: Optional[EvaluationStatus] = None,
+        branch_id: Optional[int] = None,
     ):
         """List evaluations with filters."""
         return await employee_evaluation_crud.list(
-            db, cycle_id, employee_user_id, evaluator_user_id, status
+            db, cycle_id, employee_user_id, evaluator_user_id, status, branch_id
         )
 
     async def score_evaluation(

@@ -1,8 +1,8 @@
 """22_staff_evaluations
 
-Revision ID: 3e0e0e46df1b
+Revision ID: 8647f1ca14ea
 Revises: 36cee098f030
-Create Date: 2026-02-07 16:21:00.079396
+Create Date: 2026-02-07 23:44:12.277456
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '3e0e0e46df1b'
+revision = '8647f1ca14ea'
 down_revision = '36cee098f030'
 branch_labels = None
 depends_on = None
@@ -46,17 +46,20 @@ def upgrade() -> None:
     sa.Column('evaluator_user_id', sa.Integer(), nullable=False),
     sa.Column('cycle_id', sa.Integer(), nullable=False),
     sa.Column('template_id', sa.Integer(), nullable=False),
+    sa.Column('branch_id', sa.Integer(), nullable=False),
     sa.Column('status', sa.String(length=20), nullable=False),
     sa.Column('final_score', sa.Numeric(precision=5, scale=2), nullable=True),
     sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
     sa.Column('updated_at', sa.DateTime(timezone=True), nullable=False),
+    sa.ForeignKeyConstraint(['branch_id'], ['branches.id'], ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['cycle_id'], ['evaluation_cycles.id'], ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['employee_user_id'], ['users.id'], ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['evaluator_user_id'], ['users.id'], ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['template_id'], ['kpi_templates.id'], ondelete='RESTRICT'),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('employee_user_id', 'cycle_id', name='uq_employee_evaluation_per_cycle')
+    sa.UniqueConstraint('employee_user_id', 'cycle_id', 'branch_id', name='uq_employee_evaluation_per_cycle')
     )
+    op.create_index(op.f('ix_employee_evaluations_branch_id'), 'employee_evaluations', ['branch_id'], unique=False)
     op.create_index(op.f('ix_employee_evaluations_cycle_id'), 'employee_evaluations', ['cycle_id'], unique=False)
     op.create_index(op.f('ix_employee_evaluations_employee_user_id'), 'employee_evaluations', ['employee_user_id'], unique=False)
     op.create_index(op.f('ix_employee_evaluations_evaluator_user_id'), 'employee_evaluations', ['evaluator_user_id'], unique=False)
@@ -121,6 +124,7 @@ def downgrade() -> None:
     op.drop_index(op.f('ix_employee_evaluations_evaluator_user_id'), table_name='employee_evaluations')
     op.drop_index(op.f('ix_employee_evaluations_employee_user_id'), table_name='employee_evaluations')
     op.drop_index(op.f('ix_employee_evaluations_cycle_id'), table_name='employee_evaluations')
+    op.drop_index(op.f('ix_employee_evaluations_branch_id'), table_name='employee_evaluations')
     op.drop_table('employee_evaluations')
     op.drop_index(op.f('ix_kpi_templates_id'), table_name='kpi_templates')
     op.drop_index(op.f('ix_kpi_templates_created_by_user_id'), table_name='kpi_templates')

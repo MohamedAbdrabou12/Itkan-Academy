@@ -225,12 +225,13 @@ class EmployeeEvaluationCRUD:
         return result.scalar_one_or_none()
 
     async def get_by_employee_and_cycle(
-        self, db: AsyncSession, employee_user_id: int, cycle_id: int
+        self, db: AsyncSession, employee_user_id: int, cycle_id: int, branch_id: int
     ) -> Optional[EmployeeEvaluation]:
         stmt = select(EmployeeEvaluation).where(
             and_(
                 EmployeeEvaluation.employee_user_id == employee_user_id,
                 EmployeeEvaluation.cycle_id == cycle_id,
+                EmployeeEvaluation.branch_id == branch_id,
             )
         )
         result = await db.execute(stmt)
@@ -243,6 +244,7 @@ class EmployeeEvaluationCRUD:
         employee_user_id: Optional[int] = None,
         evaluator_user_id: Optional[int] = None,
         status: Optional[EvaluationStatus] = None,
+        branch_id: Optional[int] = None,
     ) -> List[EmployeeEvaluation]:
         stmt = select(EmployeeEvaluation).options(
             joinedload(EmployeeEvaluation.cycle),
@@ -258,6 +260,8 @@ class EmployeeEvaluationCRUD:
             stmt = stmt.where(EmployeeEvaluation.evaluator_user_id == evaluator_user_id)
         if status is not None:
             stmt = stmt.where(EmployeeEvaluation.status == status)
+        if branch_id is not None:
+            stmt = stmt.where(EmployeeEvaluation.branch_id == branch_id)
         stmt = stmt.order_by(EmployeeEvaluation.created_at.desc())
         result = await db.execute(stmt)
         return list(result.scalars().all())

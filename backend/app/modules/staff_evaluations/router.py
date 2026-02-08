@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 
 from app.core.auth import get_current_user
 from app.core.authorization import require_permission
@@ -100,9 +100,7 @@ async def update_cycle(
     "/kpi-templates",
     response_model=KPITemplateRead,
     status_code=201,
-    dependencies=[
-        Depends(require_permission(PermissionCode.STAFF_EVALUATION_KPI_CREATE))
-    ],
+    dependencies=[Depends(require_permission(PermissionCode.STAFF_EVALUATION_KPI_ADD))],
 )
 async def create_template(
     template_in: KPITemplateCreate,
@@ -175,9 +173,7 @@ async def delete_template(
     "/kpi-templates/{template_id}/kpis",
     response_model=KPIRead,
     status_code=201,
-    dependencies=[
-        Depends(require_permission(PermissionCode.STAFF_EVALUATION_KPI_CREATE))
-    ],
+    dependencies=[Depends(require_permission(PermissionCode.STAFF_EVALUATION_KPI_ADD))],
 )
 async def add_kpi(
     template_id: int,
@@ -238,17 +234,23 @@ async def delete_kpi(
 
 @staff_evaluations_router.post(
     "/evaluations/start",
-    response_model=EmployeeEvaluationReadWithDetails,
     status_code=201,
-    dependencies=[Depends(require_permission(PermissionCode.STAFF_EVALUATION_CREATE))],
+    dependencies=[Depends(require_permission(PermissionCode.STAFF_EVALUATION_ADD))],
 )
 async def start_evaluation(
     request: StartEvaluationRequest,
+    req: Request,
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
     """Start a new evaluation for an employee."""
-    return await staff_evaluation_service.start_evaluation(db, request, user)
+    if not request.branch_id:
+        request.branch_id = getattr(req.state, "active_branch_id", None)
+    if not request.branch_id:
+        raise HTTPException(status_code=400, detail="لم يتم تحديد الفرع")
+
+    await staff_evaluation_service.start_evaluation(db, request, user)
+    return {"message": "تم بدء التقييم بنجاح"}
 
 
 @staff_evaluations_router.get(
@@ -257,6 +259,7 @@ async def start_evaluation(
     dependencies=[Depends(require_permission(PermissionCode.STAFF_EVALUATION_VIEW))],
 )
 async def list_evaluations(
+    request: Request,
     cycle_id: Optional[int] = Query(None),
     employee_user_id: Optional[int] = Query(None),
     status: Optional[EvaluationStatus] = Query(None),
@@ -264,8 +267,9 @@ async def list_evaluations(
     user: User = Depends(get_current_user),
 ):
     """List evaluations with filters."""
+    branch_id = getattr(request.state, "active_branch_id", None)
     return await staff_evaluation_service.list_evaluations(
-        db, cycle_id, employee_user_id, user.id, status
+        db, cycle_id, employee_user_id, user.id, status, branch_id
     )
 
 
@@ -285,7 +289,7 @@ async def get_evaluation(
 @staff_evaluations_router.post(
     "/evaluations/{evaluation_id}/score",
     response_model=List[EvaluationKPIScoreRead],
-    dependencies=[Depends(require_permission(PermissionCode.STAFF_EVALUATION_CREATE))],
+    dependencies=[Depends(require_permission(PermissionCode.STAFF_EVALUATION_ADD))],
 )
 async def score_evaluation(
     evaluation_id: int,
@@ -315,11 +319,15 @@ async def approve_evaluation(
     dependencies=[Depends(require_permission(PermissionCode.STAFF_EVALUATION_VIEW))],
 )
 async def get_employee_evaluations(
+    request: Request,
     user_id: int,
     db: AsyncSession = Depends(get_db),
 ):
     """Get all evaluations for a specific employee."""
-    return await staff_evaluation_service.list_evaluations(db, employee_user_id=user_id)
+    branch_id = getattr(request.state, "active_branch_id", None)
+    return await staff_evaluation_service.list_evaluations(
+        db, employee_user_id=user_id, branch_id=branch_id
+    )
 
 
 # ========== Comments ==========
@@ -329,7 +337,7 @@ async def get_employee_evaluations(
     "/evaluations/{evaluation_id}/comments",
     response_model=EvaluationCommentRead,
     status_code=201,
-    dependencies=[Depends(require_permission(PermissionCode.STAFF_EVALUATION_CREATE))],
+    dependencies=[Depends(require_permission(PermissionCode.STAFF_EVALUATION_ADD))],
 )
 async def add_comment(
     evaluation_id: int,
