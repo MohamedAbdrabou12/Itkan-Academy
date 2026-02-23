@@ -1,11 +1,13 @@
 from collections.abc import Sequence
+from functools import reduce
+from typing import Any
 
 from app.modules.classes.models import Class
 from app.modules.curriculums.models.curriculum import Curriculum
 from app.modules.curriculums.models.subject import Subject
 from app.modules.curriculums.models.unit import Unit
 from app.modules.curriculums.models.unit_item import UnitItem
-from app.modules.evaluations.constants import MAX_GRADE
+from app.modules.evaluations.constants import MAX_GRADE, evaluation_score_weight_mapping
 from app.modules.evaluations.models import AttendanceStatus, Evaluation
 from app.modules.exams.models.exam_attempt import ExamAttempt
 from app.modules.student_progress.models import StudentProgress
@@ -30,18 +32,26 @@ from sqlalchemy.orm import selectinload
 
 
 class StudentProgressCRUD:
+    def get_progress_total_score(self, progress: StudentProgress, class_: Class) -> int:
+        if progress.evaluation:
+            return sum(evaluation_score_weight_mapping[name] for name in class_.evaluation_config)
+
+        if progress.exam_attempt:
+            return progress.exam_attempt.exam.total_marks
+
+        return 0
+
     def create_class_group(
         self,
-        class_id: int,
-        class_name: str,
+        class_: Class,
         subject_name: str,
         curriculum_name: str,
         unit_items: Sequence[UnitItem],
         progress: StudentProgress,
     ) -> StudentProgressClassGroup:
         return StudentProgressClassGroup(
-            class_id=class_id,
-            class_name=class_name,
+            class_id=class_.id,
+            class_name=class_.name,
             subject_name=subject_name,
             curriculum_name=curriculum_name,
             unit_items_info=[self.serialize_unit_item(unit_item) for unit_item in unit_items],
@@ -80,7 +90,7 @@ class StudentProgressCRUD:
         student_id: int,
     ) -> list[StudentProgressClassGroup]:
         query = (
-            select(StudentProgress, Class.id, Class.name, Subject.name, Curriculum.name)
+            select(StudentProgress, Class, Subject.name, Curriculum.name)
             .select_from(StudentProgress)
             .join(Student, Student.id == StudentProgress.student_id)
             .join(UserBranch, UserBranch.user_id == Student.user_id)
@@ -106,23 +116,21 @@ class StudentProgressCRUD:
 
         for entry in entries:
             progress: StudentProgress = entry[0]
-            class_id: int = entry[1]
-            class_name: str = entry[2]
-            subject_name: str = entry[3]
-            curriculum_name: str = entry[4]
+            class_: Class = entry[1]
+            subject_name: str = entry[2]
+            curriculum_name: str = entry[3]
 
-            if class_id in progress_response:
+            if class_.id in progress_response:
                 # - add new progress to class group -
 
-                progress_response[class_id].items.append(self.serialize_progress_entry(progress))
+                progress_response[class_.id].items.append(self.serialize_progress_entry(progress))
             else:
                 # - create new class group -
 
-                unit_items = await self.get_class_unit_items(db, class_id)
+                unit_items = await self.get_class_unit_items(db, class_.id)
 
-                progress_response[class_id] = self.create_class_group(
-                    class_id=class_id,
-                    class_name=class_name,
+                progress_response[class_.id] = self.create_class_group(
+                    class_=class_,
                     subject_name=subject_name,
                     curriculum_name=curriculum_name,
                     unit_items=unit_items,
@@ -137,7 +145,7 @@ class StudentProgressCRUD:
         student_ids: list[int],
     ) -> list[StudentProgressStudentGroupResponse]:
         query = (
-            select(StudentProgress, Class.id, Class.name, Subject.name, Curriculum.name)
+            select(StudentProgress, Class, Subject.name, Curriculum.name)
             .select_from(StudentProgress)
             .join(Student, Student.id == StudentProgress.student_id)
             .join(UserBranch, UserBranch.user_id == Student.user_id)
@@ -163,22 +171,20 @@ class StudentProgressCRUD:
 
         for entry in entries:
             progress: StudentProgress = entry[0]
-            class_id: int = entry[1]
-            class_name: str = entry[2]
-            subject_name: str = entry[3]
-            curriculum_name: str = entry[4]
+            class_: Class = entry[1]
+            subject_name: str = entry[2]
+            curriculum_name: str = entry[3]
 
             if progress.student_id in progress_response:
-                if class_id in progress_response[progress.student_id].groups:
-                    progress_response[progress.student_id].groups[class_id].items.append(
+                if class_.id in progress_response[progress.student_id].groups:
+                    progress_response[progress.student_id].groups[class_.id].items.append(
                         self.serialize_progress_entry(progress)
                     )
                 else:
-                    unit_items = await self.get_class_unit_items(db, class_id)
-                    progress_response[progress.student_id].groups[class_id] = (
+                    unit_items = await self.get_class_unit_items(db, class_.id)
+                    progress_response[progress.student_id].groups[class_.id] = (
                         self.create_class_group(
-                            class_id=class_id,
-                            class_name=class_name,
+                            class_=class_,
                             subject_name=subject_name,
                             curriculum_name=curriculum_name,
                             unit_items=unit_items,
@@ -186,14 +192,13 @@ class StudentProgressCRUD:
                         )
                     )
             else:
-                unit_items = await self.get_class_unit_items(db, class_id)
+                unit_items = await self.get_class_unit_items(db, class_.id)
                 progress_response[progress.student_id] = StudentProgressStudentGroupInternal(
                     student_id=progress.student_id,
                     student_name=progress.student.user.full_name,
                     groups={
-                        class_id: self.create_class_group(
-                            class_id=class_id,
-                            class_name=class_name,
+                        class_.id: self.create_class_group(
+                            class_=class_,
                             subject_name=subject_name,
                             curriculum_name=curriculum_name,
                             unit_items=unit_items,
@@ -216,38 +221,57 @@ class StudentProgressCRUD:
             id=unit_item.id,
             title=unit_item.title,
             type=unit_item.type,
+            content=unit_item.content,
             unit_info=StudentProgressUnitInfo(
                 id=unit_item.unit_id,
                 title=unit_item.unit.title,
             ),
         )
 
-    def evaluation_progress_status(self, evaluation: Evaluation) -> StudentProgressStatus:
+    def evaluation_progress_status(
+        self, evaluation: Evaluation
+    ) -> tuple[float, float, StudentProgressStatus]:
         arrived = evaluation.attendance_status not in (
             AttendanceStatus.ABSENT,
             AttendanceStatus.EXCUSED,
         )
 
-        grade_requirement_fullfilled = sum(ev["grade"] for ev in evaluation.evaluation_grades) >= (
-            MAX_GRADE * len(evaluation.evaluation_grades) / 2
-        )
+        def f(prev_tup: tuple[float, float], ev: dict[str, Any]) -> tuple[float, float]:
+            score_weight = evaluation_score_weight_mapping[ev["name"]]
+            return (
+                prev_tup[0] + ev["grade"] * score_weight,
+                prev_tup[1] + MAX_GRADE * score_weight,
+            )
+
+        score, max_score = reduce(f, evaluation.evaluation_grades, (0, 0))
+
+        score_requirement_fullfilled = score >= max_score / 2
 
         return (
+            score,
+            max_score,
             StudentProgressStatus.PASSED
-            if arrived and grade_requirement_fullfilled
-            else StudentProgressStatus.FAILED
+            if arrived and score_requirement_fullfilled
+            else StudentProgressStatus.FAILED,
         )
 
-    def exam_attempt_progress_status(self, exam_attempt: ExamAttempt) -> StudentProgressStatus:
+    def exam_attempt_progress_status(
+        self, exam_attempt: ExamAttempt
+    ) -> tuple[float, float, StudentProgressStatus]:
         score_requirement_fullfilled = exam_attempt.score >= (exam_attempt.exam.total_marks / 2)
         return (
+            exam_attempt.score,
+            exam_attempt.exam.total_marks,
             StudentProgressStatus.PASSED
             if score_requirement_fullfilled
-            else StudentProgressStatus.FAILED
+            else StudentProgressStatus.FAILED,
         )
 
     def serialize_progress_entry(self, progress: StudentProgress) -> StudentProgressEntry:
         status = StudentProgressStatus.PASSED
+        score = 0
+        max_score = 0
+
         status_checks = [
             (progress.evaluation, self.evaluation_progress_status),
             (progress.exam_attempt, self.exam_attempt_progress_status),
@@ -255,7 +279,11 @@ class StudentProgressCRUD:
 
         for item, func in status_checks:
             if item:
-                status = func(item)  # type: ignore reportArgumentType
+                tup = func(item)  # type: ignore reportArgumentType
+
+                score += tup[0]
+                max_score += tup[1]
+                status = tup[2]
 
             if status == StudentProgressStatus.FAILED:
                 break
@@ -267,6 +295,8 @@ class StudentProgressCRUD:
                 name=progress.student.user.full_name,
             ),
             status=status,
+            score=score,
+            max_score=max_score,
             unit_item_info=self.serialize_unit_item(progress.unit_item),
             evaluation_info=StudentProgressEvaluationInfo(
                 id=progress.evaluation_id,

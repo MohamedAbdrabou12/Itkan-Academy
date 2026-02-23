@@ -48,6 +48,7 @@ async def list_evaluations(
             date=evaluation.date.isoformat(),
             unit_item_id=evaluation.unit_item_id,
             unit_item_title=evaluation.unit_item.title,
+            unit_item_content=evaluation.unit_item.content,
             attendance_status=evaluation.attendance_status.value,
             evaluation_grades=evaluation.evaluation_grades,
             notes=evaluation.notes,
