@@ -65,6 +65,7 @@ class ListEvaluationsResponseItem(BaseModel):
     branch_id: int
     unit_item_id: int
     unit_item_title: str
+    unit_item_content: str
     date: str
     attendance_status: str
     evaluation_grades: list[dict]

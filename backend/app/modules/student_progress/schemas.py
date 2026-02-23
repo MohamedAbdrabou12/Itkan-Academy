@@ -21,6 +21,7 @@ class StudentProgressUnitItemInfo(BaseModel):
     id: int
     title: str
     type: UnitItemType
+    content: str
     unit_info: StudentProgressUnitInfo
 
 
@@ -59,6 +60,8 @@ class StudentProgressEntry(BaseModel):
     id: int
     student_info: StudentProgressStudentInfo
     status: StudentProgressStatus
+    score: float
+    max_score: float
     unit_item_info: StudentProgressUnitItemInfo
     evaluation_info: StudentProgressEvaluationInfo | None = None
     exam_attempt_info: StudentProgressExamAttemptInfo | None = None
