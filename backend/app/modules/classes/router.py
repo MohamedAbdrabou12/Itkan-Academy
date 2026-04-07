@@ -2,7 +2,7 @@ from typing import List, Optional
 
 from app.core.auth import get_current_user
 from app.core.authorization import require_permission
-from app.core.utils import get_active_branch
+from app.core.utils import get_active_branch_id
 from app.db.session import get_db
 from app.modules.classes.crud import class_crud
 from app.modules.classes.models import Class
@@ -33,7 +33,7 @@ classes_router = APIRouter(prefix="/classes", tags=["Classes"])
 async def get_teachers_classes_with_header(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
-    active_branch_id: int = Depends(get_active_branch),
+    active_branch_id: int = Depends(get_active_branch_id),
 ):
     try:
         teacher_query = (

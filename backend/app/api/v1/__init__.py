@@ -1,4 +1,5 @@
 from app.api.v1.auth.auth import auth_router
+from app.modules.attendance.router import attendance_router
 from app.modules.audits.router import audit_log_router
 from app.modules.branches.router import branch_router
 from app.modules.classes.router import classes_router
@@ -20,13 +21,12 @@ from app.modules.question_bank.router import question_bank_router
 from app.modules.reports.router.base import reports_router
 from app.modules.role_permissions.router import role_permissions_router
 from app.modules.roles.router import role_router
+from app.modules.salary.router.contracts import contracts_router
+from app.modules.salary.router.payroll_cycles import payroll_cycles_router
+from app.modules.staff_evaluations.router import staff_evaluations_router
 from app.modules.student_progress.router import student_progress_router
 from app.modules.students.router import students_router
 from app.modules.teachers.router import teachers_router
-
-from app.modules.attendance.router import attendance_router
-from app.modules.staff_evaluations.router import staff_evaluations_router
-
 from app.modules.users.router import user_router
 from fastapi import APIRouter
 
@@ -48,6 +48,8 @@ api_router.include_router(invoice_router, tags=["Invoices"])
 api_router.include_router(notification_router, tags=["Notifications"])
 api_router.include_router(parents_router, tags=["Parents"])
 api_router.include_router(attendance_router, tags=["Attendance"])
+api_router.include_router(contracts_router, tags=["Contracts"])
+api_router.include_router(payroll_cycles_router, tags=["Payroll Cycles"])
 api_router.include_router(staff_evaluations_router, tags=["Staff Evaluations"])
 api_router.include_router(payment_router, tags=["Payments"])
 api_router.include_router(permissions_router, tags=["Permissions"])

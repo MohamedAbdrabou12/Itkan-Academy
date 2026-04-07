@@ -1,3 +1,4 @@
+from collections.abc import Sequence
 from typing import List, Optional
 
 from app.core.security import get_password_hash as hash_password
@@ -9,8 +10,9 @@ from app.modules.users.models import User, UserBranch, UserStatus
 from app.modules.users.schemas import BranchInfo, UserCreate, UserRead, UserUpdate
 from app.services.notification_service.workrs.worker import send_notification_task
 from fastapi import HTTPException, Request
+from fastapi_pagination import Page
 from fastapi_pagination.ext.sqlalchemy import paginate
-from sqlalchemy import and_, asc, desc, not_, or_
+from sqlalchemy import Select, and_, asc, desc, not_, or_
 from sqlalchemy import delete as sa_delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -30,9 +32,7 @@ def map_user_to_read(user: User) -> UserRead:
         last_login=user.last_login,
         created_at=user.created_at,
         updated_at=user.updated_at,
-        branch_ids=[link.branch_id for link in user.branch_links]
-        if user.branch_links
-        else None,
+        branch_ids=[link.branch_id for link in user.branch_links] if user.branch_links else None,
         branches=[BranchInfo.from_orm(link.branch) for link in user.branch_links]
         if user.branch_links
         else None,
@@ -45,10 +45,10 @@ class UserCRUD:
     async def get_all_staff(
         self,
         db: AsyncSession,
-        search: Optional[str] = None,
-        sort_by: Optional[str] = "id",
-        sort_order: Optional[str] = "asc",
-    ):
+        search: str | None = None,
+        sort_by: str = "id",
+        sort_order: str = "asc",
+    ) -> Page[User]:
         query = (
             select(User)
             .options(
@@ -88,8 +88,27 @@ class UserCRUD:
         else:
             query = query.order_by(asc(sort_column))
 
-        result = await paginate(db, query)
-        return result
+        return await paginate(db, query)
+
+    async def get_all_employees(
+        self, db: AsyncSession, branch_id: int | None = None
+    ) -> Sequence[User]:
+        query = (
+            select(User)
+            .options(
+                selectinload(User.role),
+                selectinload(User.branch_links).joinedload(UserBranch.branch),
+            )
+            .where(and_(not_(User.student.has()), not_(User.parent.has())))
+        )
+
+        if branch_id is not None:
+            query = query.join(UserBranch, UserBranch.user_id == User.id).where(
+                UserBranch.branch_id == branch_id
+            )
+
+        result = await db.execute(query)
+        return result.scalars().all()
 
     async def get_by_id(
         self, db: AsyncSession, user_id: int, request: Optional[Request] = None
@@ -111,9 +130,7 @@ class UserCRUD:
         if request:
             active_branch = getattr(request.state, "active_branch_id", None)
             if active_branch is not None:
-                stmt = stmt.join(User.branch_links).where(
-                    UserBranch.branch_id == active_branch
-                )
+                stmt = stmt.join(User.branch_links).where(UserBranch.branch_id == active_branch)
 
         result = await db.execute(stmt)
 
@@ -131,9 +148,7 @@ class UserCRUD:
         result = await db.execute(stmt)
         return result.scalars().first()
 
-    async def get_by_login_identifier(
-        self, db: AsyncSession, identifier: str
-    ) -> Optional[User]:
+    async def get_by_login_identifier(self, db: AsyncSession, identifier: str) -> Optional[User]:
         stmt = (
             select(User)
             .where(User.login_identifier == identifier)
@@ -148,9 +163,7 @@ class UserCRUD:
         result = await db.execute(stmt)
         return result.scalars().first()
 
-    async def _sync_user_branches(
-        self, db: AsyncSession, user: User, branch_ids: List[int]
-    ):
+    async def _sync_user_branches(self, db: AsyncSession, user: User, branch_ids: List[int]):
         await db.execute(sa_delete(UserBranch).where(UserBranch.user_id == user.id))
         for bid in branch_ids:
             db.add(UserBranch(user_id=user.id, branch_id=bid))
@@ -161,11 +174,7 @@ class UserCRUD:
     async def create(
         self, db: AsyncSession, obj_in: dict | UserCreate, is_staff: bool = False
     ) -> Optional[User]:
-        data = (
-            obj_in.dict(exclude_unset=True)
-            if not isinstance(obj_in, dict)
-            else obj_in.copy()
-        )
+        data = obj_in.dict(exclude_unset=True) if not isinstance(obj_in, dict) else obj_in.copy()
         # if "password" in data:
         #     data["password_hash"] = hash_password(data.pop("password"))
         password = data.pop("password", None)
@@ -185,9 +194,7 @@ class UserCRUD:
             password_hash=data.get("password_hash", ""),
             role_id=data.get("role_id"),
             status=status_val,
-            login_identifier=data.get("email")
-            if is_staff
-            else data["login_identifier"],
+            login_identifier=data.get("email") if is_staff else data["login_identifier"],
             login_type="email" if is_staff else data["login_type"],
         )
         db.add(db_obj)
@@ -195,9 +202,7 @@ class UserCRUD:
 
         branch_ids = data.get("branch_ids")
         if branch_ids:
-            result = await db.execute(
-                select(Branch.id).where(Branch.id.in_(branch_ids))
-            )
+            result = await db.execute(select(Branch.id).where(Branch.id.in_(branch_ids)))
             existing_ids = [row[0] for row in result.fetchall()]
             missing = set(branch_ids) - set(existing_ids)
             if missing:
@@ -233,11 +238,7 @@ class UserCRUD:
     async def update(
         self, db: AsyncSession, db_obj: User, obj_in: dict | UserUpdate
     ) -> Optional[User]:
-        data = (
-            obj_in.dict(exclude_unset=True)
-            if not isinstance(obj_in, dict)
-            else obj_in.copy()
-        )
+        data = obj_in.dict(exclude_unset=True) if not isinstance(obj_in, dict) else obj_in.copy()
         if "password" in data:
             data["password_hash"] = hash_password(data.pop("password"))
         if "status" in data and isinstance(data["status"], UserStatus):
@@ -257,9 +258,7 @@ class UserCRUD:
 
         return db_obj
 
-    async def update_role(
-        self, db: AsyncSession, user: User, role_id: int
-    ) -> Optional[User]:
+    async def update_role(self, db: AsyncSession, user: User, role_id: int) -> Optional[User]:
         try:
             user.role_id = role_id
             await db.commit()
@@ -278,9 +277,7 @@ class UserCRUD:
             await db.refresh(user)
         return user
 
-    async def assign_branches(
-        self, db: AsyncSession, user: User, branch_ids: List[int]
-    ):
+    async def assign_branches(self, db: AsyncSession, user: User, branch_ids: List[int]):
         await self._sync_user_branches(db, user, branch_ids)
         return user
 

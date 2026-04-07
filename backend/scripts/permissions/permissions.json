@@ -1,1323 +1,1234 @@
 [
   {
-    "id": 1001,
     "code": "academic.curriculum.*",
-    "name": "Full Curriculum Management",
-    "name_ar": "إدارة المناهج الكاملة",
     "description": "Complete control over all curriculum operations",
-    "description_ar": "التحكم الكامل في جميع عمليات المناهج"
+    "description_ar": "التحكم الكامل في جميع عمليات المناهج",
+    "id": 1001,
+    "name": "Full Curriculum Management",
+    "name_ar": "إدارة المناهج الكاملة"
   },
   {
-    "id": 1002,
     "code": "academic.curriculum.view",
-    "name": "View Curriculum",
-    "name_ar": "عرض المستوى التعليمى",
     "description": "Access to view curriculum and timetable",
-    "description_ar": "الوصول لعرض المستوى التعليمى والجدول الزمني"
+    "description_ar": "الوصول لعرض المستوى التعليمى والجدول الزمني",
+    "id": 1002,
+    "name": "View Curriculum",
+    "name_ar": "عرض المستوى التعليمى"
   },
   {
-    "id": 1005,
     "code": "financial.invoices.*",
-    "name": "Full Invoice Management",
-    "name_ar": "إدارة الفواتير الكاملة",
     "description": "Complete control over all invoice operations",
-    "description_ar": "التحكم الكامل في جميع عمليات الفواتير"
+    "description_ar": "التحكم الكامل في جميع عمليات الفواتير",
+    "id": 1005,
+    "name": "Full Invoice Management",
+    "name_ar": "إدارة الفواتير الكاملة"
   },
   {
-    "id": 1006,
     "code": "financial.invoices.pay",
-    "name": "Pay Invoices",
-    "name_ar": "دفع الفواتير",
     "description": "Paying student invoices (tuition)",
-    "description_ar": "دفع فواتير الطلاب (الرسوم الدراسية)"
+    "description_ar": "دفع فواتير الطلاب (الرسوم الدراسية)",
+    "id": 1006,
+    "name": "Pay Invoices",
+    "name_ar": "دفع الفواتير"
   },
   {
-    "id": 1007,
     "code": "financial.payments.*",
-    "name": "Full Payments Management",
-    "name_ar": "إدارة المدفوعات الكاملة",
     "description": "Complete control over payment operations",
-    "description_ar": "التحكم الكامل في عمليات الدفع"
+    "description_ar": "التحكم الكامل في عمليات الدفع",
+    "id": 1007,
+    "name": "Full Payments Management",
+    "name_ar": "إدارة المدفوعات الكاملة"
   },
   {
-    "id": 1008,
     "code": "financial.payments.view",
-    "name": "View Payment History",
-    "name_ar": "عرض سجل المدفوعات",
     "description": "Viewing historical payments",
-    "description_ar": "عرض المدفوعات السابقة"
+    "description_ar": "عرض المدفوعات السابقة",
+    "id": 1008,
+    "name": "View Payment History",
+    "name_ar": "عرض سجل المدفوعات"
   },
   {
-    "id": 1009,
     "code": "academic.exams.*",
-    "name": "Full Exams Management",
-    "name_ar": "إدارة الامتحانات الكاملة",
     "description": "Complete control over all exam operations",
-    "description_ar": "التحكم الكامل في جميع عمليات الامتحانات"
+    "description_ar": "التحكم الكامل في جميع عمليات الامتحانات",
+    "id": 1009,
+    "name": "Full Exams Management",
+    "name_ar": "إدارة الامتحانات الكاملة"
   },
   {
-    "id": 1010,
     "code": "academic.exams.view",
-    "name": "View Exams",
-    "name_ar": "عرض الامتحانات",
     "description": "Access to view available exams",
-    "description_ar": "الوصول لعرض الامتحانات المتاحة"
+    "description_ar": "الوصول لعرض الامتحانات المتاحة",
+    "id": 1010,
+    "name": "View Exams",
+    "name_ar": "عرض الامتحانات"
   },
   {
-    "id": 1011,
     "code": "academic.exams.add",
-    "name": "Take Exams",
-    "name_ar": "اضافة الامتحانات",
     "description": "Adding exams",
-    "description_ar": "اضافة الامتحانات"
+    "description_ar": "اضافة الامتحانات",
+    "id": 1011,
+    "name": "Take Exams",
+    "name_ar": "اضافة الامتحانات"
   },
   {
-    "id": 1012,
     "code": "communication.management.*",
-    "name": "Full Communication Management",
-    "name_ar": "إدارة الاتصالات الكاملة",
     "description": "Complete control over communication operations",
-    "description_ar": "التحكم الكامل في عمليات الاتصال"
+    "description_ar": "التحكم الكامل في عمليات الاتصال",
+    "id": 1012,
+    "name": "Full Communication Management",
+    "name_ar": "إدارة الاتصالات الكاملة"
   },
   {
-    "id": 1013,
     "code": "communication.management.contact",
-    "name": "Contact School Management",
-    "name_ar": "الاتصال بإدارة المدرسة",
     "description": "Communication with school management",
-    "description_ar": "التواصل مع إدارة المدرسة"
+    "description_ar": "التواصل مع إدارة المدرسة",
+    "id": 1013,
+    "name": "Contact School Management",
+    "name_ar": "الاتصال بإدارة المدرسة"
   },
   {
-    "id": 1014,
     "code": "academic.classes.*",
-    "name": "Full Classes Management",
-    "name_ar": "إدارة الفصول الكاملة",
     "description": "Complete control over all class operations",
-    "description_ar": "التحكم الكامل في جميع عمليات الفصول"
+    "description_ar": "التحكم الكامل في جميع عمليات الفصول",
+    "id": 1014,
+    "name": "Full Classes Management",
+    "name_ar": "إدارة الفصول الكاملة"
   },
   {
-    "id": 1015,
     "code": "academic.classes.view",
-    "name": "View Classes",
-    "name_ar": "عرض الفصول",
     "description": "Access to view class information",
-    "description_ar": "الوصول لعرض معلومات الفصول"
+    "description_ar": "الوصول لعرض معلومات الفصول",
+    "id": 1015,
+    "name": "View Classes",
+    "name_ar": "عرض الفصول"
   },
   {
-    "id": 1016,
     "code": "academic.classes.add",
-    "name": "Add Classes",
-    "name_ar": "اضافة فصل",
     "description": "Add new class",
-    "description_ar": "اضافة فصل جديد"
+    "description_ar": "اضافة فصل جديد",
+    "id": 1016,
+    "name": "Add Classes",
+    "name_ar": "اضافة فصل"
   },
   {
-    "id": 1017,
     "code": "academic.classes.edit",
-    "name": "Edit Classes",
-    "name_ar": "تعديل فصل",
     "description": "Edit class information",
-    "description_ar": "تعديل بيانات الفصل"
+    "description_ar": "تعديل بيانات الفصل",
+    "id": 1017,
+    "name": "Edit Classes",
+    "name_ar": "تعديل فصل"
   },
   {
-    "id": 2000,
     "code": "academic.classes.delete",
-    "name": "Delete Classes",
-    "name_ar": "ازالة فصل",
     "description": "Delete class information",
-    "description_ar": "حذف بيانات الفصل"
+    "description_ar": "حذف بيانات الفصل",
+    "id": 2000,
+    "name": "Delete Classes",
+    "name_ar": "ازالة فصل"
   },
   {
-    "id": 1018,
     "code": "communication.supervisor.*",
-    "name": "Full Supervisor Communication",
-    "name_ar": "الاتصال الكامل بالمشرف",
     "description": "Complete control over supervisor communication",
-    "description_ar": "التحكم الكامل في الاتصال بالمشرف"
+    "description_ar": "التحكم الكامل في الاتصال بالمشرف",
+    "id": 1018,
+    "name": "Full Supervisor Communication",
+    "name_ar": "الاتصال الكامل بالمشرف"
   },
   {
-    "id": 1019,
     "code": "communication.supervisor.contact",
-    "name": "Contact Branch Supervisor",
-    "name_ar": "الاتصال بمشرف الفرع",
     "description": "Communicating with branch supervisor",
-    "description_ar": "التواصل مع مشرف الفرع"
+    "description_ar": "التواصل مع مشرف الفرع",
+    "id": 1019,
+    "name": "Contact Branch Supervisor",
+    "name_ar": "الاتصال بمشرف الفرع"
   },
   {
-    "id": 1021,
     "code": "reports.attendance.view",
-    "name": "View Attendance Reports",
-    "name_ar": "عرض التقارير الحضور",
     "description": "Access to attendance reports",
-    "description_ar": "الوصول للتقارير الحضور"
+    "description_ar": "الوصول للتقارير الحضور",
+    "id": 1021,
+    "name": "View Attendance Reports",
+    "name_ar": "عرض التقارير الحضور"
   },
   {
-    "id": 1022,
     "code": "reports.evaluations.view",
-    "name": "View Evaluations Reports",
-    "name_ar": "عرض تقارير التقييمات",
     "description": "Access to evaluations reports",
-    "description_ar": "الوصول لتقارير التقييمات"
+    "description_ar": "الوصول لتقارير التقييمات",
+    "id": 1022,
+    "name": "View Evaluations Reports",
+    "name_ar": "عرض تقارير التقييمات"
   },
   {
-    "id": 1023,
     "code": "reports.finance.view",
-    "name": "View Finance Reports",
-    "name_ar": "عرض التقارير المالية",
     "description": "Access to finance reports",
-    "description_ar": "الوصول للتقارير المالية"
+    "description_ar": "الوصول للتقارير المالية",
+    "id": 1023,
+    "name": "View Finance Reports",
+    "name_ar": "عرض التقارير المالية"
   },
   {
-    "id": 1024,
     "code": "reports.teachers.view",
-    "name": "View Teachers Reports",
-    "name_ar": "عرض تقارير المعلمين",
     "description": "Access to teachers performance reports",
-    "description_ar": "الوصول لتقارير المعلمين"
+    "description_ar": "الوصول لتقارير المعلمين",
+    "id": 1024,
+    "name": "View Teachers Reports",
+    "name_ar": "عرض تقارير المعلمين"
   },
   {
-    "id": 1025,
     "code": "reports.staff.view",
-    "name": "View Staff Reports",
-    "name_ar": "عرض تقارير الاداريين",
     "description": "Access to staff performance reports",
-    "description_ar": "الوصول لتقارير الاداريين"
+    "description_ar": "الوصول لتقارير الاداريين",
+    "id": 1025,
+    "name": "View Staff Reports",
+    "name_ar": "عرض تقارير الاداريين"
   },
   {
-    "id": 1030,
     "code": "communication.announcements.*",
-    "name": "Full Announcements Management",
-    "name_ar": "إدارة الإعلانات الكاملة",
     "description": "Complete control over announcements",
-    "description_ar": "التحكم الكامل في الإعلانات"
+    "description_ar": "التحكم الكامل في الإعلانات",
+    "id": 1030,
+    "name": "Full Announcements Management",
+    "name_ar": "إدارة الإعلانات الكاملة"
   },
   {
-    "id": 1031,
     "code": "communication.announcements.send",
-    "name": "Send Announcements",
-    "name_ar": "إرسال الإعلانات",
     "description": "Sending announcements to the system",
-    "description_ar": "إرسال الإعلانات للنظام"
+    "description_ar": "إرسال الإعلانات للنظام",
+    "id": 1031,
+    "name": "Send Announcements",
+    "name_ar": "إرسال الإعلانات"
   },
   {
-    "id": 1032,
     "code": "teacher.management.*",
-    "name": "Full Teacher Management",
-    "name_ar": "إدارة المعلمين الكاملة",
     "description": "Complete control over teacher management",
-    "description_ar": "التحكم الكامل في إدارة المعلمين"
+    "description_ar": "التحكم الكامل في إدارة المعلمين",
+    "id": 1032,
+    "name": "Full Teacher Management",
+    "name_ar": "إدارة المعلمين الكاملة"
   },
   {
-    "id": 1033,
     "code": "teacher.management.view",
-    "name": "View Teachers",
-    "name_ar": "عرض المعلمين",
     "description": "View teacher information",
-    "description_ar": "عرض معلومات المعلمين"
+    "description_ar": "عرض معلومات المعلمين",
+    "id": 1033,
+    "name": "View Teachers",
+    "name_ar": "عرض المعلمين"
   },
   {
-    "id": 1034,
     "code": "teacher.management.add",
-    "name": "Add Teachers",
-    "name_ar": "إضافة المعلمين",
     "description": "Add new teachers",
-    "description_ar": "إضافة معلمين جدد"
+    "description_ar": "إضافة معلمين جدد",
+    "id": 1034,
+    "name": "Add Teachers",
+    "name_ar": "إضافة المعلمين"
   },
   {
-    "id": 1035,
     "code": "teacher.management.edit",
-    "name": "Edit Teachers",
-    "name_ar": "تعديل المعلمين",
     "description": "Edit teacher information",
-    "description_ar": "تعديل معلومات المعلمين"
+    "description_ar": "تعديل معلومات المعلمين",
+    "id": 1035,
+    "name": "Edit Teachers",
+    "name_ar": "تعديل المعلمين"
   },
   {
-    "id": 1036,
     "code": "teacher.management.delete",
-    "name": "Delete Teachers",
-    "name_ar": "حذف المعلمين",
     "description": "Delete teachers",
-    "description_ar": "حذف المعلمين"
+    "description_ar": "حذف المعلمين",
+    "id": 1036,
+    "name": "Delete Teachers",
+    "name_ar": "حذف المعلمين"
   },
   {
-    "id": 1037,
     "code": "attendance.teacher.*",
-    "name": "Full Teacher Attendance Management",
-    "name_ar": "إدارة حضور المعلمين الكاملة",
     "description": "Complete control over teacher attendance",
-    "description_ar": "التحكم الكامل في حضور المعلمين"
+    "description_ar": "التحكم الكامل في حضور المعلمين",
+    "id": 1037,
+    "name": "Full Teacher Attendance Management",
+    "name_ar": "إدارة حضور المعلمين الكاملة"
   },
   {
-    "id": 1038,
     "code": "attendance.teacher.view",
-    "name": "View Teacher Attendance",
-    "name_ar": "عرض حضور المعلمين",
     "description": "View teacher attendance records",
-    "description_ar": "عرض سجلات حضور المعلمين"
+    "description_ar": "عرض سجلات حضور المعلمين",
+    "id": 1038,
+    "name": "View Teacher Attendance",
+    "name_ar": "عرض حضور المعلمين"
   },
   {
-    "id": 1039,
     "code": "attendance.teacher.add",
-    "name": "Add Teacher Attendance",
-    "name_ar": "إضافة حضور المعلمين",
     "description": "Add teacher attendance records",
-    "description_ar": "إضافة سجلات حضور المعلمين"
+    "description_ar": "إضافة سجلات حضور المعلمين",
+    "id": 1039,
+    "name": "Add Teacher Attendance",
+    "name_ar": "إضافة حضور المعلمين"
   },
   {
-    "id": 1040,
     "code": "attendance.teacher.edit",
-    "name": "Edit Teacher Attendance",
-    "name_ar": "تعديل حضور المعلمين",
     "description": "Edit teacher attendance records",
-    "description_ar": "تعديل سجلات حضور المعلمين"
+    "description_ar": "تعديل سجلات حضور المعلمين",
+    "id": 1040,
+    "name": "Edit Teacher Attendance",
+    "name_ar": "تعديل حضور المعلمين"
   },
   {
-    "id": 1041,
     "code": "attendance.teacher.delete",
-    "name": "Delete Teacher Attendance",
-    "name_ar": "حذف حضور المعلمين",
     "description": "Delete teacher attendance records",
-    "description_ar": "حذف سجلات حضور المعلمين"
+    "description_ar": "حذف سجلات حضور المعلمين",
+    "id": 1041,
+    "name": "Delete Teacher Attendance",
+    "name_ar": "حذف حضور المعلمين"
   },
   {
-    "id": 1042,
     "code": "evaluation.teacher.*",
-    "name": "Full Teacher Evaluation Management",
-    "name_ar": "إدارة تقييم المعلمين الكاملة",
     "description": "Complete control over teacher evaluations",
-    "description_ar": "التحكم الكامل في تقييمات المعلمين"
+    "description_ar": "التحكم الكامل في تقييمات المعلمين",
+    "id": 1042,
+    "name": "Full Teacher Evaluation Management",
+    "name_ar": "إدارة تقييم المعلمين الكاملة"
   },
   {
-    "id": 1043,
     "code": "evaluation.teacher.view",
-    "name": "View Teacher Evaluations",
-    "name_ar": "عرض تقييمات المعلمين",
     "description": "View teacher performance evaluations",
-    "description_ar": "عرض تقييمات أداء المعلمين"
+    "description_ar": "عرض تقييمات أداء المعلمين",
+    "id": 1043,
+    "name": "View Teacher Evaluations",
+    "name_ar": "عرض تقييمات المعلمين"
   },
   {
-    "id": 1044,
     "code": "evaluation.teacher.add",
-    "name": "Add Teacher Evaluations",
-    "name_ar": "إضافة تقييمات المعلمين",
     "description": "Add teacher performance evaluations",
-    "description_ar": "إضافة تقييمات أداء المعلمين"
+    "description_ar": "إضافة تقييمات أداء المعلمين",
+    "id": 1044,
+    "name": "Add Teacher Evaluations",
+    "name_ar": "إضافة تقييمات المعلمين"
   },
   {
-    "id": 1045,
     "code": "evaluation.teacher.edit",
-    "name": "Edit Teacher Evaluations",
-    "name_ar": "تعديل تقييمات المعلمين",
     "description": "Edit teacher performance evaluations",
-    "description_ar": "تعديل تقييمات أداء المعلمين"
+    "description_ar": "تعديل تقييمات أداء المعلمين",
+    "id": 1045,
+    "name": "Edit Teacher Evaluations",
+    "name_ar": "تعديل تقييمات المعلمين"
   },
   {
-    "id": 1046,
     "code": "evaluation.teacher.delete",
-    "name": "Delete Teacher Evaluations",
-    "name_ar": "حذف تقييمات المعلمين",
     "description": "Delete teacher performance evaluations",
-    "description_ar": "حذف تقييمات أداء المعلمين"
+    "description_ar": "حذف تقييمات أداء المعلمين",
+    "id": 1046,
+    "name": "Delete Teacher Evaluations",
+    "name_ar": "حذف تقييمات المعلمين"
   },
   {
-    "id": 1051,
     "code": "system.assignments.*",
-    "name": "Full Assignments Management",
-    "name_ar": "إدارة التعيينات الكاملة",
     "description": "Complete control over assignments",
-    "description_ar": "التحكم الكامل في التعيينات"
+    "description_ar": "التحكم الكامل في التعيينات",
+    "id": 1051,
+    "name": "Full Assignments Management",
+    "name_ar": "إدارة التعيينات الكاملة"
   },
   {
-    "id": 1052,
     "code": "system.assignments.view",
-    "name": "View Assignments",
-    "name_ar": "عرض التعيينات",
     "description": "View student and teacher assignments to classes",
-    "description_ar": "عرض تعيينات الطلاب والمعلمين للفصول"
+    "description_ar": "عرض تعيينات الطلاب والمعلمين للفصول",
+    "id": 1052,
+    "name": "View Assignments",
+    "name_ar": "عرض التعيينات"
   },
   {
-    "id": 1053,
     "code": "system.assignments.add",
-    "name": "Add Assignments",
-    "name_ar": "إضافة التعيينات",
     "description": "Assign students and teachers to classes",
-    "description_ar": "تعيين الطلاب والمعلمين للفصول"
+    "description_ar": "تعيين الطلاب والمعلمين للفصول",
+    "id": 1053,
+    "name": "Add Assignments",
+    "name_ar": "إضافة التعيينات"
   },
   {
-    "id": 1054,
     "code": "system.assignments.edit",
-    "name": "Edit Assignments",
-    "name_ar": "تعديل التعيينات",
     "description": "Edit student and teacher assignments to classes",
-    "description_ar": "تعديل تعيينات الطلاب والمعلمين للفصول"
+    "description_ar": "تعديل تعيينات الطلاب والمعلمين للفصول",
+    "id": 1054,
+    "name": "Edit Assignments",
+    "name_ar": "تعديل التعيينات"
   },
   {
-    "id": 1055,
     "code": "system.assignments.delete",
-    "name": "Delete Assignments",
-    "name_ar": "حذف التعيينات",
     "description": "Remove student and teacher assignments from classes",
-    "description_ar": "إزالة تعيينات الطلاب والمعلمين من الفصول"
+    "description_ar": "إزالة تعيينات الطلاب والمعلمين من الفصول",
+    "id": 1055,
+    "name": "Delete Assignments",
+    "name_ar": "حذف التعيينات"
   },
   {
-    "id": 1056,
     "code": "system.teachers.*",
-    "name": "Full Teacher Permissions Management",
-    "name_ar": "إدارة صلاحيات المعلمين الكاملة",
     "description": "Complete control over teacher permissions",
-    "description_ar": "التحكم الكامل في صلاحيات المعلمين"
+    "description_ar": "التحكم الكامل في صلاحيات المعلمين",
+    "id": 1056,
+    "name": "Full Teacher Permissions Management",
+    "name_ar": "إدارة صلاحيات المعلمين الكاملة"
   },
   {
-    "id": 1057,
     "code": "system.teachers.view",
-    "name": "View Teacher",
-    "name_ar": "عرض المعلمين",
     "description": "View teachers",
-    "description_ar": "عرض المعلمين"
+    "description_ar": "عرض المعلمين",
+    "id": 1057,
+    "name": "View Teacher",
+    "name_ar": "عرض المعلمين"
   },
   {
-    "id": 1058,
     "code": "system.teachers.add",
-    "name": "Add Teacher",
-    "name_ar": "إضافة المعلمين",
     "description": "Add to teachers",
-    "description_ar": "إضافة للمعلمين"
+    "description_ar": "إضافة للمعلمين",
+    "id": 1058,
+    "name": "Add Teacher",
+    "name_ar": "إضافة المعلمين"
   },
   {
-    "id": 1059,
     "code": "system.teachers.edit",
-    "name": "Edit Teacher",
-    "name_ar": "تعديل المعلمين",
     "description": "Edit teacher",
-    "description_ar": "تعديل المعلمين"
+    "description_ar": "تعديل المعلمين",
+    "id": 1059,
+    "name": "Edit Teacher",
+    "name_ar": "تعديل المعلمين"
   },
   {
-    "id": 1060,
     "code": "system.teachers.delete",
-    "name": "Delete Teacher",
-    "name_ar": "حذف المعلمين",
     "description": "Remove teacher",
-    "description_ar": "إزالة المعلمين"
+    "description_ar": "إزالة المعلمين",
+    "id": 1060,
+    "name": "Delete Teacher",
+    "name_ar": "حذف المعلمين"
   },
   {
-    "id": 1061,
     "code": "academic.exams.edit",
-    "name": "Edit Exams",
-    "name_ar": "الإشراف على الامتحانات",
     "description": "Edit exams",
-    "description_ar": "تعديل الامتحانات"
+    "description_ar": "تعديل الامتحانات",
+    "id": 1061,
+    "name": "Edit Exams",
+    "name_ar": "الإشراف على الامتحانات"
   },
   {
-    "id": 1062,
     "code": "academic.curriculum.add",
-    "name": "Add Curriculum",
-    "name_ar": "إضافة المستوى التعليمى",
     "description": "Add new curriculum",
-    "description_ar": "إضافة مستوى تعليمى جديد"
+    "description_ar": "إضافة مستوى تعليمى جديد",
+    "id": 1062,
+    "name": "Add Curriculum",
+    "name_ar": "إضافة المستوى التعليمى"
   },
   {
-    "id": 1063,
     "code": "academic.curriculum.edit",
-    "name": "Edit Curriculum",
-    "name_ar": "تعديل المستوى التعليمى",
     "description": "Edit curriculum information",
-    "description_ar": "تعديل معلومات المستوى التعليمى"
+    "description_ar": "تعديل معلومات المستوى التعليمى",
+    "id": 1063,
+    "name": "Edit Curriculum",
+    "name_ar": "تعديل المستوى التعليمى"
   },
   {
-    "id": 1064,
     "code": "academic.curriculum.delete",
-    "name": "Delete Curriculum",
-    "name_ar": "حذف المستوى التعليمى",
     "description": "Delete curriculum",
-    "description_ar": "حذف المستوى التعليمى"
+    "description_ar": "حذف المستوى التعليمى",
+    "id": 1064,
+    "name": "Delete Curriculum",
+    "name_ar": "حذف المستوى التعليمى"
   },
   {
-    "id": 1065,
     "code": "training.teacher.*",
-    "name": "Full Teacher Training Management",
-    "name_ar": "إدارة تدريب المعلمين الكاملة",
     "description": "Complete control over teacher training",
-    "description_ar": "التحكم الكامل في تدريب المعلمين"
+    "description_ar": "التحكم الكامل في تدريب المعلمين",
+    "id": 1065,
+    "name": "Full Teacher Training Management",
+    "name_ar": "إدارة تدريب المعلمين الكاملة"
   },
   {
-    "id": 1066,
     "code": "training.teacher.view",
-    "name": "View Teacher Training",
-    "name_ar": "عرض تدريب المعلمين",
     "description": "View teacher training classes",
-    "description_ar": "عرض فصول تدريب المعلمين"
+    "description_ar": "عرض فصول تدريب المعلمين",
+    "id": 1066,
+    "name": "View Teacher Training",
+    "name_ar": "عرض تدريب المعلمين"
   },
   {
-    "id": 1067,
     "code": "training.teacher.add",
-    "name": "Add Teacher Training",
-    "name_ar": "إضافة تدريب المعلمين",
     "description": "Add teacher training classes",
-    "description_ar": "إضافة فصول تدريب المعلمين"
+    "description_ar": "إضافة فصول تدريب المعلمين",
+    "id": 1067,
+    "name": "Add Teacher Training",
+    "name_ar": "إضافة تدريب المعلمين"
   },
   {
-    "id": 1068,
     "code": "training.teacher.edit",
-    "name": "Edit Teacher Training",
-    "name_ar": "تعديل تدريب المعلمين",
     "description": "Edit teacher training classes",
-    "description_ar": "تعديل فصول تدريب المعلمين"
+    "description_ar": "تعديل فصول تدريب المعلمين",
+    "id": 1068,
+    "name": "Edit Teacher Training",
+    "name_ar": "تعديل تدريب المعلمين"
   },
   {
-    "id": 1069,
     "code": "training.teacher.delete",
-    "name": "Delete Teacher Training",
-    "name_ar": "حذف تدريب المعلمين",
     "description": "Delete teacher training classes",
-    "description_ar": "حذف فصول تدريب المعلمين"
+    "description_ar": "حذف فصول تدريب المعلمين",
+    "id": 1069,
+    "name": "Delete Teacher Training",
+    "name_ar": "حذف تدريب المعلمين"
   },
   {
-    "id": 1070,
     "code": "academic.exams.delete",
-    "name": "Delete Exams",
-    "name_ar": "حذف الامتحانات",
     "description": "Delete exams",
-    "description_ar": "حذف الامتحانات"
+    "description_ar": "حذف الامتحانات",
+    "id": 1070,
+    "name": "Delete Exams",
+    "name_ar": "حذف الامتحانات"
   },
   {
-    "id": 1076,
     "code": "activities.student.*",
-    "name": "Full Student Activities Management",
-    "name_ar": "إدارة أنشطة الطلاب الكاملة",
     "description": "Complete control over student activities",
-    "description_ar": "التحكم الكامل في أنشطة الطلاب"
+    "description_ar": "التحكم الكامل في أنشطة الطلاب",
+    "id": 1076,
+    "name": "Full Student Activities Management",
+    "name_ar": "إدارة أنشطة الطلاب الكاملة"
   },
   {
-    "id": 1077,
     "code": "activities.student.approve",
-    "name": "Approve Student Activities",
-    "name_ar": "اعتماد أنشطة الطلاب",
     "description": "Review and approve student activities",
-    "description_ar": "مراجعة واعتماد أنشطة الطلاب"
+    "description_ar": "مراجعة واعتماد أنشطة الطلاب",
+    "id": 1077,
+    "name": "Approve Student Activities",
+    "name_ar": "اعتماد أنشطة الطلاب"
   },
   {
+    "code": "payroll.cycles.*",
+    "description": "Complete control over payroll cycles",
+    "description_ar": "التحكم الكامل في دورات المرتب",
     "id": 1083,
-    "code": "penalty.staff.*",
-    "name": "Full Staff Penalty Management",
-    "name_ar": "إدارة جزاءات الموظفين الكاملة",
-    "description": "Complete control over staff penalties",
-    "description_ar": "التحكم الكامل في جزاءات الموظفين"
+    "name": "Full Payroll Cycles Management",
+    "name_ar": "إدارة دورات المرتب الكاملة"
   },
   {
+    "code": "payroll.cycles.view",
+    "description": "View payroll cycles",
+    "description_ar": "عرض دورات المرتب",
     "id": 1084,
-    "code": "penalty.staff.view",
-    "name": "View Staff Penalties",
-    "name_ar": "عرض جزاءات الموظفين",
-    "description": "View staff penalties and rewards",
-    "description_ar": "عرض جزاءات ومكافآت الموظفين"
+    "name": "View Payroll Cycles",
+    "name_ar": "عرض دورات المرتب"
   },
   {
+    "code": "payroll.cycles.add",
+    "description": "Add payroll cycles",
+    "description_ar": "إضافة دورات المرتب",
     "id": 1085,
-    "code": "penalty.staff.add",
-    "name": "Add Staff Penalties",
-    "name_ar": "إضافة جزاءات الموظفين",
-    "description": "Add staff penalties and rewards",
-    "description_ar": "إضافة جزاءات ومكافآت الموظفين"
+    "name": "Add Payroll Cycles",
+    "name_ar": "إضافة دورات المرتب"
   },
   {
+    "code": "payroll.cycles.edit",
+    "description": "Edit payroll cycles and add components",
+    "description_ar": "تعديل دورات المرتب وإضافة مكافآت وجزائات",
     "id": 1086,
-    "code": "penalty.staff.edit",
-    "name": "Edit Staff Penalties",
-    "name_ar": "تعديل جزاءات الموظفين",
-    "description": "Edit staff penalties and rewards",
-    "description_ar": "تعديل جزاءات ومكافآت الموظفين"
+    "name": "Edit Payroll cycles",
+    "name_ar": "تعديل دورات المرتب"
   },
   {
+    "code": "payroll.cycles.approve",
+    "description": "Approve payroll cycles and mark them as paid",
+    "description_ar": "قبول دورات المرتب ودفعها",
     "id": 1087,
-    "code": "penalty.staff.delete",
-    "name": "Delete Staff Penalties",
-    "name_ar": "حذف جزاءات الموظفين",
-    "description": "Delete staff penalties and rewards",
-    "description_ar": "حذف جزاءات ومكافآت الموظفين"
+    "name": "Approve Payroll Cycles",
+    "name_ar": "قبول دورات المرتب"
   },
   {
+    "code": "payroll.cycles.delete",
+    "description": "Delete payroll cycles",
+    "description_ar": "مسح دورات المرتب",
     "id": 1088,
-    "code": "penalty.teacher.*",
-    "name": "Full Teacher Penalty Management",
-    "name_ar": "إدارة جزاءات المعلمين الكاملة",
-    "description": "Complete control over teacher penalties",
-    "description_ar": "التحكم الكامل في جزاءات المعلمين"
+    "name": "Delete Payroll Cycles",
+    "name_ar": "مسح دورات المرتب"
   },
   {
-    "id": 1089,
-    "code": "penalty.teacher.view",
-    "name": "View Teacher Penalties",
-    "name_ar": "عرض جزاءات المعلمين",
-    "description": "View teacher penalties and rewards",
-    "description_ar": "عرض جزاءات ومكافآت المعلمين"
-  },
-  {
-    "id": 1090,
-    "code": "penalty.teacher.add",
-    "name": "Add Teacher Penalties",
-    "name_ar": "إضافة جزاءات المعلمين",
-    "description": "Add teacher penalties and rewards",
-    "description_ar": "إضافة جزاءات ومكافآت المعلمين"
-  },
-  {
-    "id": 1091,
-    "code": "penalty.teacher.edit",
-    "name": "Edit Teacher Penalties",
-    "name_ar": "تعديل جزاءات المعلمين",
-    "description": "Edit teacher penalties and rewards",
-    "description_ar": "تعديل جزاءات ومكافآت المعلمين"
-  },
-  {
-    "id": 1092,
-    "code": "penalty.teacher.delete",
-    "name": "Delete Teacher Penalties",
-    "name_ar": "حذف جزاءات المعلمين",
-    "description": "Delete teacher penalties and rewards",
-    "description_ar": "حذف جزاءات ومكافآت المعلمين"
-  },
-  {
+    "code": "staff.contracts.*",
+    "description": "Complete control over staff contracts",
+    "description_ar": "التحكم الكامل في عقودات الموظفين",
     "id": 1093,
-    "code": "salary.staff.*",
-    "name": "Full Staff Salary Management",
-    "name_ar": "إدارة رواتب الموظفين الكاملة",
-    "description": "Complete control over staff salaries",
-    "description_ar": "التحكم الكامل في رواتب الموظفين"
+    "name": "Full Staff Contracts Management",
+    "name_ar": "إدارة عقودات الموظفين"
   },
   {
+    "code": "staff.contracts.view",
+    "description": "View salary structures",
+    "description_ar": "عرض عقودات الموظفين",
     "id": 1094,
-    "code": "salary.staff.view",
-    "name": "View Staff Salaries",
-    "name_ar": "عرض رواتب الموظفين",
-    "description": "View staff monthly salaries",
-    "description_ar": "عرض الرواتب الشهرية للموظفين"
+    "name": "View Staff Contracts",
+    "name_ar": "عرض عقودات الموظفين"
   },
   {
+    "code": "staff.contracts.add",
+    "description": "Add staff contracts",
+    "description_ar": "إضافة عقودات الموظفين",
     "id": 1095,
-    "code": "salary.staff.add",
-    "name": "Add Staff Salaries",
-    "name_ar": "إضافة رواتب الموظفين",
-    "description": "Add staff monthly salaries",
-    "description_ar": "إضافة الرواتب الشهرية للموظفين"
+    "name": "Add Staff Contracts",
+    "name_ar": "إضافة عقودات الموظفين"
   },
   {
+    "code": "staff.contracts.edit",
+    "description": "Edit staff contracts",
+    "description_ar": "تعديل عقودات الموظفين",
     "id": 1096,
-    "code": "salary.staff.edit",
-    "name": "Edit Staff Salaries",
-    "name_ar": "تعديل رواتب الموظفين",
-    "description": "Edit staff monthly salaries",
-    "description_ar": "تعديل الرواتب الشهرية للموظفين"
+    "name": "Edit Staff Contracts",
+    "name_ar": "تعديل عقودات الموظفين"
   },
   {
+    "code": "staff.contracts.delete",
+    "description": "Delete staff contracts",
+    "description_ar": "حذف عقودات الموظفين",
     "id": 1097,
-    "code": "salary.staff.delete",
-    "name": "Delete Staff Salaries",
-    "name_ar": "حذف رواتب الموظفين",
-    "description": "Delete staff monthly salaries",
-    "description_ar": "حذف الرواتب الشهرية للموظفين"
+    "name": "Delete Staff Contracts",
+    "name_ar": "حذف عقودات الموظفين"
   },
   {
-    "id": 1098,
-    "code": "salary.teacher.*",
-    "name": "Full Teacher Salary Management",
-    "name_ar": "إدارة رواتب المعلمين الكاملة",
-    "description": "Complete control over teacher salaries",
-    "description_ar": "التحكم الكامل في رواتب المعلمين"
-  },
-  {
-    "id": 1099,
-    "code": "salary.teacher.view",
-    "name": "View Teacher Salaries",
-    "name_ar": "عرض رواتب المعلمين",
-    "description": "View teacher monthly salaries",
-    "description_ar": "عرض الرواتب الشهرية للمعلمين"
-  },
-  {
-    "id": 1100,
-    "code": "salary.teacher.add",
-    "name": "Add Teacher Salaries",
-    "name_ar": "إضافة رواتب المعلمين",
-    "description": "Add teacher monthly salaries",
-    "description_ar": "إضافة الرواتب الشهرية للمعلمين"
-  },
-  {
-    "id": 1101,
-    "code": "salary.teacher.edit",
-    "name": "Edit Teacher Salaries",
-    "name_ar": "تعديل رواتب المعلمين",
-    "description": "Edit teacher monthly salaries",
-    "description_ar": "تعديل الرواتب الشهرية للمعلمين"
-  },
-  {
-    "id": 1102,
-    "code": "salary.teacher.delete",
-    "name": "Delete Teacher Salaries",
-    "name_ar": "حذف رواتب المعلمين",
-    "description": "Delete teacher monthly salaries",
-    "description_ar": "حذف الرواتب الشهرية للمعلمين"
-  },
-  {
-    "id": 1108,
     "code": "evaluation.student.*",
-    "name": "Full Student Evaluation Management",
-    "name_ar": "إدارة تقييم الطلاب الكاملة",
     "description": "Complete control over student evaluations",
-    "description_ar": "التحكم الكامل في تقييم الطلاب"
+    "description_ar": "التحكم الكامل في تقييم الطلاب",
+    "id": 1108,
+    "name": "Full Student Evaluation Management",
+    "name_ar": "إدارة تقييم الطلاب الكاملة"
   },
   {
-    "id": 1109,
     "code": "evaluation.student.view",
-    "name": "View Student Evaluations",
-    "name_ar": "عرض تقييمات الطلاب",
     "description": "View student evaluation records",
-    "description_ar": "عرض سجلات تقييم الطلاب"
+    "description_ar": "عرض سجلات تقييم الطلاب",
+    "id": 1109,
+    "name": "View Student Evaluations",
+    "name_ar": "عرض تقييمات الطلاب"
   },
   {
-    "id": 1110,
     "code": "evaluation.student.add",
-    "name": "Add Student Evaluations",
-    "name_ar": "إضافة تقييمات الطلاب",
     "description": "Add student evaluation records",
-    "description_ar": "إضافة سجلات تقييم الطلاب"
+    "description_ar": "إضافة سجلات تقييم الطلاب",
+    "id": 1110,
+    "name": "Add Student Evaluations",
+    "name_ar": "إضافة تقييمات الطلاب"
   },
   {
-    "id": 1111,
     "code": "evaluation.student.edit",
-    "name": "Edit Student Evaluations",
-    "name_ar": "تعديل تقييمات الطلاب",
     "description": "Edit student evaluation records",
-    "description_ar": "تعديل سجلات تقييم الطلاب"
+    "description_ar": "تعديل سجلات تقييم الطلاب",
+    "id": 1111,
+    "name": "Edit Student Evaluations",
+    "name_ar": "تعديل تقييمات الطلاب"
   },
   {
-    "id": 1113,
     "code": "financial.subscriptions.*",
-    "name": "Full Subscriptions Management",
-    "name_ar": "إدارة الاشتراكات الكاملة",
     "description": "Complete control over subscriptions",
-    "description_ar": "التحكم الكامل في الاشتراكات"
+    "description_ar": "التحكم الكامل في الاشتراكات",
+    "id": 1113,
+    "name": "Full Subscriptions Management",
+    "name_ar": "إدارة الاشتراكات الكاملة"
   },
   {
-    "id": 1114,
     "code": "financial.subscriptions.view",
-    "name": "View Subscriptions",
-    "name_ar": "عرض الاشتراكات",
     "description": "View student subscriptions and invoices",
-    "description_ar": "عرض اشتراكات الطلاب والفواتير"
+    "description_ar": "عرض اشتراكات الطلاب والفواتير",
+    "id": 1114,
+    "name": "View Subscriptions",
+    "name_ar": "عرض الاشتراكات"
   },
   {
-    "id": 1115,
     "code": "financial.subscriptions.add",
-    "name": "Add Subscriptions",
-    "name_ar": "إضافة الاشتراكات",
     "description": "Add student subscriptions and invoices",
-    "description_ar": "إضافة اشتراكات الطلاب والفواتير"
+    "description_ar": "إضافة اشتراكات الطلاب والفواتير",
+    "id": 1115,
+    "name": "Add Subscriptions",
+    "name_ar": "إضافة الاشتراكات"
   },
   {
-    "id": 1116,
     "code": "financial.subscriptions.edit",
-    "name": "Edit Subscriptions",
-    "name_ar": "تعديل الاشتراكات",
     "description": "Edit student subscriptions and invoices",
-    "description_ar": "تعديل اشتراكات الطلاب والفواتير"
+    "description_ar": "تعديل اشتراكات الطلاب والفواتير",
+    "id": 1116,
+    "name": "Edit Subscriptions",
+    "name_ar": "تعديل الاشتراكات"
   },
   {
-    "id": 1117,
     "code": "financial.subscriptions.delete",
-    "name": "Delete Subscriptions",
-    "name_ar": "حذف الاشتراكات",
     "description": "Delete student subscriptions and invoices",
-    "description_ar": "حذف اشتراكات الطلاب والفواتير"
+    "description_ar": "حذف اشتراكات الطلاب والفواتير",
+    "id": 1117,
+    "name": "Delete Subscriptions",
+    "name_ar": "حذف الاشتراكات"
   },
   {
-    "id": 1118,
     "code": "communication.messages.*",
-    "name": "Full Messages Management",
-    "name_ar": "إدارة الرسائل الكاملة",
     "description": "Complete control over messages",
-    "description_ar": "التحكم الكامل في الرسائل"
+    "description_ar": "التحكم الكامل في الرسائل",
+    "id": 1118,
+    "name": "Full Messages Management",
+    "name_ar": "إدارة الرسائل الكاملة"
   },
   {
-    "id": 1119,
     "code": "communication.messages.send",
-    "name": "Send Messages",
-    "name_ar": "إرسال الرسائل",
     "description": "Send messages to students/parents",
-    "description_ar": "إرسال رسائل للطلاب/أولياء الأمور"
+    "description_ar": "إرسال رسائل للطلاب/أولياء الأمور",
+    "id": 1119,
+    "name": "Send Messages",
+    "name_ar": "إرسال الرسائل"
   },
   {
-    "id": 1120,
     "code": "activities.seminars.*",
-    "name": "Full Seminars Management",
-    "name_ar": "إدارة الندوات الكاملة",
     "description": "Complete control over seminars",
-    "description_ar": "التحكم الكامل في الندوات"
+    "description_ar": "التحكم الكامل في الندوات",
+    "id": 1120,
+    "name": "Full Seminars Management",
+    "name_ar": "إدارة الندوات الكاملة"
   },
   {
-    "id": 1121,
     "code": "activities.seminars.organize",
-    "name": "Organize Seminars",
-    "name_ar": "تنظيم الندوات",
     "description": "Organize educational seminars",
-    "description_ar": "تنظيم الندوات التعليمية"
+    "description_ar": "تنظيم الندوات التعليمية",
+    "id": 1121,
+    "name": "Organize Seminars",
+    "name_ar": "تنظيم الندوات"
   },
   {
-    "id": 1122,
     "code": "activities.competitions.*",
-    "name": "Full Competitions Management",
-    "name_ar": "إدارة المسابقات الكاملة",
     "description": "Complete control over competitions",
-    "description_ar": "التحكم الكامل في المسابقات"
+    "description_ar": "التحكم الكامل في المسابقات",
+    "id": 1122,
+    "name": "Full Competitions Management",
+    "name_ar": "إدارة المسابقات الكاملة"
   },
   {
-    "id": 1123,
     "code": "activities.competitions.view",
-    "name": "View Competitions",
-    "name_ar": "عرض المسابقات",
     "description": "View student competitions and activities",
-    "description_ar": "عرض مسابقات وأنشطة الطلاب"
+    "description_ar": "عرض مسابقات وأنشطة الطلاب",
+    "id": 1123,
+    "name": "View Competitions",
+    "name_ar": "عرض المسابقات"
   },
   {
-    "id": 1124,
     "code": "activities.competitions.add",
-    "name": "Add Competitions",
-    "name_ar": "إضافة المسابقات",
     "description": "Add student competitions and activities",
-    "description_ar": "إضافة مسابقات وأنشطة الطلاب"
+    "description_ar": "إضافة مسابقات وأنشطة الطلاب",
+    "id": 1124,
+    "name": "Add Competitions",
+    "name_ar": "إضافة المسابقات"
   },
   {
-    "id": 1125,
     "code": "activities.competitions.edit",
-    "name": "Edit Competitions",
-    "name_ar": "تعديل المسابقات",
     "description": "Edit student competitions and activities",
-    "description_ar": "تعديل مسابقات وأنشطة الطلاب"
+    "description_ar": "تعديل مسابقات وأنشطة الطلاب",
+    "id": 1125,
+    "name": "Edit Competitions",
+    "name_ar": "تعديل المسابقات"
   },
   {
-    "id": 1126,
     "code": "activities.competitions.delete",
-    "name": "Delete Competitions",
-    "name_ar": "حذف المسابقات",
     "description": "Delete student competitions and activities",
-    "description_ar": "حذف مسابقات وأنشطة الطلاب"
+    "description_ar": "حذف مسابقات وأنشطة الطلاب",
+    "id": 1126,
+    "name": "Delete Competitions",
+    "name_ar": "حذف المسابقات"
   },
   {
-    "id": 1127,
     "code": "activities.parties.*",
-    "name": "Full Parties Management",
-    "name_ar": "إدارة الحفلات الكاملة",
     "description": "Complete control over parties",
-    "description_ar": "التحكم الكامل في الحفلات"
+    "description_ar": "التحكم الكامل في الحفلات",
+    "id": 1127,
+    "name": "Full Parties Management",
+    "name_ar": "إدارة الحفلات الكاملة"
   },
   {
-    "id": 1128,
     "code": "activities.parties.view",
-    "name": "View Parties",
-    "name_ar": "عرض الحفلات",
     "description": "View student parties and events",
-    "description_ar": "عرض حفلات وفعاليات الطلاب"
+    "description_ar": "عرض حفلات وفعاليات الطلاب",
+    "id": 1128,
+    "name": "View Parties",
+    "name_ar": "عرض الحفلات"
   },
   {
-    "id": 1129,
     "code": "activities.parties.add",
-    "name": "Add Parties",
-    "name_ar": "إضافة الحفلات",
     "description": "Add student parties and events",
-    "description_ar": "إضافة حفلات وفعاليات الطلاب"
+    "description_ar": "إضافة حفلات وفعاليات الطلاب",
+    "id": 1129,
+    "name": "Add Parties",
+    "name_ar": "إضافة الحفلات"
   },
   {
-    "id": 1130,
     "code": "activities.parties.edit",
-    "name": "Edit Parties",
-    "name_ar": "تعديل الحفلات",
     "description": "Edit student parties and events",
-    "description_ar": "تعديل حفلات وفعاليات الطلاب"
+    "description_ar": "تعديل حفلات وفعاليات الطلاب",
+    "id": 1130,
+    "name": "Edit Parties",
+    "name_ar": "تعديل الحفلات"
   },
   {
-    "id": 1131,
     "code": "activities.parties.delete",
-    "name": "Delete Parties",
-    "name_ar": "حذف الحفلات",
     "description": "Delete student parties and events",
-    "description_ar": "حذف حفلات وفعاليات الطلاب"
+    "description_ar": "حذف حفلات وفعاليات الطلاب",
+    "id": 1131,
+    "name": "Delete Parties",
+    "name_ar": "حذف الحفلات"
   },
   {
-    "id": 1132,
     "code": "financial.accounts.*",
-    "name": "Full Accounts Management",
-    "name_ar": "إدارة الحسابات الكاملة",
     "description": "Complete control over accounts",
-    "description_ar": "التحكم الكامل في الحسابات"
+    "description_ar": "التحكم الكامل في الحسابات",
+    "id": 1132,
+    "name": "Full Accounts Management",
+    "name_ar": "إدارة الحسابات الكاملة"
   },
   {
-    "id": 1133,
     "code": "financial.accounts.view",
-    "name": "View Accounts",
-    "name_ar": "عرض الحسابات",
     "description": "View general accounting operations",
-    "description_ar": "عرض عمليات المحاسبة العامة"
+    "description_ar": "عرض عمليات المحاسبة العامة",
+    "id": 1133,
+    "name": "View Accounts",
+    "name_ar": "عرض الحسابات"
   },
   {
-    "id": 1134,
     "code": "financial.accounts.add",
-    "name": "Add Accounts",
-    "name_ar": "إضافة الحسابات",
     "description": "Add general accounting operations",
-    "description_ar": "إضافة عمليات المحاسبة العامة"
+    "description_ar": "إضافة عمليات المحاسبة العامة",
+    "id": 1134,
+    "name": "Add Accounts",
+    "name_ar": "إضافة الحسابات"
   },
   {
-    "id": 1135,
     "code": "financial.accounts.edit",
-    "name": "Edit Accounts",
-    "name_ar": "تعديل الحسابات",
     "description": "Edit general accounting operations",
-    "description_ar": "تعديل عمليات المحاسبة العامة"
+    "description_ar": "تعديل عمليات المحاسبة العامة",
+    "id": 1135,
+    "name": "Edit Accounts",
+    "name_ar": "تعديل الحسابات"
   },
   {
-    "id": 1136,
     "code": "financial.accounts.delete",
-    "name": "Delete Accounts",
-    "name_ar": "حذف الحسابات",
     "description": "Delete general accounting operations",
-    "description_ar": "حذف عمليات المحاسبة العامة"
+    "description_ar": "حذف عمليات المحاسبة العامة",
+    "id": 1136,
+    "name": "Delete Accounts",
+    "name_ar": "حذف الحسابات"
   },
   {
-    "id": 1137,
     "code": "financial.expenses.*",
-    "name": "Full Expenses Management",
-    "name_ar": "إدارة المصروفات الكاملة",
     "description": "Complete control over expenses",
-    "description_ar": "التحكم الكامل في المصروفات"
+    "description_ar": "التحكم الكامل في المصروفات",
+    "id": 1137,
+    "name": "Full Expenses Management",
+    "name_ar": "إدارة المصروفات الكاملة"
   },
   {
-    "id": 1138,
     "code": "financial.expenses.view",
-    "name": "View Expenses",
-    "name_ar": "عرض المصروفات",
     "description": "View maintenance, rent and other expenses",
-    "description_ar": "عرض الصيانة والإيجار والمصروفات الأخرى"
+    "description_ar": "عرض الصيانة والإيجار والمصروفات الأخرى",
+    "id": 1138,
+    "name": "View Expenses",
+    "name_ar": "عرض المصروفات"
   },
   {
-    "id": 1139,
     "code": "financial.expenses.add",
-    "name": "Add Expenses",
-    "name_ar": "إضافة المصروفات",
     "description": "Add maintenance, rent and other expenses",
-    "description_ar": "إضافة الصيانة والإيجار والمصروفات الأخرى"
+    "description_ar": "إضافة الصيانة والإيجار والمصروفات الأخرى",
+    "id": 1139,
+    "name": "Add Expenses",
+    "name_ar": "إضافة المصروفات"
   },
   {
-    "id": 1140,
     "code": "financial.expenses.edit",
-    "name": "Edit Expenses",
-    "name_ar": "تعديل المصروفات",
     "description": "Edit maintenance, rent and other expenses",
-    "description_ar": "تعديل الصيانة والإيجار والمصروفات الأخرى"
+    "description_ar": "تعديل الصيانة والإيجار والمصروفات الأخرى",
+    "id": 1140,
+    "name": "Edit Expenses",
+    "name_ar": "تعديل المصروفات"
   },
   {
-    "id": 1141,
     "code": "financial.expenses.delete",
-    "name": "Delete Expenses",
-    "name_ar": "حذف المصروفات",
     "description": "Delete maintenance, rent and other expenses",
-    "description_ar": "حذف الصيانة والإيجار والمصروفات الأخرى"
+    "description_ar": "حذف الصيانة والإيجار والمصروفات الأخرى",
+    "id": 1141,
+    "name": "Delete Expenses",
+    "name_ar": "حذف المصروفات"
   },
   {
-    "id": 1142,
-    "code": "salary.staff.approve",
-    "name": "Approve Staff Salaries",
-    "name_ar": "اعتماد رواتب الموظفين",
-    "description": "Approve staff monthly salaries",
-    "description_ar": "اعتماد الرواتب الشهرية للموظفين"
-  },
-  {
-    "id": 1143,
-    "code": "salary.teacher.approve",
-    "name": "Approve Teacher Salaries",
-    "name_ar": "اعتماد رواتب المعلمين",
-    "description": "Approve teacher monthly salaries",
-    "description_ar": "اعتماد الرواتب الشهرية للمعلمين"
-  },
-  {
-    "id": 1145,
     "code": "system.roles.*",
-    "name": "Full Roles Management",
-    "name_ar": "إدارة الأدوار الكاملة",
     "description": "Complete control over roles management",
-    "description_ar": "التحكم الكامل في إدارة الأدوار"
+    "description_ar": "التحكم الكامل في إدارة الأدوار",
+    "id": 1145,
+    "name": "Full Roles Management",
+    "name_ar": "إدارة الأدوار الكاملة"
   },
   {
-    "id": 1146,
     "code": "system.roles.add",
-    "name": "Add Roles",
-    "name_ar": "إضافة الأدوار",
     "description": "Create new system roles",
-    "description_ar": "إنشاء أدوار نظام جديدة"
+    "description_ar": "إنشاء أدوار نظام جديدة",
+    "id": 1146,
+    "name": "Add Roles",
+    "name_ar": "إضافة الأدوار"
   },
   {
-    "id": 1147,
     "code": "system.roles.edit",
-    "name": "Edit Roles",
-    "name_ar": "تعديل الأدوار",
     "description": "Modify existing system roles",
-    "description_ar": "تعديل أدوار النظام الموجودة"
+    "description_ar": "تعديل أدوار النظام الموجودة",
+    "id": 1147,
+    "name": "Edit Roles",
+    "name_ar": "تعديل الأدوار"
   },
   {
-    "id": 1148,
     "code": "system.roles.delete",
-    "name": "Delete Roles",
-    "name_ar": "حذف الأدوار",
     "description": "Remove system roles",
-    "description_ar": "حذف أدوار النظام"
+    "description_ar": "حذف أدوار النظام",
+    "id": 1148,
+    "name": "Delete Roles",
+    "name_ar": "حذف الأدوار"
   },
   {
-    "id": 1149,
     "code": "system.role_permissions.*",
-    "name": "Full Role Permissions Management",
-    "name_ar": "إدارة صلاحيات الأدوار الكاملة",
     "description": "Complete control over role permissions",
-    "description_ar": "التحكم الكامل في صلاحيات الأدوار"
+    "description_ar": "التحكم الكامل في صلاحيات الأدوار",
+    "id": 1149,
+    "name": "Full Role Permissions Management",
+    "name_ar": "إدارة صلاحيات الأدوار الكاملة"
   },
   {
-    "id": 1150,
     "code": "system.role_permissions.manage",
-    "name": "Manage Role Permissions",
-    "name_ar": "إدارة صلاحيات الأدوار",
     "description": "Assign and manage permissions for roles",
-    "description_ar": "تعيين وإدارة الصلاحيات للأدوار"
+    "description_ar": "تعيين وإدارة الصلاحيات للأدوار",
+    "id": 1150,
+    "name": "Manage Role Permissions",
+    "name_ar": "إدارة صلاحيات الأدوار"
   },
   {
-    "id": 1151,
     "code": "system.branches.*",
-    "name": "Full Branches Management",
-    "name_ar": "إدارة الفروع الكاملة",
     "description": "Complete control over branches",
-    "description_ar": "التحكم الكامل في الفروع"
+    "description_ar": "التحكم الكامل في الفروع",
+    "id": 1151,
+    "name": "Full Branches Management",
+    "name_ar": "إدارة الفروع الكاملة"
   },
   {
-    "id": 1152,
     "code": "system.branches.add",
-    "name": "Add Branches",
-    "name_ar": "إضافة الفروع",
     "description": "Create new branches",
-    "description_ar": "إنشاء فروع جديدة"
+    "description_ar": "إنشاء فروع جديدة",
+    "id": 1152,
+    "name": "Add Branches",
+    "name_ar": "إضافة الفروع"
   },
   {
-    "id": 1153,
     "code": "system.branches.edit",
-    "name": "Edit Branches",
-    "name_ar": "تعديل الفروع",
     "description": "Modify existing branches",
-    "description_ar": "تعديل الفروع الموجودة"
+    "description_ar": "تعديل الفروع الموجودة",
+    "id": 1153,
+    "name": "Edit Branches",
+    "name_ar": "تعديل الفروع"
   },
-
   {
-    "id": 1156,
     "code": "system.branches.view",
-    "name": "View Branches",
-    "name_ar": "عرض الفروع",
     "description": "View existing branches",
-    "description_ar": "عرض الفروع الموجودة"
+    "description_ar": "عرض الفروع الموجودة",
+    "id": 1156,
+    "name": "View Branches",
+    "name_ar": "عرض الفروع"
   },
   {
-    "id": 1157,
     "code": "system.roles.view",
-    "name": "View Roles",
-    "name_ar": "عرض الأدوار",
     "description": "View system roles",
-    "description_ar": "عرض أدوار نظام"
+    "description_ar": "عرض أدوار نظام",
+    "id": 1157,
+    "name": "View Roles",
+    "name_ar": "عرض الأدوار"
   },
   {
-    "id": 1159,
     "code": "system.students.*",
-    "name": "Full Students Management",
-    "name_ar": "إدارة الطلاب الكاملة",
     "description": "Complete control over students management",
-    "description_ar": "التحكم الكامل في إدارة الطلاب"
+    "description_ar": "التحكم الكامل في إدارة الطلاب",
+    "id": 1159,
+    "name": "Full Students Management",
+    "name_ar": "إدارة الطلاب الكاملة"
   },
   {
-    "id": 1160,
     "code": "system.students.view",
-    "name": "View Students",
-    "name_ar": "عرض الطلاب",
     "description": "View students information",
-    "description_ar": "عرض معلومات الطلاب"
+    "description_ar": "عرض معلومات الطلاب",
+    "id": 1160,
+    "name": "View Students",
+    "name_ar": "عرض الطلاب"
   },
   {
-    "id": 1161,
     "code": "system.students.add",
-    "name": "Add Students",
-    "name_ar": "إضافة طلاب",
     "description": "Add new students",
-    "description_ar": "إضافة طلاب جدد"
+    "description_ar": "إضافة طلاب جدد",
+    "id": 1161,
+    "name": "Add Students",
+    "name_ar": "إضافة طلاب"
   },
   {
-    "id": 1162,
     "code": "system.students.edit",
-    "name": "Edit Students",
-    "name_ar": "تعديل الطلاب",
     "description": "Edit student information",
-    "description_ar": "تعديل معلومات الطالب"
+    "description_ar": "تعديل معلومات الطالب",
+    "id": 1162,
+    "name": "Edit Students",
+    "name_ar": "تعديل الطلاب"
   },
   {
-    "id": 1164,
     "code": "system.staff.*",
-    "name": "Full Staff Management",
-    "name_ar": "إدارة الموظفين الكاملة",
     "description": "Complete control over staff",
-    "description_ar": "التحكم الكامل في الموظفين"
+    "description_ar": "التحكم الكامل في الموظفين",
+    "id": 1164,
+    "name": "Full Staff Management",
+    "name_ar": "إدارة الموظفين الكاملة"
   },
   {
-    "id": 1165,
     "code": "system.staff.view",
-    "name": "View Staff",
-    "name_ar": "عرض الموظفين",
     "description": "View user information",
-    "description_ar": "عرض معلومات الموظفين"
+    "description_ar": "عرض معلومات الموظفين",
+    "id": 1165,
+    "name": "View Staff",
+    "name_ar": "عرض الموظفين"
   },
   {
-    "id": 1166,
     "code": "system.staff.edit",
-    "name": "Update Staff",
-    "name_ar": "تعديل الموظفين",
     "description": "Modify user information",
-    "description_ar": "تعديل معلومات الموظفين"
+    "description_ar": "تعديل معلومات الموظفين",
+    "id": 1166,
+    "name": "Update Staff",
+    "name_ar": "تعديل الموظفين"
   },
   {
-    "id": 1167,
     "code": "system.staff.add",
-    "name": "Add Staff",
-    "name_ar": "إضافة الموظفين",
     "description": "Add new staff members",
-    "description_ar": "إضافة موظفين جدد"
+    "description_ar": "إضافة موظفين جدد",
+    "id": 1167,
+    "name": "Add Staff",
+    "name_ar": "إضافة الموظفين"
   },
   {
-    "id": 1168,
     "code": "system.parents.*",
-    "name": "Full Parent Management",
-    "name_ar": "إدارة أولياء الأمور الكاملة",
     "description": "Complete control over all parent operations",
-    "description_ar": "التحكم الكامل في جميع عمليات أولياء الأمور"
+    "description_ar": "التحكم الكامل في جميع عمليات أولياء الأمور",
+    "id": 1168,
+    "name": "Full Parent Management",
+    "name_ar": "إدارة أولياء الأمور الكاملة"
   },
   {
-    "id": 1169,
     "code": "system.parents.view",
-    "name": "View Parents",
-    "name_ar": "عرض أولياء الأمور",
     "description": "Access to view parent information",
-    "description_ar": "الوصول لعرض بيانات أولياء الأمور"
+    "description_ar": "الوصول لعرض بيانات أولياء الأمور",
+    "id": 1169,
+    "name": "View Parents",
+    "name_ar": "عرض أولياء الأمور"
   },
   {
-    "id": 1170,
     "code": "system.parents.add",
-    "name": "Add Parents",
-    "name_ar": "إضافة أولياء الأمور",
     "description": "Add new parents",
-    "description_ar": "إضافة أولياء أمور جدد"
+    "description_ar": "إضافة أولياء أمور جدد",
+    "id": 1170,
+    "name": "Add Parents",
+    "name_ar": "إضافة أولياء الأمور"
   },
   {
-    "id": 1171,
     "code": "system.parents.edit",
-    "name": "Edit Parents",
-    "name_ar": "تعديل أولياء الأمور",
     "description": "Edit parent information",
-    "description_ar": "تعديل بيانات أولياء الأمور"
+    "description_ar": "تعديل بيانات أولياء الأمور",
+    "id": 1171,
+    "name": "Edit Parents",
+    "name_ar": "تعديل أولياء الأمور"
   },
   {
-    "id": 1172,
     "code": "system.parents.delete",
-    "name": "Delete Parents",
-    "name_ar": "حذف أولياء الأمور",
     "description": "Delete parent information",
-    "description_ar": "حذف بيانات أولياء الأمور"
+    "description_ar": "حذف بيانات أولياء الأمور",
+    "id": 1172,
+    "name": "Delete Parents",
+    "name_ar": "حذف أولياء الأمور"
   },
   {
-    "id": 1173,
     "code": "system.parents.link_child",
-    "name": "Link Child to Parent",
-    "name_ar": "ربط طالب بولي أمر",
     "description": "Link a student to a parent",
-    "description_ar": "ربط طالب بولي أمر"
+    "description_ar": "ربط طالب بولي أمر",
+    "id": 1173,
+    "name": "Link Child to Parent",
+    "name_ar": "ربط طالب بولي أمر"
   },
   {
-    "id": 1174,
     "code": "system.parents.unlink_child",
-    "name": "Unlink Child from Parent",
-    "name_ar": "فصل طالب عن ولي أمر",
     "description": "Unlink a student from a parent",
-    "description_ar": "فصل طالب عن ولي أمر"
+    "description_ar": "فصل طالب عن ولي أمر",
+    "id": 1174,
+    "name": "Unlink Child from Parent",
+    "name_ar": "فصل طالب عن ولي أمر"
   },
   {
-    "id": 1207,
     "code": "academic.question_bank.*",
-    "name": "Question Bank Management",
-    "name_ar": "إدارة بنك الاسئلة",
     "description": "Complete control over all Your question bank operations",
-    "description_ar": "التحكم الكامل في جميع عمليات بنك الاسئلة الخاصة بك"
+    "description_ar": "التحكم الكامل في جميع عمليات بنك الاسئلة الخاصة بك",
+    "id": 1207,
+    "name": "Question Bank Management",
+    "name_ar": "إدارة بنك الاسئلة"
   },
   {
-    "id": 1208,
     "code": "academic.question_bank.view",
-    "name": "View Question Bank",
-    "name_ar": "عرض بنك الاسئلة",
     "description": "Access to view question bank information",
-    "description_ar": "الوصول لعرض بيانات بنك الاسئلة"
+    "description_ar": "الوصول لعرض بيانات بنك الاسئلة",
+    "id": 1208,
+    "name": "View Question Bank",
+    "name_ar": "عرض بنك الاسئلة"
   },
   {
-    "id": 1209,
     "code": "academic.question_bank.add",
-    "name": "Add Question Bank",
-    "name_ar": "إضافة بنك الاسئلة",
     "description": "Add new question bank",
-    "description_ar": "إضافة بنك اسئلة جديد"
+    "description_ar": "إضافة بنك اسئلة جديد",
+    "id": 1209,
+    "name": "Add Question Bank",
+    "name_ar": "إضافة بنك الاسئلة"
   },
   {
+    "code": "academic.question_bank.edit",
+    "description": "Edit question bank information",
+    "description_ar": "تعديل بيانات بنك الاسئلة",
     "id": 1210,
     "name": "Edit Question Bank",
-    "code": "academic.question_bank.edit",
-    "name_ar": "تعديل بنك الاسئلة",
-    "description": "Edit question bank information",
-    "description_ar": "تعديل بيانات بنك الاسئلة"
+    "name_ar": "تعديل بنك الاسئلة"
   },
   {
-    "id": 1211,
     "code": "academic.question_bank.delete",
-    "name": "Delete Question Bank",
-    "name_ar": "حذف بنك الاسئلة",
     "description": "Delete question bank information",
-    "description_ar": "حذف بيانات بنك الاسئلة"
+    "description_ar": "حذف بيانات بنك الاسئلة",
+    "id": 1211,
+    "name": "Delete Question Bank",
+    "name_ar": "حذف بنك الاسئلة"
   },
   {
-    "id": 1212,
     "code": "academic.educational_content.*",
-    "name": "Full Educational Content Management",
-    "name_ar": "إدارة المحتوى الدراسى الكاملة",
     "description": "Complete control over all educational content operations",
-    "description_ar": "التحكم الكامل فى المحتوى الدراسى"
+    "description_ar": "التحكم الكامل فى المحتوى الدراسى",
+    "id": 1212,
+    "name": "Full Educational Content Management",
+    "name_ar": "إدارة المحتوى الدراسى الكاملة"
   },
   {
-    "id": 1213,
     "code": "academic.educational_content.view",
-    "name": "View Educational Content",
-    "name_ar": "عرض المحتوى الدراسى",
     "description": "Access to view educational content",
-    "description_ar": "القدرة على عرض المحتوى الدراسى"
+    "description_ar": "القدرة على عرض المحتوى الدراسى",
+    "id": 1213,
+    "name": "View Educational Content",
+    "name_ar": "عرض المحتوى الدراسى"
   },
   {
-    "id": 1214,
     "code": "academic.educational_content.add",
-    "name": "Add Educational Content",
-    "name_ar": "إضافة للمحتوى الدراسى",
     "description": "Access to add educational content",
-    "description_ar": "القدرة على إضافة للمحتوى الدراسى"
+    "description_ar": "القدرة على إضافة للمحتوى الدراسى",
+    "id": 1214,
+    "name": "Add Educational Content",
+    "name_ar": "إضافة للمحتوى الدراسى"
   },
   {
-    "id": 1215,
     "code": "academic.educational_content.edit",
-    "name": "Edit Educational Content",
-    "name_ar": "التعديل على المحتوى الدراسى",
     "description": "Access to edit educational content",
-    "description_ar": "القدرة على التعديل على المحتوى الدراسى"
+    "description_ar": "القدرة على التعديل على المحتوى الدراسى",
+    "id": 1215,
+    "name": "Edit Educational Content",
+    "name_ar": "التعديل على المحتوى الدراسى"
   },
   {
-    "id": 1216,
     "code": "academic.educational_content.delete",
-    "name": "Delete Educational Content",
-    "name_ar": "حذف من المحتوى الدراسى",
     "description": "Access to delete educational content",
-    "description_ar": "القدرة على حذف من المحتوى الدراسى"
+    "description_ar": "القدرة على حذف من المحتوى الدراسى",
+    "id": 1216,
+    "name": "Delete Educational Content",
+    "name_ar": "حذف من المحتوى الدراسى"
   },
   {
-    "id": 1217,
     "code": "staff_attendance.staff.checkin",
-    "name": "Staff Attendance Checkin",
-    "name_ar": "الحضور والغياب للموظفين",
     "description": "Staff Attendance Checkin",
-    "description_ar": "الحضور والغياب للموظفين"
+    "description_ar": "الحضور والغياب للموظفين",
+    "id": 1217,
+    "name": "Staff Attendance Checkin",
+    "name_ar": "الحضور والغياب للموظفين"
   },
   {
-    "id": 1218,
     "code": "staff_attendance.staff.view",
-    "name": "View Staff Attendance",
-    "name_ar": "عرض الحضور والغياب للموظفين",
     "description": "View staff attendance",
-    "description_ar": "عرض الحضور والغياب للموظفين"
+    "description_ar": "عرض الحضور والغياب للموظفين",
+    "id": 1218,
+    "name": "View Staff Attendance",
+    "name_ar": "عرض الحضور والغياب للموظفين"
   },
   {
-    "id": 1219,
     "code": "staff_attendance.staff.edit",
-    "name": "Edit Staff Attendance",
-    "name_ar": "تعديل الحضور والغياب للموظفين",
     "description": "Edit staff attendance",
-    "description_ar": "تعديل الحضور والغياب للموظفين"
+    "description_ar": "تعديل الحضور والغياب للموظفين",
+    "id": 1219,
+    "name": "Edit Staff Attendance",
+    "name_ar": "تعديل الحضور والغياب للموظفين"
   },
   {
-    "id": 1220,
     "code": "staff_attendance.calendar.management",
-    "name": "Staff Attendance Calendar Management",
-    "name_ar": "إدارة تقويم الحضور والغياب للموظفين",
     "description": "Staff Attendance Calendar Management",
-    "description_ar": "إدارة تقويم الحضور والغياب للموظفين"
+    "description_ar": "إدارة تقويم الحضور والغياب للموظفين",
+    "id": 1220,
+    "name": "Staff Attendance Calendar Management",
+    "name_ar": "إدارة تقويم الحضور والغياب للموظفين"
   },
   {
-    "id": 1221,
     "code": "staff_evaluation.kpi.add",
-    "name": "staff evaluation kpi add",
-    "name_ar": "انشاء معيار تقييم",
     "description": "staff evaluation kpi add",
-    "description_ar": "انشاء معيار تقييم"
+    "description_ar": "انشاء معيار تقييم",
+    "id": 1221,
+    "name": "staff evaluation kpi add",
+    "name_ar": "انشاء معيار تقييم"
   },
   {
-    "id": 1222,
     "code": "staff_evaluation.kpi.edit",
-    "name": "staff evaluation kpi edit",
-    "name_ar": "تعديل معيار تقييم",
     "description": "staff evaluation kpi edit",
-    "description_ar": "تعديل معيار تقييم"
+    "description_ar": "تعديل معيار تقييم",
+    "id": 1222,
+    "name": "staff evaluation kpi edit",
+    "name_ar": "تعديل معيار تقييم"
   },
   {
-    "id": 1223,
     "code": "staff_evaluation.kpi.view",
-    "name": "staff evaluation kpi view",
-    "name_ar": "عرض معيار تقييم",
     "description": "staff evaluation kpi view",
-    "description_ar": "عرض معيار تقييم"
+    "description_ar": "عرض معيار تقييم",
+    "id": 1223,
+    "name": "staff evaluation kpi view",
+    "name_ar": "عرض معيار تقييم"
   },
   {
-    "id": 1224,
     "code": "staff_evaluation.kpi.delete",
-    "name": "staff evaluation kpi delete",
-    "name_ar": "حذف معيار تقييم",
     "description": "staff evaluation kpi delete",
-    "description_ar": "حذف معيار تقييم"
+    "description_ar": "حذف معيار تقييم",
+    "id": 1224,
+    "name": "staff evaluation kpi delete",
+    "name_ar": "حذف معيار تقييم"
   },
   {
-    "id": 1225,
     "code": "staff_evaluation.cycle.manage",
-    "name": "staff evaluation cycle manage",
-    "name_ar": "إدارة دورة التقييم",
     "description": "staff evaluation cycle manage",
-    "description_ar": "إدارة دورة التقييم"
+    "description_ar": "إدارة دورة التقييم",
+    "id": 1225,
+    "name": "staff evaluation cycle manage",
+    "name_ar": "إدارة دورة التقييم"
   },
   {
-    "id": 1226,
     "code": "staff_evaluation.evaluation.add",
-    "name": "staff evaluation evaluation add",
-    "name_ar": "انشاء تقييم",
     "description": "staff evaluation evaluation add",
-    "description_ar": "انشاء تقييم"
+    "description_ar": "انشاء تقييم",
+    "id": 1226,
+    "name": "staff evaluation evaluation add",
+    "name_ar": "انشاء تقييم"
   },
   {
-    "id": 1227,
     "code": "staff_evaluation.evaluation.view",
-    "name": "staff evaluation evaluation view",
-    "name_ar": "عرض تقييم",
     "description": "staff evaluation evaluation view",
-    "description_ar": "عرض تقييم"
+    "description_ar": "عرض تقييم",
+    "id": 1227,
+    "name": "staff evaluation evaluation view",
+    "name_ar": "عرض تقييم"
   },
   {
-    "id": 1228,
     "code": "staff_evaluation.evaluation.approve",
-    "name": "staff evaluation evaluation approve",
-    "name_ar": "اعتماد تقييم",
     "description": "staff evaluation evaluation approve",
-    "description_ar": "اعتماد تقييم"
+    "description_ar": "اعتماد تقييم",
+    "id": 1228,
+    "name": "staff evaluation evaluation approve",
+    "name_ar": "اعتماد تقييم"
   }
 ]
