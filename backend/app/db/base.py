@@ -26,8 +26,13 @@ from app.modules.permissions.models import Permission
 from app.modules.question_bank import models
 from app.modules.role_permissions.models import RolePermission
 from app.modules.roles import models
+from app.modules.salary.models import (
+    contracts,
+    payroll_cycles,
+    payroll_records,
+)
+from app.modules.staff_evaluations import models
 from app.modules.student_progress import models
 from app.modules.students import models
 from app.modules.teachers import models
 from app.modules.users import models
-from app.modules.staff_evaluations import models

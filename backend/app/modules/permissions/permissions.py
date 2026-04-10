@@ -178,35 +178,20 @@ class PermissionCode(str, Enum):
     SYSTEM_PARENTS_LINK_CHILD = "system.parents.link_child"
     SYSTEM_PARENTS_UNLINK_CHILD = "system.parents.unlink_child"
 
-    # Penalty Staff
-    PENALTY_STAFF_ALL = "penalty.staff.*"
-    PENALTY_STAFF_VIEW = "penalty.staff.view"
-    PENALTY_STAFF_ADD = "penalty.staff.add"
-    PENALTY_STAFF_EDIT = "penalty.staff.edit"
-    PENALTY_STAFF_DELETE = "penalty.staff.delete"
+    # Payroll Cycles
+    PAYROLL_CYCLES_ALL = "payroll.cycles.*"
+    PAYROLL_CYCLES_VIEW = "payroll.cycles.view"
+    PAYROLL_CYCLES_ADD = "payroll.cycles.add"
+    PAYROLL_CYCLES_EDIT = "payroll.cycles.edit"
+    PAYROLL_CYCLES_APPROVE = "payroll.cycles.approve"
+    PAYROLL_CYCLES_DELETE = "payroll.cycles.delete"
 
-    # Penalty Teacher
-    PENALTY_TEACHER_ALL = "penalty.teacher.*"
-    PENALTY_TEACHER_VIEW = "penalty.teacher.view"
-    PENALTY_TEACHER_ADD = "penalty.teacher.add"
-    PENALTY_TEACHER_EDIT = "penalty.teacher.edit"
-    PENALTY_TEACHER_DELETE = "penalty.teacher.delete"
-
-    # Salary Staff
-    SALARY_STAFF_ALL = "salary.staff.*"
-    SALARY_STAFF_VIEW = "salary.staff.view"
-    SALARY_STAFF_ADD = "salary.staff.add"
-    SALARY_STAFF_EDIT = "salary.staff.edit"
-    SALARY_STAFF_DELETE = "salary.staff.delete"
-    SALARY_STAFF_APPROVE = "salary.staff.approve"
-
-    # Salary Teacher
-    SALARY_TEACHER_ALL = "salary.teacher.*"
-    SALARY_TEACHER_VIEW = "salary.teacher.view"
-    SALARY_TEACHER_ADD = "salary.teacher.add"
-    SALARY_TEACHER_EDIT = "salary.teacher.edit"
-    SALARY_TEACHER_DELETE = "salary.teacher.delete"
-    SALARY_TEACHER_APPROVE = "salary.teacher.approve"
+    # Staff Contracts
+    STAFF_CONTRACTS_ALL = "staff.contracts.*"
+    STAFF_CONTRACTS_VIEW = "staff.contracts.view"
+    STAFF_CONTRACTS_ADD = "staff.contracts.add"
+    STAFF_CONTRACTS_EDIT = "staff.contracts.edit"
+    STAFF_CONTRACTS_DELETE = "staff.contracts.delete"
 
     # Activities Student
     ACTIVITIES_STUDENT_ALL = "activities.student.*"
@@ -267,3 +252,5 @@ class PermissionCode(str, Enum):
     STAFF_EVALUATION_ADD = "staff_evaluation.evaluation.add"
     STAFF_EVALUATION_VIEW = "staff_evaluation.evaluation.view"
     STAFF_EVALUATION_APPROVE = "staff_evaluation.evaluation.approve"
+
+

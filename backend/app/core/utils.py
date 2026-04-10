@@ -17,9 +17,7 @@ PASSWORD_RESET_EXPIRE_HOURS: int = 24
 
 
 # Password Reset Token Management
-def create_password_reset_token(
-    user_id: int, expires_hours: Optional[int] = None
-) -> str:
+def create_password_reset_token(user_id: int, expires_hours: Optional[int] = None) -> str:
     """
     Create a signed JWT token for password reset.
     Token payload contains:
@@ -62,7 +60,7 @@ def verify_password_reset_token(token: str) -> int:
         raise credentials_exception
 
 
-async def get_active_branch(
+async def get_active_branch_id(
     x_branch_id: Annotated[Optional[str], Header(alias="X-Branch-ID")] = None,
 ) -> int:
     if not x_branch_id:
