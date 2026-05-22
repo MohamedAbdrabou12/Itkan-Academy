@@ -30,6 +30,16 @@ class Settings(BaseSettings):
     # Frontend URL for password reset links
     FRONTEND_URL: str | None = os.getenv("FRONTEND_URL")
 
+    # CORS – comma-separated origins, e.g. "https://example.com,https://www.example.com"
+    ALLOWED_ORIGINS: str | None = os.getenv("ALLOWED_ORIGINS")
+
+    @property
+    def cors_origins(self) -> list[str]:
+        """Return CORS origins list from env or sensible local defaults."""
+        if self.ALLOWED_ORIGINS:
+            return [o.strip() for o in self.ALLOWED_ORIGINS.split(",") if o.strip()]
+        return ["http://localhost:5173", "http://127.0.0.1:5173"]
+
     @property
     def DATABASE_URL(self) -> str:
         """Generate async PostgreSQL database URL."""
