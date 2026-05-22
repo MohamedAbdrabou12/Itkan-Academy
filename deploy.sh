@@ -10,10 +10,13 @@ DEPLOY_DIR="$(cd "$(dirname "$0")" && pwd)"
 ENV_FILE="$DEPLOY_DIR/.env.production"
 
 echo "─── Itkan Academy Deployment ───"
+echo "Deploy dir: $DEPLOY_DIR"
+echo "Looking for: $ENV_FILE"
+ls -la "$DEPLOY_DIR"/.env* 2>/dev/null || echo "(no .env* files found)"
 
 # 1. Check .env.production exists
 if [ ! -f "$ENV_FILE" ]; then
-  echo "ERROR: .env.production not found."
+  echo "ERROR: .env.production not found at $ENV_FILE"
   echo "Copy .env.production.example to .env.production and fill in real values."
   exit 1
 fi
