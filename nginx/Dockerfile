@@ -7,7 +7,7 @@ WORKDIR /app
 ARG VITE_APP_API_URL
 ENV VITE_APP_API_URL=$VITE_APP_API_URL
 
-COPY frontend/ .
+COPY Itkan-Academy-FE/ .
 RUN npm ci && npm run build
 
 # ── Stage 2: Serve with Nginx ────────────────────────────
@@ -17,7 +17,7 @@ FROM nginx:alpine
 RUN rm /etc/nginx/conf.d/default.conf
 
 # Copy custom nginx config
-COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
+COPY Itkan-Academy/nginx/nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copy built frontend from builder stage
 COPY --from=builder /app/dist /usr/share/nginx/html

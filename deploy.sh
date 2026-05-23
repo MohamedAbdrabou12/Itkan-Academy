@@ -21,12 +21,14 @@ if [ ! -f "$ENV_FILE" ]; then
   exit 1
 fi
 
-# 2. Check frontend directory exists
-if [ ! -d "$DEPLOY_DIR/frontend" ]; then
-  echo "ERROR: frontend/ directory not found."
-  echo "Clone or symlink Itkan-Academy-FE into $DEPLOY_DIR/frontend"
+# 2. Check frontend directory exists as sibling
+FE_DIR="$(dirname "$DEPLOY_DIR")/Itkan-Academy-FE"
+if [ ! -d "$FE_DIR" ]; then
+  echo "ERROR: Itkan-Academy-FE not found at $FE_DIR"
+  echo "Clone the frontend repo as a sibling directory."
   exit 1
 fi
+echo "Frontend found at: $FE_DIR"
 
 # 3. Load env vars for docker-compose build args
 set -a

@@ -2,8 +2,8 @@ services:
   # ── Nginx (frontend + reverse proxy) ─────────────────────
   nginx:
     build:
-      context: .
-      dockerfile: nginx/Dockerfile
+      context: ..
+      dockerfile: Itkan-Academy/nginx/Dockerfile
       args:
         VITE_APP_API_URL: ${VITE_APP_API_URL}
     ports:
