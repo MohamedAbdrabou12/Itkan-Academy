@@ -8,7 +8,7 @@ ARG VITE_APP_API_URL
 ENV VITE_APP_API_URL=$VITE_APP_API_URL
 
 COPY Itkan-Academy-FE/ .
-RUN npm ci && npm run build
+RUN npm ci && npx vite build
 
 # ── Stage 2: Serve with Nginx ────────────────────────────
 FROM nginx:alpine
