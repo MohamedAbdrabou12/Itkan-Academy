@@ -312,8 +312,11 @@ class AttendanceService:
                                 check_out_dt = datetime.combine(
                                     check_date, check_out_time
                                 )
+                                expected_end = datetime.combine(
+                                    check_date, schedule.end_time
+                                )
                                 schedule_work_minutes = (
-                                    schedule.end_time - schedule.start_time
+                                    expected_end - expected_start
                                 ).total_seconds() / 60
                                 worked_minutes = (
                                     check_out_dt - check_in_dt
