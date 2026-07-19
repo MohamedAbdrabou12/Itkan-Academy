@@ -13,6 +13,7 @@ from app.modules.audits.models import AuditLog
 from app.modules.branches import models
 from app.modules.classes import models
 from app.modules.curriculums.models import curriculum, subject, unit, unit_item
+from app.modules.enrolments.models import enrolment, pricing_plan
 from app.modules.evaluations.models import Evaluation
 from app.modules.exams.models.exam import Exam
 from app.modules.exams.models.exam_answer import ExamAnswer

@@ -4,8 +4,10 @@ from typing import List, Optional
 from app.core.security import get_password_hash as hash_password
 from app.core.utils import create_password_reset_token
 from app.modules.branches.models import Branch
+from app.modules.parents.models import Parent
 from app.modules.role_permissions.models import RolePermission
 from app.modules.roles.models import Role
+from app.modules.students.models import Student
 from app.modules.users.models import User, UserBranch, UserStatus
 from app.modules.users.schemas import BranchInfo, UserCreate, UserRead, UserUpdate
 from app.services.notification_service.workrs.worker import send_notification_task
@@ -122,7 +124,12 @@ class UserCRUD:
                         RolePermission.permission
                     )
                 ),
+                selectinload(User.student),
                 selectinload(User.teacher),
+                selectinload(User.parent)
+                .selectinload(Parent.children)
+                .selectinload(Student.user)
+                .options(selectinload(User.role), selectinload(User.branch_links)),
                 selectinload(User.branch_links).joinedload(UserBranch.branch),
                 selectinload(User.branches).options(selectinload(Branch.classes)),
             )

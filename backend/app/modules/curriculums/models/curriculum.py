@@ -1,5 +1,5 @@
-from datetime import datetime
-from typing import TYPE_CHECKING
+import datetime
+from typing import TYPE_CHECKING, final
 
 from app.db.base import Base
 from sqlalchemy import DateTime
@@ -9,6 +9,7 @@ if TYPE_CHECKING:
     from app.modules.classes.models import Class
 
 
+@final
 class Curriculum(Base):
     __tablename__ = "curriculums"
 
@@ -16,7 +17,9 @@ class Curriculum(Base):
     name: Mapped[str] = mapped_column(nullable=False)
     description: Mapped[str] = mapped_column(nullable=False, default="")
     academic_year: Mapped[str] = mapped_column(nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow)
+    created_at: Mapped[datetime.datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.datetime.now(datetime.UTC)
+    )
     is_active: Mapped[bool] = mapped_column(nullable=False, default=True)
 
     class_links: Mapped[list["Class"]] = relationship(

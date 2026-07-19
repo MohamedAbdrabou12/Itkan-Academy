@@ -88,9 +88,7 @@ async def delete_parent(
 @parents_router.post(
     "/{parent_id}/children/{student_id}",
     response_model=ParentRead,
-    dependencies=[
-        Depends(require_permission(PermissionCode.SYSTEM_PARENTS_LINK_CHILD))
-    ],
+    dependencies=[Depends(require_permission(PermissionCode.SYSTEM_PARENTS_LINK_CHILD))],
 )
 async def link_child(
     request: Request,
@@ -105,9 +103,7 @@ async def link_child(
 @parents_router.delete(
     "/{parent_id}/children/{student_id}",
     response_model=ParentRead,
-    dependencies=[
-        Depends(require_permission(PermissionCode.SYSTEM_PARENTS_UNLINK_CHILD))
-    ],
+    dependencies=[Depends(require_permission(PermissionCode.SYSTEM_PARENTS_UNLINK_CHILD))],
 )
 async def unlink_child(
     parent_id: int,

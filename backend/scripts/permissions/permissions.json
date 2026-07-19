@@ -584,6 +584,86 @@
     "name_ar": "حذف عقودات الموظفين"
   },
   {
+    "code": "academic.enrolments.*",
+    "description": "Complete control over student enrolments",
+    "description_ar": "التحكم الكامل في التحاقات الطلاب",
+    "id": 1098,
+    "name": "Full Enrolment Management",
+    "name_ar": "إدارة التحاقات الطلاب الكاملة"
+  },
+  {
+    "code": "academic.enrolments.view",
+    "description": "View student enrolment records",
+    "description_ar": "عرض سجلات التحاق الطلاب",
+    "id": 1099,
+    "name": "View Student Enrolments",
+    "name_ar": "عرض التحاقات الطلاب"
+  },
+  {
+    "code": "academic.enrolments.add",
+    "description": "Add new student enrolment records",
+    "description_ar": "إضافة سجلات التحاق الطلاب",
+    "id": 1100,
+    "name": "Add Student Enrolments",
+    "name_ar": "إضافة التحاقات الطلاب"
+  },
+  {
+    "code": "academic.enrolments.edit",
+    "description": "Edit student enrolment records",
+    "description_ar": "تعديل سجلات التحاق الطلاب",
+    "id": 1101,
+    "name": "Edit Student Enrolments",
+    "name_ar": "تعديل التحاقات الطلاب"
+  },
+  {
+    "code": "academic.enrolments.delete",
+    "description": "Delete student enrolment records",
+    "description_ar": "حذف سجلات التحاق الطلاب",
+    "id": 1102,
+    "name": "Delete Student Enrolments",
+    "name_ar": "حذف التحاقات الطلاب"
+  },
+  {
+    "code": "academic.enrolment_pricing_plans.*",
+    "description": "Complete control over enrolment pricing plans",
+    "description_ar": "التحكم الكامل في خطط الدفع لالتحاق الطلاب",
+    "id": 1103,
+    "name": "Full Enrolment Pricing Plan Management",
+    "name_ar": "إدارة خطط الدفع لالتحاق الطلاب الكاملة"
+  },
+  {
+    "code": "academic.enrolment_pricing_plans.view",
+    "description": "View enrolment pricing plan records",
+    "description_ar": "عرض سجلات خطط الدفع لالتحاق الطلاب",
+    "id": 1104,
+    "name": "View Enrolment Pricing Plans",
+    "name_ar": "عرض خطط الدفع لالتحاق الطلاب"
+  },
+  {
+    "code": "academic.enrolment_pricing_plans.add",
+    "description": "Add new enrolment pricing plan records",
+    "description_ar": "إضافة سجلات خطط الدفع لالتحاق الطلاب",
+    "id": 1105,
+    "name": "Add Enrolment Pricing Plans",
+    "name_ar": "إضافة خطط دفع لالتحاق الطلاب"
+  },
+  {
+    "code": "academic.enrolment_pricing_plans.edit",
+    "description": "Edit enrolment pricing plan records",
+    "description_ar": "تعديل سجلات خطط الدفع لالتحاق الطلاب",
+    "id": 1106,
+    "name": "Edit Enrollment Pricing Plans",
+    "name_ar": "تعديل خطط الدفع لالتحاق الطلاب"
+  },
+  {
+    "code": "academic.enrolment_pricing_plans.delete",
+    "description": "Delete enrolment pricing plan records",
+    "description_ar": "حذف سجلات خطط الدفع لالتحاق الطلاب",
+    "id": 1107,
+    "name": "Delete Enrolment Pricing Plans",
+    "name_ar": "حذف خطط الدفع لالتحاق الطلاب"
+  },
+  {
     "code": "evaluation.student.*",
     "description": "Complete control over student evaluations",
     "description_ar": "التحكم الكامل في تقييم الطلاب",

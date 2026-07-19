@@ -37,6 +37,20 @@ class PermissionCode(str, Enum):
     ACADEMIC_QUESTION_BANK_EDIT = "academic.question_bank.edit"
     ACADEMIC_QUESTION_BANK_DELETE = "academic.question_bank.delete"
 
+    # Academic Enrolments
+    ACADEMIC_ENROLMENTS_ALL = "academic.enrolments.*"
+    ACADEMIC_ENROLMENTS_VIEW = "academic.enrolments.view"
+    ACADEMIC_ENROLMENTS_ADD = "academic.enrolments.add"
+    ACADEMIC_ENROLMENTS_EDIT = "academic.enrolments.edit"
+    ACADEMIC_ENROLMENTS_DELETE = "academic.enrolments.delete"
+
+    # Academic Enrolment Pricing Plans
+    ACADEMIC_ENROLMENT_PRICING_PLANS_ALL = "academic.enrolment_pricing_plans.*"
+    ACADEMIC_ENROLMENT_PRICING_PLANS_VIEW = "academic.enrolment_pricing_plans.view"
+    ACADEMIC_ENROLMENT_PRICING_PLANS_ADD = "academic.enrolment_pricing_plans.add"
+    ACADEMIC_ENROLMENT_PRICING_PLANS_EDIT = "academic.enrolment_pricing_plans.edit"
+    ACADEMIC_ENROLMENT_PRICING_PLANS_DELETE = "academic.enrolment_pricing_plans.delete"
+
     # Financial Invoices
     FINANCIAL_INVOICES_ALL = "financial.invoices.*"
     FINANCIAL_INVOICES_PAY = "financial.invoices.pay"
