@@ -7,6 +7,7 @@ from app.modules.curriculums.router.curriculum import curriculums_router
 from app.modules.curriculums.router.subject import subjects_router
 from app.modules.curriculums.router.unit import units_router
 from app.modules.curriculums.router.unit_item import unit_items_router
+from app.modules.enrolments.router.enrolment import enrolments_router
 from app.modules.evaluations.router import evaluations_router
 from app.modules.exams.router.exam import exam_router
 from app.modules.exams.router.exam_answer import exam_answers_router
@@ -47,6 +48,7 @@ api_router.include_router(exam_router, tags=["Exams"])
 api_router.include_router(invoice_router, tags=["Invoices"])
 api_router.include_router(notification_router, tags=["Notifications"])
 api_router.include_router(parents_router, tags=["Parents"])
+api_router.include_router(enrolments_router, tags=["Enrolments"])
 api_router.include_router(attendance_router, tags=["Attendance"])
 api_router.include_router(contracts_router, tags=["Contracts"])
 api_router.include_router(payroll_cycles_router, tags=["Payroll Cycles"])
